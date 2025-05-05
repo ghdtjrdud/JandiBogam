@@ -81,6 +81,7 @@ public class UserController {
         UserDto userDto = userService.detail(id);
 
         if (userDto != null) {
+
             return ResponseEntity.status(HttpStatus.OK).body(userDto);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청");
