@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.MealDao">
+
+    <insert id="insertMeal" parameterType="MealDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meals (user_id, eat_date, time_slot, photo_url, food_name, memo)
+        VALUES (#{userId}, #{eatDate}, #{timeSlot}, #{photoUrl}, #{foodName},
+        #{memo})
+    </insert>
+
+    <select id="selectById" resultType="MealDto" parameterType="int">
+        SELECT *
+        FROM meals
+        WHERE id=#{id}
+    </select>
+
+    <select id="selectMealsByFilter" resultType="MealDto">
+        SELECT *
+        FROM meals
+        WHERE user_id = #{userId}
+        <if test="startDate != null and endDate != null">
+            AND eat_date BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="timeSlot != null and timeSlot != '' and timeSlot != '전체'">
+            AND time_slot = #{timeSlot}
+        </if>
+        ORDER BY eat_date DESC,
+        FIELD(time_slot, '아침', '점심', '저녁')
+    </select>
+
+    <update id="updateMeal" parameterType="MealDto">
+        UPDATE meals
+        SET eat_date = #{eatDate},time_slot = #{timeSlot},
+        photo_url = #{photoUrl},food_name = #{foodName},
+        memo = #{memo}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteMeal" parameterType="int">
+        DELETE FROM meals
+        WHERE id=#{id}
+    </delete>
+
+</mapper>

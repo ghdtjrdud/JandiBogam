@@ -83,7 +83,7 @@ CREATE TABLE `meals`
 CREATE TABLE `meal_comments`
 (
     `id`         INT          NOT NULL AUTO_INCREMENT,
-    `meal_id`    INT          NOT NULL COMMENT 'meals.id',
+    `meal_id`    INT          NOT NULL COMMENT 'mealDtos.id',
     `user_id`    INT          NOT NULL COMMENT '댓글 작성자 user_id',
     `content`    VARCHAR(500) NOT NULL COMMENT '댓글 내용',
     `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -223,8 +223,13 @@ show databases ;
 show tables ;
 select * from users;
 
+select * from meals;
+
 insert into users (login_id, password_hash, name, birth_date, gender, email, height, weight, theme_pref)
 values ('ssafy111', 'ssafy', '김싸피', '2025-05-03', 'M', 'ssafy111@naver.com', 170.2, 70.2, 'default');
 
 insert into users (login_id, password_hash, name, birth_date, gender, email, height, weight)
 values ('ssafy2', 'ssafy2', '김싸피2', '2025-05-03', 'M', 'ssafy2@naver.com', 170.2, 70.2);
+
+INSERT INTO meals (user_id, eat_date, time_slot, food_name, memo)
+VALUES (1, '2025-05-03', '아침', '돈까스', '오제제');

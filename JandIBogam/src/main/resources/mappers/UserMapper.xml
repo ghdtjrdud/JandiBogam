@@ -36,8 +36,9 @@
         theme_pref AS uiTheme,
         created_at AS createdAt,
         updated_at AS updatedAt
-        FROM users;
+        FROM users
     </select>
+
 
     <update id="update" parameterType="UserDto">
         UPDATE users
@@ -53,9 +54,12 @@
             <if test="uiTheme != null">
                 , theme_pref = #{uiTheme}
             </if>
+            , updated_at = NOW()
         </set>
         WHERE id = #{id}
     </update>
+
+
 
     <delete id="delete" parameterType="int">
         DELETE FROM users
