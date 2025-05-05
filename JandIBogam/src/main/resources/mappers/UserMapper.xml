@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.mvc.model.dao.UserDao">
+
+    <insert id="insert" parameterType="UserDto">
+        INSERT INTO users
+        <trim prefix="(" suffix=")" suffixOverrides=","> <!-- 지금상환에는 suffixOverrides 는 따로 필요없음 근데 일반적으로 끝에 , 땔 때 씀-->
+            login_id, password_hash, name, birth_date, gender, email, height, weight
+            <if test="uiTheme != null">
+                , theme_pref
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{loginId}, #{password}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
+            <if test="uiTheme != null">
+                , #{uiTheme}
+            </if>
+        </trim>
+    </insert>
+
+    <select id="select" resultType="UserDto">
+        SELECT
+        id,
+        login_id AS loginId,
+        password_hash AS password,
+        name,
+        birth_date AS birthDate,
+        gender,
+        email,
+        height,
+        weight,
+        theme_pref AS uiTheme,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM users;
+    </select>
+
+    <update id="update" parameterType="UserDto">
+        UPDATE users
+        <set>
+            login_id = #{loginId},
+            password_hash = #{password},
+            name = #{name},
+            birth_date = #{birthDate},
+            gender = #{gender},
+            email = #{email},
+            height = #{height},
+            weight = #{weight}
+            <if test="uiTheme != null">
+                , theme_pref = #{uiTheme}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM users
+        WHERE id = #{id}
+    </delete>
+
+    <select id="detail" parameterType="int" resultType="UserDto">
+        SELECT
+        id,
+        login_id AS loginId,
+        password_hash AS password,
+        name,
+        birth_date AS birthDate,
+        gender,
+        email,
+        height,
+        weight,
+        theme_pref AS uiTheme,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM users
+        WHERE id = #{id}
+    </select>
+
+</mapper>
