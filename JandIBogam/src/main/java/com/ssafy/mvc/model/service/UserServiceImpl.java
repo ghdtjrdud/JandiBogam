@@ -41,4 +41,6 @@ public class UserServiceImpl implements UserService{
     public UserDto detail(int id) {
         return userDao.detail(id);
     }
+
+
 }
