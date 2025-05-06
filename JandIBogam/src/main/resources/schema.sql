@@ -233,3 +233,12 @@ values ('ssafy2', 'ssafy2', '김싸피2', '2025-05-03', 'M', 'ssafy2@naver.com',
 
 INSERT INTO meals (user_id, eat_date, time_slot, food_name, memo)
 VALUES (1, '2025-05-03', '아침', '돈까스', '오제제');
+
+ALTER TABLE users
+    ADD COLUMN diabetes TINYINT(1) DEFAULT 0,
+    ADD COLUMN hypertension TINYINT(1) DEFAULT 0,
+    ADD COLUMN hyperlipidemia TINYINT(1) DEFAULT 0,
+    ADD COLUMN heart_disease TINYINT(1) DEFAULT 0,
+    ADD COLUMN kidney_disease TINYINT(1) DEFAULT 0,
+    ADD COLUMN allergies TINYINT(1) DEFAULT 0,
+    ADD COLUMN family_code VARCHAR(50) NULL;
