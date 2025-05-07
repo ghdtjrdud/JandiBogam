@@ -4,11 +4,16 @@ import com.ssafy.mvc.config.JwtConfig;
 import com.ssafy.mvc.model.dto.UserDto;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -108,4 +113,28 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
     public String generateRefreshToken(UserDto user) {
         return generateToken(user, Duration.ofMillis(jwtConfig.getRefreshTokenExpiration()));
     }
+
+    // 토큰에서 Authentication 객체 생성하는 메서드 추가
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        String loginId = claims.getSubject();
+        Long userId = claims.get("id", Long.class);
+
+        // UserDetails나 UserDto를 생성하는 대신 필요한 정보만 담은 Principal 객체 생성
+        UserDto principal = new UserDto();
+        principal.setId(userId);
+        principal.setLoginId(loginId);
+        principal.setName(claims.get("name", String.class));
+        principal.setEmail(claims.get("email", String.class));
+
+        // 권한 정보가 있다면 추가
+        String role = claims.get("role", String.class);
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(role != null ? role : "ROLE_USER")
+        );
+
+        // Authentication 객체 생성하여 반환
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    }
+
 }

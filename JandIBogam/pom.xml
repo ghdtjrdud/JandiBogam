@@ -66,10 +66,25 @@
         </dependency>
 
         <!-- JWT (JSON Web Token) 라이브러리 -->
+        <!-- 1) 핵심 API -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+
+        <!-- 2) 구현체 (runtime 뿐 아니라 compile 시에도 필요) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+
+        <!-- 3) Jackson 직렬화/역직렬화 지원 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
         </dependency>
 
         <!-- JAXB API (Java ↔ XML 매핑용) -->

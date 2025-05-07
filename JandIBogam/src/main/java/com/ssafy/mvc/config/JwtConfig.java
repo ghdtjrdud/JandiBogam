@@ -4,16 +4,17 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "jwt")
 @Getter
 @Setter
-public class JwtConfig { //**jwt 설정 정보(시크릿 키, 토큰 만료 시간)
+public class JwtConfig {
     private String secretKey;
-    private long accessTokenExpiration;
-    private long refreshTokenExpiration;
+    private long accessTokenExpiration; // 밀리초 단위
+    private long refreshTokenExpiration; // 밀리초 단위
+
 
     // 시크릿 키가 올바르게 로드되었는지 확인하는 초기화 메서드
     @PostConstruct
