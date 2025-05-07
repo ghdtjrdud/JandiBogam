@@ -23,7 +23,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            //요청에서 토큰 추출
+            //**요청에서 토큰 추출**
             String token = resolveToken(request);
             logger.info("토큰 추출: " + (token != null ? "성공" : "실패"));
 
@@ -41,7 +41,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginId, null, Collections.emptyList());
                     authentication.setDetails(new WebAuthenticationDetails(request));
 
-                    //인증 정보 저장
+                    //**인증 정보 저장**
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

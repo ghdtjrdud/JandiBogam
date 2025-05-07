@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository //**refreshToken 데이터 접근 인터페이스**
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByLoginId(String loginId);
     Optional<RefreshToken> findByToken(String token);

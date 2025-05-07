@@ -12,7 +12,7 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
-public class JwtTokenProvider {
+public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기능**
 
     private final JwtConfig jwtConfig;
 

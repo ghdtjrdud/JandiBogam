@@ -18,7 +18,7 @@ public class AuthServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    //회원가입 처리
+    //**회원가입 처리**
     public UserDto signup(AuthDto.SignupRequest request){
         //아이디 중복 확인
         if(userDao.findByLoginId(request.getLoginId()) != null){
@@ -32,6 +32,7 @@ public class AuthServiceImpl {
         user.setName(request.getName());
         user.setGender(request.getGender());
         user.setBirthDate(request.getBirthDate());
+        user.setEmail(request.getEmail());
         user.setHeight(request.getHeight());
         user.setWeight(request.getWeight());
 
@@ -49,7 +50,7 @@ public class AuthServiceImpl {
         return user;
     }
 
-    //로그인 처리 및 jwt 토큰 발급
+    //**로그인 처리 및 jwt 토큰 발급**
     public AuthDto.TokenResponse login(AuthDto.LoginRequest request){
         //사용자 조회
         UserDto user = userDao.findByLoginId(request.getLoginId());

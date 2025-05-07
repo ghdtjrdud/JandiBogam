@@ -16,7 +16,7 @@ public class AuthDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SignupRequest {
+    public static class SignupRequest { //**회원가입 요청**
         @NotBlank
         @Size(min = 6, max = 12)
         private String loginId;
@@ -32,6 +32,8 @@ public class AuthDto {
 
         @NotBlank
         private String gender;
+
+        private String email;
 
         private LocalDate birthDate;
 
@@ -53,7 +55,7 @@ public class AuthDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LoginRequest {
+    public static class LoginRequest { //**로그인 요청**
         @NotBlank
         private String loginId;
 
@@ -64,7 +66,7 @@ public class AuthDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TokenResponse {
+    public static class TokenResponse { //**토큰 응답(access, refresh토큰 포함)**
         private String accessToken;
         private String refreshToken;
         private String tokenType = "Bearer";

@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "jwt")
 @Getter
 @Setter
-public class JwtConfig {
+public class JwtConfig { //**jwt 설정 정보(시크릿 키, 토큰 만료 시간)
     private String secretKey;
     private long accessTokenExpiration;
     private long refreshTokenExpiration;
