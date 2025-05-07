@@ -57,8 +57,15 @@ public class AuthServiceImpl {
             throw new RuntimeException("존재하지 않는 사용자입니다.");
         }
 
+        // 디버깅 로그 추가
+        System.out.println("입력된 ID: " + request.getLoginId());
+        System.out.println("입력된 비밀번호: " + request.getPassword());
+        System.out.println("DB의 해시: " + user.getPasswordHash());
+        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+        System.out.println("비밀번호 일치 여부: " + matches);
+
         //비밀번호 검증
-        if(!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())){
+        if(!matches){
             throw new RuntimeException("일치하지 않는 비밀번호입니다.");
         }
 
