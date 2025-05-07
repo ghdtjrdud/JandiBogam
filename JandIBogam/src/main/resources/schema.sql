@@ -1,4 +1,4 @@
--- 1. 사용자 테이블 (질병 필드 제거)
+-- 1. 사용자 테이블
 CREATE TABLE `users`
 (
     `id`            INT          NOT NULL AUTO_INCREMENT,
@@ -11,7 +11,14 @@ CREATE TABLE `users`
     `height`        DECIMAL(5, 2) NULL COMMENT '키(cm)',
     `weight`        DECIMAL(5, 2) NULL COMMENT '몸무게(kg)',
     `theme_pref`    ENUM('default','senior') NOT NULL DEFAULT 'senior'
-                                  COMMENT 'UI 테마(default, 고령자용)',
+        COMMENT 'UI 테마(default, 고령자용)',
+    `diabetes`      TINYINT(1)   DEFAULT 0,
+    `hypertension`  TINYINT(1)   DEFAULT 0,
+    `hyperlipidemia` TINYINT(1)  DEFAULT 0,
+    `heart_disease` TINYINT(1)   DEFAULT 0,
+    `kidney_disease` TINYINT(1)  DEFAULT 0,
+    `allergies`     TINYINT(1)   DEFAULT 0,
+    `family_code`   VARCHAR(50)  NULL,
     `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
@@ -83,7 +90,7 @@ CREATE TABLE `meals`
 CREATE TABLE `meal_comments`
 (
     `id`         INT          NOT NULL AUTO_INCREMENT,
-    `meal_id`    INT          NOT NULL COMMENT 'mealDtos.id',
+    `meal_id`    INT          NOT NULL COMMENT 'meals.id',
     `user_id`    INT          NOT NULL COMMENT '댓글 작성자 user_id',
     `content`    VARCHAR(500) NOT NULL COMMENT '댓글 내용',
     `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -94,7 +101,7 @@ CREATE TABLE `meal_comments`
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 8. 복약(약 정보) 테이블 (복약 대상자 필드 제거)
+-- 8. 복약(약 정보) 테이블
 CREATE TABLE `medications`
 (
     `id`         INT          NOT NULL AUTO_INCREMENT,
@@ -154,21 +161,7 @@ CREATE TABLE `user_tips`
     FOREIGN KEY (`tip_id`) REFERENCES `tips` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 13. 알림 로그 테이블
-CREATE TABLE `medication_reminders`
-(
-    `id`            INT      NOT NULL AUTO_INCREMENT,
-    `medication_id` INT      NOT NULL COMMENT 'medications.id',
-    `reminder_type` ENUM('식전','식후','취침전') NOT NULL COMMENT '알림 타입',
-    `is_enabled`    TINYINT(1)        NOT NULL DEFAULT 1 COMMENT '알림 사용 여부',
-    `created_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    INDEX (`medication_id`),
-    FOREIGN KEY (`medication_id`) REFERENCES `medications` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 14. 주간 건강 리포트 테이블
+-- 13. 주간 건강 리포트 테이블
 CREATE TABLE `weekly_reports`
 (
     `id`            INT           NOT NULL AUTO_INCREMENT,
@@ -184,7 +177,7 @@ CREATE TABLE `weekly_reports`
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 15. 식단 추천 테이블
+-- 14. 식단 추천 테이블
 CREATE TABLE `diet_recommendations`
 (
     `id`         INT      NOT NULL AUTO_INCREMENT,
@@ -195,7 +188,7 @@ CREATE TABLE `diet_recommendations`
     FOREIGN KEY (`report_id`) REFERENCES `weekly_reports` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 16. 세션 관리 테이블 (JWT 토큰)
+-- 15. 세션 관리 테이블 (JWT 토큰)
 CREATE TABLE `sessions`
 (
     `id`            INT          NOT NULL AUTO_INCREMENT,
@@ -209,7 +202,7 @@ CREATE TABLE `sessions`
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 17. 초기 데이터: 질병 마스터 데이터 삽입
+-- 16. 질병 마스터 데이터 삽입
 INSERT INTO `diseases` (`name`, `description`)
 VALUES ('없음', '해당 없음'),
        ('당뇨', '혈당 조절에 문제가 있는 질환'),
@@ -219,17 +212,55 @@ VALUES ('없음', '해당 없음'),
        ('관절염', '관절에 염증이 생기는 질환'),
        ('기타', '기타 질환');
 
-show databases ;
-show tables ;
-select * from users;
+SELECT * FROM users;
+SELECT * FROM meals;
 
-select * from meals;
+-- 테스트 사용자 추가
+INSERT INTO users (
+    login_id,
+    password_hash,
+    name,
+    birth_date,
+    gender,
+    email,
+    height,
+    weight,
+    theme_pref,
+    diabetes,
+    hypertension,
+    hyperlipidemia,
+    heart_disease,
+    kidney_disease,
+    allergies
+) VALUES (
+             'test1',
+             '$2a$10$IrTU5lGx8ZLd7Ht.NMDmxeQY8YVA2ufJ/Z5yjULBF5oD0OPMvsb7O', -- 'password123$'의 해시
+             '홍길동',
+             '1990-01-01',
+             'M',
+             'test1@example.com',
+             175.0,
+             70.0,
+             'default',
+             1, -- 당뇨 있음
+             0, -- 고혈압 없음
+             0, -- 고지혈증 없음
+             0, -- 심장질환 없음
+             0, -- 신장질환 없음
+             0  -- 알레르기 없음
+         );
 
-insert into users (login_id, password_hash, name, birth_date, gender, email, height, weight, theme_pref)
-values ('ssafy111', 'ssafy', '김싸피', '2025-05-03', 'M', 'ssafy111@naver.com', 170.2, 70.2, 'default');
 
-insert into users (login_id, password_hash, name, birth_date, gender, email, height, weight)
-values ('ssafy2', 'ssafy2', '김싸피2', '2025-05-03', 'M', 'ssafy2@naver.com', 170.2, 70.2);
-
-INSERT INTO meals (user_id, eat_date, time_slot, food_name, memo)
-VALUES (1, '2025-05-03', '아침', '돈까스', '오제제');
+INSERT INTO meals (
+    user_id,
+    eat_date,
+    time_slot,
+    food_name,
+    memo
+) VALUES (
+             1, -- 방금 추가한 test1 사용자의 ID
+             CURRENT_DATE(),
+             '아침',
+             '현미밥과 된장국',
+             '건강한 한식 아침'
+         );

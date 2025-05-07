@@ -7,18 +7,32 @@
 
     <insert id="insert" parameterType="UserDto">
         INSERT INTO users
-        <trim prefix="(" suffix=")" suffixOverrides=","> <!-- 지금상환에는 suffixOverrides 는 따로 필요없음 근데 일반적으로 끝에 , 땔 때 씀-->
+        <trim prefix="(" suffix=")" suffixOverrides=",">
             login_id, password_hash, name, birth_date, gender, email, height, weight
             <if test="uiTheme != null">
                 , theme_pref
             </if>
+            <!-- 건강 정보 필드 추가 -->
+            , diabetes, hypertension, hyperlipidemia, heart_disease, kidney_disease, allergies
+            <!-- 가족 코드 추가 (선택사항) -->
+            <if test="familyCode != null">
+                , family_code
+            </if>
+            , created_at, updated_at
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            #{loginId}, #{password}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
+            #{loginId}, #{passwordHash}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
             <if test="uiTheme != null">
                 , #{uiTheme}
             </if>
+            <!-- 건강 정보 값 추가 -->
+            , #{diabetes}, #{hypertension}, #{hyperlipidemia}, #{heartDisease}, #{kidneyDisease}, #{allergies}
+            <!-- 가족 코드 값 추가 (선택사항) -->
+            <if test="familyCode != null">
+                , #{familyCode}
+            </if>
+            , #{createdAt}, #{updatedAt}
         </trim>
     </insert>
 
@@ -44,7 +58,7 @@
         UPDATE users
         <set>
             login_id = #{loginId},
-            password_hash = #{password},
+            password_hash = #{passwordHash},
             name = #{name},
             birth_date = #{birthDate},
             gender = #{gender},
@@ -82,6 +96,31 @@
         updated_at AS updatedAt
         FROM users
         WHERE id = #{id}
+    </select>
+
+    <select id="findByLoginId" resultType="UserDto" parameterType="String">
+        SELECT
+        id,
+        login_id AS loginId,
+        password_hash AS passwordHash, <!-- 여기가 문제! password가 아닌 passwordHash로 매핑해야 함 -->
+        name,
+        birth_date AS birthDate,
+        gender,
+        email,
+        height,
+        weight,
+        theme_pref AS uiTheme,
+        diabetes,
+        hypertension,
+        hyperlipidemia,
+        heart_disease AS heartDisease,
+        kidney_disease AS kidneyDisease,
+        allergies,
+        family_code AS familyCode,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+        FROM users
+        WHERE login_id = #{loginId}
     </select>
 
 </mapper>

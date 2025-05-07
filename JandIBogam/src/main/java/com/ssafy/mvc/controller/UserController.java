@@ -1,6 +1,7 @@
 package com.ssafy.mvc.controller;
 
 import com.ssafy.mvc.model.dto.UserDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import com.ssafy.mvc.model.service.UserService;
 
 import java.util.List;
 
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
