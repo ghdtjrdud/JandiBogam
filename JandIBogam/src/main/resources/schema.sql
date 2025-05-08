@@ -264,3 +264,22 @@ INSERT INTO meals (
              '현미밥과 된장국',
              '건강한 한식 아침'
          );
+
+# 음식 영양소 구성 테이블
+CREATE TABLE food_nutrients (
+                                id             INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                                food_name      VARCHAR(200)   NOT NULL COMMENT '식품명',
+                                serving_size   VARCHAR(100)   COMMENT '영양성분함량기준량',
+                                energy         FLOAT          COMMENT '에너지(kcal)',
+                                protein        FLOAT          COMMENT '단백질(g)',
+                                fat            FLOAT          COMMENT '지방(g)',
+                                carbohydrate   FLOAT          COMMENT '탄수화물(g)',
+                                sugar          FLOAT          COMMENT '당류(g)',
+                                fiber          FLOAT          COMMENT '식이섬유(g)',
+                                potassium      FLOAT          COMMENT '칼륨(mg)',
+                                sodium         FLOAT          COMMENT '나트륨(mg)',
+                                cholesterol    FLOAT          COMMENT '콜레스테롤(mg)',
+                                saturated_fat  FLOAT          COMMENT '포화지방산(g)'
+);
+
+select * from food_nutrients;
