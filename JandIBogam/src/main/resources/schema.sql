@@ -265,7 +265,7 @@ INSERT INTO meals (
              '건강한 한식 아침'
          );
 
-# 음식 영양소 구성 테이블
+# 음식 영양소 구성 테이블 생성
 CREATE TABLE food_nutrients (
                                 id             INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
                                 food_name      VARCHAR(200)   NOT NULL COMMENT '식품명',
