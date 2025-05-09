@@ -80,6 +80,6 @@ public class AuthController {
             String token = authHeader.substring(7);
             authService.logout(token);
         }
-        return ResponseEntity.ok("로그아웃되었습니다. 클라이언트에서 토큰을 삭제해주세요.");
+        return ResponseEntity.ok("로그아웃되었습니다.");
     }
 }
