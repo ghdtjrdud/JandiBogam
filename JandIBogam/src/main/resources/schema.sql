@@ -12,12 +12,11 @@ CREATE TABLE `users`
     `weight`         DECIMAL(5, 2)             NULL COMMENT '몸무게(kg)',
     `theme_pref`     ENUM ('default','senior') NOT NULL DEFAULT 'senior'
         COMMENT 'UI 테마(default, 고령자용)',
-    `diabetes`       TINYINT(1)                         DEFAULT 0,
-    `hypertension`   TINYINT(1)                         DEFAULT 0,
-    `hyperlipidemia` TINYINT(1)                         DEFAULT 0,
-    `heart_disease`  TINYINT(1)                         DEFAULT 0,
-    `kidney_disease` TINYINT(1)                         DEFAULT 0,
-    `allergies`      TINYINT(1)                         DEFAULT 0,
+    `diabetes`       TINYINT(1)                         DEFAULT 0, # 당뇨
+    `hypertension`   TINYINT(1)                         DEFAULT 0, # 고혈압
+    `heart_disease`  TINYINT(1)                         DEFAULT 0, # 심장질환
+    `kidney_disease` TINYINT(1)                         DEFAULT 0, # 신장질환
+    `liver_disease`  TINYINT(1)                         DEFAULT 0, # 간질환
     `family_code`    VARCHAR(50)               NULL,
     `created_at`     DATETIME                  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at`     DATETIME                  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -224,7 +223,7 @@ VALUES ('없음', '해당 없음'),
        ('고혈압', '혈압이 정상 범위보다 높은 상태'),
        ('신장질환', '신장 기능에 문제가 있는 질환'),
        ('심장질환', '심장 기능에 문제가 있는 질환'),
-       ('관절염', '관절에 염증이 생기는 질환'),
+       ('간질환', '간 기능에 문제가 있는 질환'),
        ('기타', '기타 질환');
 
 SELECT *
@@ -244,10 +243,10 @@ INSERT INTO users (login_id,
                    theme_pref,
                    diabetes,
                    hypertension,
-                   hyperlipidemia,
                    heart_disease,
                    kidney_disease,
-                   allergies)
+                   liver_disease)
+
 VALUES ('test1',
         '$2a$10$IrTU5lGx8ZLd7Ht.NMDmxeQY8YVA2ufJ/Z5yjULBF5oD0OPMvsb7O', -- 'password123$'의 해시
         '홍길동',
@@ -259,10 +258,9 @@ VALUES ('test1',
         'default',
         1, -- 당뇨 있음
         0, -- 고혈압 없음
-        0, -- 고지혈증 없음
         0, -- 심장질환 없음
         0, -- 신장질환 없음
-        0 -- 알레르기 없음
+        0 -- 간질환 없음
        );
 
 
@@ -319,6 +317,7 @@ CREATE TABLE disease_nutrient_guidelines
     FOREIGN KEY (disease_id) REFERENCES diseases (id),
     FOREIGN KEY (nutrient_id) REFERENCES food_nutrients (id)
 );
+
 
 -- 고혈압 영양소 가이드라인
 INSERT INTO disease_nutrient_guidelines
