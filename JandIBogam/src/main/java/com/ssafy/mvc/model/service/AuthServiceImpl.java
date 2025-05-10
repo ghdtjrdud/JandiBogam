@@ -47,10 +47,9 @@ public class AuthServiceImpl implements AuthService {
         // 건강 정보 설정
         user.setDiabetes(request.isDiabetes());
         user.setHypertension(request.isHypertension());
-        user.setHyperlipidemia(request.isHyperlipidemia());
         user.setHeartDisease(request.isHeartDisease());
         user.setKidneyDisease(request.isKidneyDisease());
-        user.setAllergies(request.isAllergies());
+        user.setLiverDisease(request.isLiverDisease());
 
         // 현재 시간 설정
         LocalDateTime now = LocalDateTime.now();

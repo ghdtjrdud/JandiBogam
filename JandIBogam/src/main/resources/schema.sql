@@ -81,7 +81,6 @@ CREATE TABLE `meals`
     `eat_date`   DATE                       NOT NULL COMMENT '식사 날짜',
     `time_slot`  ENUM ('아침','점심','저녁','간식') NOT NULL COMMENT '시간대',
     `photo_url`  VARCHAR(255)               NULL COMMENT '음식 사진 URL',
-    `food_name`  VARCHAR(100)               NULL COMMENT '음식 명칭',
     `memo`       VARCHAR(255)               NULL COMMENT '메모',
     `created_at` DATETIME                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME                   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -90,6 +89,14 @@ CREATE TABLE `meals`
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
+insert into meals (user_id, eat_date, time_slot, memo)
+values (1, '2025-05-10', '아침', '아침넣을 테스트');
+
+insert into meals (user_id, eat_date, time_slot, memo)
+values (1, '2025-05-10', '점심', '점심넣을 테스트');
+
+select * from meals;
 
 -- 7. 식단 댓글 테이블
 CREATE TABLE `meal_comments`
@@ -267,12 +274,10 @@ VALUES ('test1',
 INSERT INTO meals (user_id,
                    eat_date,
                    time_slot,
-                   food_name,
                    memo)
 VALUES (1, -- 방금 추가한 test1 사용자의 ID
         CURRENT_DATE(),
         '아침',
-        '현미밥과 된장국',
         '건강한 한식 아침');
 
 # 음식 영양소 구성 테이블 생성
@@ -318,48 +323,20 @@ CREATE TABLE disease_nutrient_guidelines
     FOREIGN KEY (nutrient_id) REFERENCES food_nutrients (id)
 );
 
+-- 한 식단에 여러가지 음식이 들어가는 테이블
+CREATE TABLE meal_foods (
+                            meal_id INT NOT NULL COMMENT 'meals.id',
+                            food_id INT NOT NULL COMMENT 'food_nutrients.id',
+                            PRIMARY KEY (meal_id, food_id),
+                            FOREIGN KEY (meal_id)
+                                REFERENCES meals(id)
+                                ON DELETE CASCADE,
+                            FOREIGN KEY (food_id)
+                                REFERENCES food_nutrients(id)
+                                ON DELETE CASCADE
+);
 
--- 고혈압 영양소 가이드라인
-INSERT INTO disease_nutrient_guidelines
-(disease_id, nutrient_id, min_value, max_value, importance, is_restriction, recommendation)
-VALUES (3, 1, 0, 2000, 5, TRUE, '나트륨 섭취를 2000mg(소금 5g) 이하로 제한하세요'),
-       (3, 2, 3500, 4700, 4, FALSE, '칼륨이 풍부한 식품을 섭취하세요'),
-       (3, 5, 0, 50, 3, TRUE, '지방 섭취를 제한하세요'),
-       (3, 6, 0, 15, 4, TRUE, '포화지방 섭취를 제한하세요'),
-       (3, 8, 25, 30, 3, FALSE, '식이섬유를 충분히 섭취하세요');
+insert into meal_foods (meal_id, food_id) VALUES (2, 1);
+insert into meal_foods (meal_id, food_id) VALUES (2, 2);
 
--- 당뇨병 영양소 가이드라인
-INSERT INTO disease_nutrient_guidelines
-(disease_id, nutrient_id, min_value, max_value, importance, is_restriction, recommendation)
-VALUES (2, 3, 45, 60, 5, TRUE, '총 칼로리의 45-60%를 탄수화물로 섭취하세요'),
-       (2, 9, 0, 25, 5, TRUE, '첨가당 섭취를 25g 이하로 제한하세요'),
-       (2, 8, 25, 30, 4, FALSE, '식이섬유 섭취를 늘리세요'),
-       (2, 4, 15, 20, 3, FALSE, '적절한 단백질을 섭취하세요'),
-       (2, 6, 0, 15, 4, TRUE, '포화지방 섭취를 제한하세요');
 
--- 심장질환 영양소 가이드라인
-INSERT INTO disease_nutrient_guidelines
-(disease_id, nutrient_id, min_value, max_value, importance, is_restriction, recommendation)
-VALUES (5, 1, 0, 2000, 5, TRUE, '나트륨 섭취를 2000mg 이하로 제한하세요'),
-       (5, 7, 0, 200, 5, TRUE, '콜레스테롤 섭취를 200mg 이하로 제한하세요'),
-       (5, 6, 0, 15, 5, TRUE, '포화지방 섭취를 제한하세요'),
-       (5, 8, 25, 30, 4, FALSE, '식이섬유를 충분히 섭취하세요'),
-       (5, 5, 20, 35, 3, TRUE, '총 지방 섭취를 제한하세요');
-
--- 신장질환 영양소 가이드라인
-INSERT INTO disease_nutrient_guidelines
-(disease_id, nutrient_id, min_value, max_value, importance, is_restriction, recommendation)
-VALUES (4, 1, 0, 2000, 5, TRUE, '나트륨 섭취를 2000mg 이하로 제한하세요'),
-       (4, 4, 0.6, 0.8, 5, TRUE, '단백질 섭취를 체중 kg당 0.6-0.8g으로 제한하세요'),
-       (4, 10, 0, 800, 4, TRUE, '인 섭취를 제한하세요'),
-       (4, 2, 0, 2000, 4, TRUE, '신장 기능에 따라 칼륨 섭취를 제한할 수 있습니다'),
-       (4, 3, 50, 60, 3, FALSE, '충분한 열량을 섭취하세요');
-
--- 간질환 영양소 가이드라인
-INSERT INTO disease_nutrient_guidelines
-(disease_id, nutrient_id, min_value, max_value, importance, is_restriction, recommendation)
-VALUES (5, 11, 0, 20, 5, TRUE, '금주가 권장되며, 불가피한 경우 여성 20g, 남성 40g 이하로 제한하세요'),
-       (5, 4, 60, 80, 4, TRUE, '간성뇌증 위험이 있는 경우 단백질을 제한하세요'),
-       (5, 1, 0, 2000, 3, TRUE, '복수가 있는 경우 나트륨을 제한하세요'),
-       (5, 3, 0, 0, 4, FALSE, '충분한 열량을 섭취하세요'),
-       (5, 5, 0, 30, 3, TRUE, '지방 섭취를 적절히 제한하세요');

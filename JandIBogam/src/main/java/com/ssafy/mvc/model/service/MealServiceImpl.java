@@ -3,6 +3,7 @@ package com.ssafy.mvc.model.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ public class MealServiceImpl implements MealService {
 
     private final MealDao mealDao;
 
+    @Autowired
     public MealServiceImpl(MealDao mealDao) {
         this.mealDao = mealDao;
     }
@@ -22,11 +24,18 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public MealDto createMeal(MealDto mealDto) {
-        int result = mealDao.insertMeal(mealDto);
-        if(result > 0){
-            return mealDto;
+        int r1 = mealDao.insertMeal(mealDto);
+        if(r1 <= 0){
+            return null;
         }
-        return null;
+
+        if (mealDto.getFoodIds() != null && !mealDto.getFoodIds().isEmpty()) {
+            int r2 = mealDao.insertMealFoods(mealDto);
+            if (r2 <= 0) {
+                System.out.println("음식이 입력되지 않았습니다.");
+            }
+        }
+        return mealDto;
     }
 
     @Override

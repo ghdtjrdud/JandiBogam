@@ -4,10 +4,19 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.mvc.model.dao.MealDao">
 
+<!--  식단 등록  -->
     <insert id="insertMeal" parameterType="MealDto" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO meals (user_id, eat_date, time_slot, photo_url, food_name, memo)
-        VALUES (#{userId}, #{eatDate}, #{timeSlot}, #{photoUrl}, #{foodName},
-        #{memo})
+        INSERT INTO meals (user_id, eat_date, time_slot, photo_url, memo)
+        VALUES (#{userId}, #{eatDate}, #{timeSlot}, #{photoUrl}, #{memo})
+    </insert>
+
+<!--  식단 등록과 동시에 meal_foods 에도 등록이 일어나야함  -->
+    <insert id="insertMealFoods" parameterType="MealDto">
+        INSERT INTO meal_foods (meal_id, food_id)
+        VALUES
+        <foreach collection="foodIds" item="fid" separator=",">
+        (#{id}, #{fid})
+        </foreach>
     </insert>
 
     <select id="selectById" resultType="MealDto" parameterType="int">

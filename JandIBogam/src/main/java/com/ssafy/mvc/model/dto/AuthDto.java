@@ -46,10 +46,10 @@ public class AuthDto {
         // 건강 정보
         private boolean diabetes; // 당뇨
         private boolean hypertension; // 고혈압
-        private boolean hyperlipidemia; // 고지혈증
         private boolean heartDisease; // 심장질환
         private boolean kidneyDisease; // 신장질환
-        private boolean allergies; // 체질시약 알러지
+        private boolean liverDisease; // 간질환
+
     }
 
     @Data
