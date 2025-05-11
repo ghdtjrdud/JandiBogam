@@ -415,9 +415,7 @@ select * from users;
 
 select * from meals;
 
-select * from food_nutrients;
 
-select * from disease_nutrient_guidelines;
 
 
 
