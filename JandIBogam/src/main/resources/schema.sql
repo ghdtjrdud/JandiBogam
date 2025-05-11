@@ -339,4 +339,6 @@ CREATE TABLE meal_foods (
 insert into meal_foods (meal_id, food_id) VALUES (2, 1);
 insert into meal_foods (meal_id, food_id) VALUES (2, 2);
 
+select * from meal_foods;
+
 

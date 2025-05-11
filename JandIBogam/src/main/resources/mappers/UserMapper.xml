@@ -9,14 +9,14 @@
         INSERT INTO users
         <trim prefix="(" suffix=")" suffixOverrides=",">
             login_id, password_hash, name, birth_date, gender, email, height, weight
-            +       , diabetes, hypertension, heart_disease, kidney_disease, liver_disease
+            , diabetes, hypertension, heart_disease, kidney_disease, liver_disease
             <if test="familyCode != null">, family_code</if>
             , created_at, updated_at
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{loginId}, #{passwordHash}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
-            +       , #{diabetes}, #{hypertension}, #{heartDisease}, #{kidneyDisease}, #{liverDisease}
+            , #{diabetes}, #{hypertension}, #{heartDisease}, #{kidneyDisease}, #{liverDisease}
             <if test="familyCode != null">, #{familyCode}</if>
             , #{createdAt}, #{updatedAt}
         </trim>
@@ -99,10 +99,9 @@
         theme_pref AS uiTheme,
         diabetes,
         hypertension,
-        hyperlipidemia,
         heart_disease AS heartDisease,
         kidney_disease AS kidneyDisease,
-        allergies,
+        liver_disease  AS liverDisease,
         family_code AS familyCode,
         created_at AS createdAt,
         updated_at AS updatedAt
