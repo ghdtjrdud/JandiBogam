@@ -92,13 +92,6 @@ CREATE TABLE `meals`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-insert into meals (user_id, eat_date, time_slot, memo)
-values (1, '2025-05-10', '아침', '아침넣을 테스트');
-
-insert into meals (user_id, eat_date, time_slot, memo)
-values (1, '2025-05-10', '점심', '점심넣을 테스트');
-
-select * from meals;
 
 -- 7. 식단 댓글 테이블
 CREATE TABLE `meal_comments`
@@ -225,64 +218,8 @@ CREATE TABLE `sessions`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
--- 16. 질병 마스터 데이터 삽입
-INSERT INTO `diseases` (`name`, `description`)
-VALUES ('없음', '해당 없음'),
-       ('당뇨', '혈당 조절에 문제가 있는 질환'),
-       ('고혈압', '혈압이 정상 범위보다 높은 상태'),
-       ('신장질환', '신장 기능에 문제가 있는 질환'),
-       ('심장질환', '심장 기능에 문제가 있는 질환'),
-       ('간질환', '간 기능에 문제가 있는 질환'),
-       ('기타', '기타 질환');
 
-SELECT *
-FROM users;
-SELECT *
-FROM meals;
-
--- 테스트 사용자 추가
-INSERT INTO users (login_id,
-                   password_hash,
-                   name,
-                   birth_date,
-                   gender,
-                   email,
-                   height,
-                   weight,
-                   theme_pref,
-                   diabetes,
-                   hypertension,
-                   heart_disease,
-                   kidney_disease,
-                   liver_disease)
-
-VALUES ('test1',
-        '$2a$10$IrTU5lGx8ZLd7Ht.NMDmxeQY8YVA2ufJ/Z5yjULBF5oD0OPMvsb7O', -- 'password123$'의 해시
-        '홍길동',
-        '1990-01-01',
-        'M',
-        'test1@example.com',
-        175.0,
-        70.0,
-        'default',
-        1, -- 당뇨 있음
-        0, -- 고혈압 없음
-        0, -- 심장질환 없음
-        0, -- 신장질환 없음
-        0 -- 간질환 없음
-       );
-
-
-INSERT INTO meals (user_id,
-                   eat_date,
-                   time_slot,
-                   memo)
-VALUES (1, -- 방금 추가한 test1 사용자의 ID
-        CURRENT_DATE(),
-        '아침',
-        '건강한 한식 아침');
-
-# 음식 영양소 구성 테이블 생성
+-- 16. 음식 영양소 구성 테이블 생성
 CREATE TABLE food_nutrients
 (
     id            INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -300,35 +237,8 @@ CREATE TABLE food_nutrients
     saturated_fat FLOAT COMMENT '포화지방산(g)'
 );
 
-select *
-from food_nutrients;
 
-select *
-from diseases;
-
-select *
-from medications;
-
-select * from disease_nutrient_guidelines;
-
--- 질병별 영양소 가이드라인 테이블
-CREATE TABLE disease_nutrient_guidelines
-(
-    id             INT AUTO_INCREMENT PRIMARY KEY,
-    disease_id     INT NOT NULL,
-    nutrient_id    INT NOT NULL,
-    min_value      DECIMAL(10, 2),
-    max_value      DECIMAL(10, 2),
-    importance     INT COMMENT '1-5 중요도, 높을수록 중요',
-    recommendation TEXT,
-    is_restriction BOOLEAN   DEFAULT FALSE COMMENT 'TRUE: 제한해야 함, FALSE: 권장함',
-    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (disease_id) REFERENCES diseases (id),
-    FOREIGN KEY (nutrient_id) REFERENCES food_nutrients (id)
-);
-
--- 한 식단에 여러가지 음식이 들어가는 테이블
+-- 17. 한 식단에 여러가지 음식이 들어가는 테이블
 CREATE TABLE meal_foods (
                             meal_id INT NOT NULL COMMENT 'meals.id',
                             food_id INT NOT NULL COMMENT 'food_nutrients.id',
@@ -341,9 +251,174 @@ CREATE TABLE meal_foods (
                                 ON DELETE CASCADE
 );
 
-insert into meal_foods (meal_id, food_id) VALUES (2, 1);
-insert into meal_foods (meal_id, food_id) VALUES (2, 2);
+-- 18. 영양소 마스터 테이블 생성
+CREATE TABLE nutrients (
+                           id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                           name VARCHAR(100) NOT NULL UNIQUE COMMENT '영양소명',
+                           unit VARCHAR(20) NOT NULL COMMENT '단위(예: g, mg)',
+                           description VARCHAR(255) NULL COMMENT '설명',
+                           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
-select * from meal_foods;
+-- 18-1. 기본 영양소 데이터 삽입
+INSERT INTO nutrients (name, unit, description)
+VALUES
+    ('나트륨', 'mg', '소금의 주요 성분으로 고혈압과 관련'),
+    ('칼륨', 'mg', '나트륨 배출을 돕고 혈압 조절에 도움'),
+    ('탄수화물', 'g', '주요 에너지원'),
+    ('단백질', 'g', '근육과 조직 형성에 필요'),
+    ('지방', 'g', '에너지 저장 및 호르몬 생성에 관여'),
+    ('포화지방', 'g', '동물성 식품에 많이 포함된 지방'),
+    ('콜레스테롤', 'mg', '세포막 구성 및 호르몬 생성에 관여'),
+    ('식이섬유', 'g', '소화를 돕고 혈당 조절에 도움'),
+    ('당류', 'g', '단순 탄수화물로 혈당 상승을 유발'),
+    ('에너지', 'kcal', '음식에서 얻는 열량');
+
+-- 19. 질병별 영양소 가이드라인 테이블
+CREATE TABLE disease_nutrient_guidelines
+(
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    disease_id     INT NOT NULL,
+    nutrient_id    INT NOT NULL,
+    min_value      DECIMAL(10, 2),
+    max_value      DECIMAL(10, 2),
+    is_restriction BOOLEAN   DEFAULT FALSE COMMENT 'TRUE: 제한해야 함, FALSE: 권장함',
+    recommendation TEXT,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (disease_id) REFERENCES diseases (id),
+    FOREIGN KEY (nutrient_id) REFERENCES nutrients (id)
+);
+
+-- 질병 마스터 데이터 삽입
+INSERT INTO `diseases` (`name`, `description`)
+VALUES ('없음', '해당 없음'),
+       ('당뇨', '혈당 조절에 문제가 있는 질환'),
+       ('고혈압', '혈압이 정상 범위보다 높은 상태'),
+       ('신장질환', '신장 기능에 문제가 있는 질환'),
+       ('심장질환', '심장 기능에 문제가 있는 질환'),
+       ('간질환', '간 기능에 문제가 있는 질환'),
+       ('기타', '기타 질환');
+
+
+-- 일반인을 위한 영양소 가이드라인 (기본 10가지 영양소)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 에너지(칼로리)
+(1, (SELECT id FROM nutrients WHERE name = '에너지'), 2000, 2500, FALSE, '성인 여성은 하루 약 2000kcal, 성인 남성은 약 2500kcal 섭취가 권장됩니다.'),
+-- 나트륨
+(1, (SELECT id FROM nutrients WHERE name = '나트륨'), 1500, 2300, TRUE, '나트륨 섭취를 2300mg 이하로 유지하세요. 저염식이 권장됩니다.'),
+-- 칼륨
+(1, (SELECT id FROM nutrients WHERE name = '칼륨'), 3500, 4700, FALSE, '칼륨은 하루 3500-4700mg 섭취가 권장됩니다.'),
+-- 탄수화물
+(1, (SELECT id FROM nutrients WHERE name = '탄수화물'), 55, 65, FALSE, '총 칼로리의 55-65%를 탄수화물로 섭취하는 것이 좋습니다.'),
+-- 단백질
+(1, (SELECT id FROM nutrients WHERE name = '단백질'), 0.8, 1.5, FALSE, '체중 kg당 0.8-1.5g의 단백질 섭취가 권장됩니다.'),
+-- 지방
+(1, (SELECT id FROM nutrients WHERE name = '지방'), 15, 30, TRUE, '총 칼로리의 15-30%를 지방으로 섭취하세요.'),
+-- 포화지방
+(1, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 7, TRUE, '포화지방은 총 칼로리의 7% 이하로 제한하세요.'),
+-- 콜레스테롤
+(1, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤은 하루 300mg 이하로 제한하세요.'),
+-- 식이섬유
+(1, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 남성 25g, 여성 20g 이상 섭취가 권장됩니다.'),
+-- 당류
+(1, (SELECT id FROM nutrients WHERE name = '당류'), 0, 50, TRUE, '첨가당은 총 칼로리의 10% 이하(약 50g)로 제한하세요.');
+
+-- 고혈압 영양소 가이드라인 (10가지 모두 포함)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 특화된 가이드라인 (5개)
+(3, (SELECT id FROM nutrients WHERE name = '나트륨'), 0, 2000, TRUE, '나트륨 섭취를 2000mg(소금 5g) 이하로 제한하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '칼륨'), 3500, 4700, FALSE, '칼륨이 풍부한 식품을 섭취하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '지방'), 0, 50, TRUE, '지방 섭취를 제한하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 15, TRUE, '포화지방 섭취를 제한하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '식이섬유'), 25, 30, FALSE, '식이섬유를 충분히 섭취하세요'),
+-- 일반 가이드라인 사용 (5개)
+(3, (SELECT id FROM nutrients WHERE name = '에너지'), 2000, 2500, FALSE, '일반적인 에너지 섭취량을 유지하되, 체중 관리에 신경쓰세요'),
+(3, (SELECT id FROM nutrients WHERE name = '탄수화물'), 55, 65, FALSE, '총 칼로리의 55-65%를 탄수화물로 섭취하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '단백질'), 0.8, 1.5, FALSE, '적정 단백질 섭취는 고혈압 관리에 도움이 됩니다'),
+(3, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤은 하루 300mg 이하로 제한하세요'),
+(3, (SELECT id FROM nutrients WHERE name = '당류'), 0, 50, TRUE, '첨가당 섭취를 제한하여 체중 관리와 고혈압 예방에 도움이 됩니다');
+
+-- 당뇨병 영양소 가이드라인 (10가지 모두 포함)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 특화된 가이드라인 (5개)
+(2, (SELECT id FROM nutrients WHERE name = '탄수화물'), 45, 60, TRUE, '총 칼로리의 45-60%를 탄수화물로 섭취하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '당류'), 0, 25, TRUE, '첨가당 섭취를 25g 이하로 제한하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '식이섬유'), 25, 30, FALSE, '식이섬유 섭취를 늘리세요'),
+(2, (SELECT id FROM nutrients WHERE name = '단백질'), 15, 20, FALSE, '적절한 단백질을 섭취하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 15, TRUE, '포화지방 섭취를 제한하세요'),
+-- 일반 가이드라인 사용 (5개)
+(2, (SELECT id FROM nutrients WHERE name = '에너지'), 2000, 2500, FALSE, '개인 체중에 맞는 적절한 열량을 섭취하되, 혈당 관리를 위해 체중 유지를 목표로 하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '나트륨'), 1500, 2300, TRUE, '나트륨 섭취를 2300mg 이하로 유지하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '칼륨'), 3500, 4700, FALSE, '칼륨이 풍부한 식품을 섭취하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '지방'), 15, 30, TRUE, '총 칼로리의 15-30%를 지방으로 섭취하되, 불포화지방 위주로 섭취하세요'),
+(2, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤 섭취는 300mg 이하로 제한하세요');
+
+-- 심장질환 영양소 가이드라인 (10가지 모두 포함)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 특화된 가이드라인 (5개)
+(5, (SELECT id FROM nutrients WHERE name = '나트륨'), 0, 2000, TRUE, '나트륨 섭취를 2000mg 이하로 제한하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 200, TRUE, '콜레스테롤 섭취를 200mg 이하로 제한하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 15, TRUE, '포화지방 섭취를 제한하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '식이섬유'), 25, 30, FALSE, '식이섬유를 충분히 섭취하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '지방'), 20, 35, TRUE, '총 지방 섭취를 제한하세요'),
+-- 일반 가이드라인 사용 (5개)
+(5, (SELECT id FROM nutrients WHERE name = '에너지'), 1800, 2200, TRUE, '적절한 체중을 유지하는 것이 심장 부담을 줄이는 데 도움이 됩니다'),
+(5, (SELECT id FROM nutrients WHERE name = '칼륨'), 3500, 4700, FALSE, '칼륨이 풍부한 식품을 섭취하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '탄수화물'), 55, 65, FALSE, '정제된 탄수화물보다 통곡물 위주로 섭취하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '단백질'), 0.8, 1.5, FALSE, '식물성 단백질과 생선 단백질을 우선적으로 선택하세요'),
+(5, (SELECT id FROM nutrients WHERE name = '당류'), 0, 25, TRUE, '첨가당 섭취를 25g 이하로 제한하세요');
+
+-- 신장질환 영양소 가이드라인 (10가지 모두 포함)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 특화된 가이드라인 (5개)
+(4, (SELECT id FROM nutrients WHERE name = '나트륨'), 0, 2000, TRUE, '나트륨 섭취를 2000mg 이하로 제한하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '단백질'), 0.6, 0.8, TRUE, '단백질 섭취를 체중 kg당 0.6-0.8g으로 제한하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '칼륨'), 0, 2000, TRUE, '신장 기능에 따라 칼륨 섭취를 제한할 수 있습니다'),
+(4, (SELECT id FROM nutrients WHERE name = '에너지'), 30, 35, FALSE, '체중 kg당 30-35kcal의 충분한 열량을 섭취하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 변비 예방에 도움이 되지만 과다 섭취를 피하세요'),
+-- 일반 가이드라인 사용 (5개)
+(4, (SELECT id FROM nutrients WHERE name = '탄수화물'), 50, 60, FALSE, '충분한 에너지 섭취를 위해 탄수화물 비율을 적절히 유지하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '지방'), 25, 35, FALSE, '건강한 지방을 적절히 섭취하여 열량을 보충하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 7, TRUE, '포화지방은 총 칼로리의 7% 이하로 제한하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤은 하루 300mg 이하로 제한하세요'),
+(4, (SELECT id FROM nutrients WHERE name = '당류'), 0, 30, TRUE, '단순당 섭취를 제한하고 복합탄수화물을 선택하세요');
+
+-- 간질환 영양소 가이드라인 (10가지 모두 포함)
+INSERT INTO disease_nutrient_guidelines
+(disease_id, nutrient_id, min_value, max_value, is_restriction, recommendation)
+VALUES
+-- 특화된 가이드라인 (5개)
+(6, (SELECT id FROM nutrients WHERE name = '에너지'), 30, 40, FALSE, '체중 kg당 30-40kcal의 충분한 열량을 섭취하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '단백질'), 60, 80, TRUE, '간성뇌증 위험이 있는 경우 단백질을 제한하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '나트륨'), 0, 2000, TRUE, '복수가 있는 경우 나트륨을 제한하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '탄수화물'), 50, 65, FALSE, '총 칼로리의 50-65%를 탄수화물로 섭취하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '지방'), 0, 30, TRUE, '지방 섭취를 적절히 제한하세요'),
+-- 일반 가이드라인 사용 (5개)
+(6, (SELECT id FROM nutrients WHERE name = '칼륨'), 3500, 4700, FALSE, '균형 잡힌 식단을 통해 충분한 칼륨을 섭취하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '포화지방'), 0, 7, TRUE, '포화지방은 총 칼로리의 7% 이하로 제한하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤은 하루 300mg 이하로 제한하세요'),
+(6, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 소화를 돕고 독소 배출에 도움이 됩니다'),
+(6, (SELECT id FROM nutrients WHERE name = '당류'), 0, 30, TRUE, '과도한 당류 섭취는 간에 부담을 줄 수 있으므로 제한하세요');
+
+select * from users;
+
+select * from meals;
+
+select * from food_nutrients;
+
+select * from disease_nutrient_guidelines;
+
+
 
 
