@@ -24,6 +24,8 @@ CREATE TABLE `users`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
+select * from  users;
+
 -- 2. 질병 마스터 테이블
 CREATE TABLE `diseases`
 (
