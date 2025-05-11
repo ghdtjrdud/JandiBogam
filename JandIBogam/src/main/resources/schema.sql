@@ -50,6 +50,8 @@ CREATE TABLE `user_diseases`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
+select * from user_diseases;
+
 -- 4. 가족 그룹 테이블
 CREATE TABLE `groups`
 (
@@ -414,7 +416,6 @@ VALUES
 select * from users;
 
 select * from meals;
-
 
 
 
