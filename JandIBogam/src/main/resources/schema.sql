@@ -119,10 +119,10 @@ CREATE TABLE `medications`
 (
     `id`         INT                   NOT NULL AUTO_INCREMENT,
     `user_id`    INT                   NOT NULL COMMENT '사용자 ID',
+    `drug_name`  VARCHAR(100)          NOT NULL COMMENT '약 이름',
+    `drug_type`  VARCHAR(100)          NOT NULL COMMENT '약 종류',
     `med_date`   DATE                  NOT NULL COMMENT '복약 날짜',
     `time_slot`  ENUM ('아침','점심','저녁') NOT NULL COMMENT '시간대',
-    `drug_name`  VARCHAR(100)          NOT NULL COMMENT '약 이름',
-    `photo_url`  VARCHAR(255)          NULL COMMENT '약봉투 사진 URL',
     `created_at` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -303,6 +303,9 @@ from food_nutrients;
 
 select *
 from diseases;
+
+select *
+from medications;
 
 select * from disease_nutrient_guidelines;
 
