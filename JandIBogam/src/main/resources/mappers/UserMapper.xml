@@ -9,32 +9,19 @@
         INSERT INTO users
         <trim prefix="(" suffix=")" suffixOverrides=",">
             login_id, password_hash, name, birth_date, gender, email, height, weight
-            <if test="uiTheme != null">
-                , theme_pref
-            </if>
-            <!-- 건강 정보 필드 추가 -->
-            , diabetes, hypertension, hyperlipidemia, heart_disease, kidney_disease, allergies
-            <!-- 가족 코드 추가 (선택사항) -->
-            <if test="familyCode != null">
-                , family_code
-            </if>
+            , diabetes, hypertension, heart_disease, kidney_disease, liver_disease
+            <if test="familyCode != null">, family_code</if>
             , created_at, updated_at
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{loginId}, #{passwordHash}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
-            <if test="uiTheme != null">
-                , #{uiTheme}
-            </if>
-            <!-- 건강 정보 값 추가 -->
-            , #{diabetes}, #{hypertension}, #{hyperlipidemia}, #{heartDisease}, #{kidneyDisease}, #{allergies}
-            <!-- 가족 코드 값 추가 (선택사항) -->
-            <if test="familyCode != null">
-                , #{familyCode}
-            </if>
+            , #{diabetes}, #{hypertension}, #{heartDisease}, #{kidneyDisease}, #{liverDisease}
+            <if test="familyCode != null">, #{familyCode}</if>
             , #{createdAt}, #{updatedAt}
         </trim>
     </insert>
+
 
     <select id="select" resultType="UserDto">
         SELECT
@@ -112,10 +99,9 @@
         theme_pref AS uiTheme,
         diabetes,
         hypertension,
-        hyperlipidemia,
         heart_disease AS heartDisease,
         kidney_disease AS kidneyDisease,
-        allergies,
+        liver_disease  AS liverDisease,
         family_code AS familyCode,
         created_at AS createdAt,
         updated_at AS updatedAt
