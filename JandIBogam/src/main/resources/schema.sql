@@ -413,9 +413,30 @@ VALUES
 (6, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 소화를 돕고 독소 배출에 도움이 됩니다'),
 (6, (SELECT id FROM nutrients WHERE name = '당류'), 0, 30, TRUE, '과도한 당류 섭취는 간에 부담을 줄 수 있으므로 제한하세요');
 
+CREATE TABLE daily_nutrient_summary
+(
+    user_id      INT            NOT NULL COMMENT 'users.id',
+    summary_date DATE           NOT NULL COMMENT '집계 날짜',
+    nutrient_id  INT            NOT NULL COMMENT 'nutrients.id',
+    total_amount DECIMAL(10, 2) NOT NULL COMMENT '당일 섭취량 합계',
+    PRIMARY KEY (user_id, summary_date, nutrient_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (nutrient_id) REFERENCES nutrients (id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
+
+
+
+
+
+
+
+
 select * from users;
 
 select * from meals;
+
+select * from daily_nutrient_summary;
 
 
 
