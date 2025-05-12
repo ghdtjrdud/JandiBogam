@@ -80,6 +80,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public boolean deleteMeal(int id) {
+
         return mealDao.deleteMeal(id) > 0;
     }
 }

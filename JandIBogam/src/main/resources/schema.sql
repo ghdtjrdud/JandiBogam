@@ -246,11 +246,9 @@ CREATE TABLE meal_foods (
                             food_id INT NOT NULL COMMENT 'food_nutrients.id',
                             PRIMARY KEY (meal_id, food_id),
                             FOREIGN KEY (meal_id)
-                                REFERENCES meals(id)
-                                ON DELETE CASCADE,
+                                REFERENCES meals(id),
                             FOREIGN KEY (food_id)
                                 REFERENCES food_nutrients(id)
-                                ON DELETE CASCADE
 );
 
 -- 18. 영양소 마스터 테이블 생성
