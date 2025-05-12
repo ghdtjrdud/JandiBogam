@@ -2,19 +2,22 @@ package com.ssafy.mvc.security;
 
 import com.ssafy.mvc.config.JwtConfig;
 import com.ssafy.mvc.model.dto.UserDto;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class JwtTokenProvider {
+public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기능**
 
     private final JwtConfig jwtConfig;
 
@@ -27,6 +30,15 @@ public class JwtTokenProvider {
     // JWT 토큰 생성 로직
     private String makeToken(Date expiry, UserDto user) {
         Date now = new Date();
+        String secretKey = jwtConfig.getSecretKey();
+
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalStateException("JWT Secret key is not configured properly");
+        }
+
+        System.out.println("JWT 시크릿 키: " + secretKey.substring(0, 5) + "..."); // 보안을 위해 일부만 출력
+        System.out.println("만료 시간: " + expiry);
+
         return Jwts.builder().setHeaderParam(Header.TYPE, Header.JWT_TYPE) // 헤더 타입 설정
                 .setIssuer("jandiBogam") // 발급자 설정
                 .setIssuedAt(now) // 발급시간
@@ -37,19 +49,40 @@ public class JwtTokenProvider {
                 .claim("name", user.getName())
                 .claim("email", user.getEmail())
                 .claim("role", "ROLE_USER") // 역할 정보 - 필요에 따라 수정 가능
-                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecretKey().getBytes()) // 바이트로 변환하여 서명
+                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes(StandardCharsets.UTF_8)) // UTF-8 인코딩 명시
                 .compact();
     }
 
     // 토큰 유효성 검증 메서드
     public boolean validateToken(String token) {
         try {
-            // 비밀값으로 복호화 (바이트로 변환)
-            Jwts.parser().setSigningKey(jwtConfig.getSecretKey().getBytes()).parseClaimsJws(token);
+            // null 체크 추가
+            if (token == null || token.isEmpty()) {
+                System.out.println("토큰 검증 실패: 토큰이 비어있습니다.");
+                return false;
+            }
+
+            String secretKey = jwtConfig.getSecretKey();
+            if (secretKey == null || secretKey.isEmpty()) {
+                System.out.println("토큰 검증 실패: 시크릿 키가 구성되지 않았습니다.");
+                return false;
+            }
+
+            // 비밀값으로 복호화 (UTF-8 인코딩 명시)
+            Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(token);
             return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("토큰 검증 실패: 만료된 토큰입니다. " + e.getMessage());
+            return false;
+        } catch (MalformedJwtException e) {
+            System.out.println("토큰 검증 실패: 잘못된 형식의 토큰입니다. " + e.getMessage());
+            return false;
+        } catch (SignatureException e) {
+            System.out.println("토큰 검증 실패: 서명 검증에 실패했습니다. " + e.getMessage());
+            return false;
         } catch (Exception e) {
-            System.out.println("토큰 검증 실패: " + e.getMessage()); // 오류 메시지 출력 추가
-            return false; // 복호화 과정에서 에러가 나면 유효하지 않은 토큰으로
+            System.out.println("토큰 검증 실패: " + e.getMessage());
+            return false;
         }
     }
 
@@ -60,7 +93,15 @@ public class JwtTokenProvider {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(jwtConfig.getSecretKey().getBytes()).parseClaimsJws(token).getBody();
+        String secretKey = jwtConfig.getSecretKey();
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalStateException("JWT Secret key is not configured properly");
+        }
+
+        return Jwts.parser()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     // 액세스 토큰 생성 - 유효기간은 설정에서 가져옴
@@ -72,4 +113,28 @@ public class JwtTokenProvider {
     public String generateRefreshToken(UserDto user) {
         return generateToken(user, Duration.ofMillis(jwtConfig.getRefreshTokenExpiration()));
     }
+
+    // 토큰에서 Authentication 객체 생성하는 메서드 추가
+    public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
+        String loginId = claims.getSubject();
+        Long userId = claims.get("id", Long.class);
+
+        // UserDetails나 UserDto를 생성하는 대신 필요한 정보만 담은 Principal 객체 생성
+        UserDto principal = new UserDto();
+        principal.setId(userId);
+        principal.setLoginId(loginId);
+        principal.setName(claims.get("name", String.class));
+        principal.setEmail(claims.get("email", String.class));
+
+        // 권한 정보가 있다면 추가
+        String role = claims.get("role", String.class);
+        List<SimpleGrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(role != null ? role : "ROLE_USER")
+        );
+
+        // Authentication 객체 생성하여 반환
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    }
+
 }

@@ -7,64 +7,89 @@ import com.ssafy.mvc.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl {
+@Transactional(readOnly = true)
+public class AuthServiceImpl implements AuthService {
 
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    //회원가입 처리
-    public UserDto signup(AuthDto.SignupRequest request){
-        //아이디 중복 확인
-        if(userDao.findByLoginId(request.getLoginId()) != null){
-            throw new RuntimeException("이미 사용중인 아이디입니다.");
+    @Override
+    @Transactional
+    public void signup(AuthDto.SignupRequest request) {
+        // 중복 ID 검사
+        if (userDao.findByLoginId(request.getLoginId()) != null) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
 
-        //사용자 객체 생성
+        // 비밀번호 해싱
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+
+        // UserDto 생성 및 저장
         UserDto user = new UserDto();
         user.setLoginId(request.getLoginId());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword())); //비밀번호 암호화
+        user.setPasswordHash(hashedPassword);
         user.setName(request.getName());
+        user.setBirthDate(request.getBirthDate() != null ? request.getBirthDate() : LocalDate.now());
         user.setGender(request.getGender());
-        user.setBirthDate(request.getBirthDate());
+        user.setEmail(request.getEmail());
         user.setHeight(request.getHeight());
         user.setWeight(request.getWeight());
+        user.setFamilyCode(request.getFamilyCode());
 
-        // 건강 정보 올바르게 설정
+        // 건강 정보 설정
         user.setDiabetes(request.isDiabetes());
-        user.setAllergies(request.isAllergies());
-        user.setHeartDisease(request.isHeartDisease());
-        user.setHyperlipidemia(request.isHyperlipidemia());
         user.setHypertension(request.isHypertension());
+        user.setHeartDisease(request.isHeartDisease());
         user.setKidneyDisease(request.isKidneyDisease());
+        user.setLiverDisease(request.isLiverDisease());
 
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        // 현재 시간 설정
+        LocalDateTime now = LocalDateTime.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         userDao.insert(user);
-        return user;
     }
 
-    //로그인 처리 및 jwt 토큰 발급
-    public AuthDto.TokenResponse login(AuthDto.LoginRequest request){
-        //사용자 조회
+    @Override
+    @Transactional
+    public AuthDto.TokenResponse login(AuthDto.LoginRequest request) {
+        // 사용자 조회
         UserDto user = userDao.findByLoginId(request.getLoginId());
-        if(user == null){
-            throw new RuntimeException("존재하지 않는 사용자입니다.");
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 아이디입니다.");
         }
 
-        //비밀번호 검증
-        if(!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())){
-            throw new RuntimeException("일치하지 않는 비밀번호입니다.");
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        //JWT 토큰 생성
+        // 토큰 생성
         String accessToken = jwtTokenProvider.generateAccessToken(user);
         String refreshToken = jwtTokenProvider.generateRefreshToken(user);
-        return new AuthDto.TokenResponse(accessToken, refreshToken, "Bearer", user.getLoginId());
+
+        // 응답 DTO 생성
+        return new AuthDto.TokenResponse(
+                accessToken,
+                refreshToken,
+                "Bearer",
+                user.getLoginId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void logout(String token) {
+        // MyBatis 환경에서는 클라이언트 측에서 토큰 삭제를 처리
+        // 서버 측에서는 특별한 로직이 필요 없음
     }
 }
