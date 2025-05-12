@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.MealCommentDao">
+
+    <insert id="insertComment" parameterType="MealCommentDto" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO meal_comments (meal_id, user_id, content)
+        VALUES (#{mealId}, #{userId}, #{content})
+    </insert>
+
+</mapper>
