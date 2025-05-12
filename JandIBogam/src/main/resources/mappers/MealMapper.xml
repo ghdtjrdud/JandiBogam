@@ -25,6 +25,13 @@
         WHERE id=#{id}
     </select>
 
+    <!-- 식단 상세조회 시 음식의 종류는 meal_foods 에서 갖고와야함 -->
+    <select id="selectmealFoodByid" parameterType="int" resultType="int">
+        SELECT food_id
+        FROM meal_foods
+        WHERE meal_id = #{mealId}
+    </select>
+
     <select id="selectMealsByFilter" resultType="MealDto">
         SELECT *
         FROM meals
@@ -41,8 +48,9 @@
 
     <update id="updateMeal" parameterType="MealDto">
         UPDATE meals
-        SET eat_date = #{eatDate},time_slot = #{timeSlot},
-        photo_url = #{photoUrl},food_name = #{foodName},
+        SET eat_date = #{eatDate},
+        time_slot = #{timeSlot},
+        photo_url = #{photoUrl},
         memo = #{memo}
         WHERE id=#{id}
     </update>
@@ -50,6 +58,11 @@
     <delete id="deleteMeal" parameterType="int">
         DELETE FROM meals
         WHERE id=#{id}
+    </delete>
+
+    <delete id="deleteMealFoods" parameterType="int">
+        DELETE FROM meal_foods
+        WHERE meal_id = #{id}
     </delete>
 
 </mapper>

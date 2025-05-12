@@ -16,6 +16,9 @@ public interface MealDao {
     //식단 조회 (식단 기록 id)
     MealDto selectById(int id);
 
+    //식단 상세조회 시 음식 목록 조회
+    List<Integer> selectmealFoodByid(int id);
+
     //식단 조회 (기간 + 시간대)
     List<MealDto> selectMealsByFilter(
             int userId,
@@ -29,5 +32,6 @@ public interface MealDao {
     //식단 삭제
     int deleteMeal(int id);
 
-
+    // meailfoods 삭제(수정 시에도 필요함)
+    int deleteMealFoods(int id);
 }
