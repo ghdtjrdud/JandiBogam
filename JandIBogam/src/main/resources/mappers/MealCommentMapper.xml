@@ -9,4 +9,22 @@
         VALUES (#{mealId}, #{userId}, #{content})
     </insert>
 
+    <select id="selectCommentById" parameterType="int" resultType="MealCommentDto">
+        SELECT * FROM meal_comments
+        WHERE meal_id = #{mealId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="updateComment" parameterType="MealCommentDto">
+        UPDATE meal_comments
+        SET content = #{content},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteComment" parameterType="int">
+        DELETE FROM meal_comments
+        WHERE id = #{id}
+    </delete>
+
 </mapper>
