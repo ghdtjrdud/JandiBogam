@@ -1,0 +1,27 @@
+package com.ssafy.mvc.model.service;
+
+import com.ssafy.mvc.model.dao.GroupDao;
+import com.ssafy.mvc.model.dto.GroupDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class GroupServiceImpl implements GroupService {
+
+    private final GroupDao groupDao;
+
+    @Autowired
+    public GroupServiceImpl(GroupDao groupDao) {
+        this.groupDao = groupDao;
+    }
+
+    @Override
+    public int createGroup(GroupDto groupDto) {
+        int result = groupDao.insertGroup(groupDto);
+
+        if (result > 0) {
+            groupDao.insertUserGroup(groupDto.getCreatedBy(), groupDto.getId());
+        }
+        return result;
+    }
+}

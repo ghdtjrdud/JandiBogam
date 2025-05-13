@@ -92,7 +92,7 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
         return claims.getSubject();
     }
 
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         String secretKey = jwtConfig.getSecretKey();
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalStateException("JWT Secret key is not configured properly");
