@@ -30,9 +30,16 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/api/auth/**").permitAll() // 인증 관련 API는 인증 없이 접근 가능
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger UI 접근 허용
-                                .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
+                                .requestMatchers(
+                                        "/api/auth/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui.html",
+                                        "/test.html",                  // ✅ test.html 허용
+                                        "/test-api/**",                // ✅ 파일 업로드 테스트 API 허용
+                                        "/static/**", "/css/**", "/js/**", "/images/**", "/uploads/**" // ✅ 정적 리소스 허용
+                                ).permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 적용
 
