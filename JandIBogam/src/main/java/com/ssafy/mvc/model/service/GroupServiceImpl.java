@@ -24,4 +24,9 @@ public class GroupServiceImpl implements GroupService {
         }
         return result;
     }
+
+    @Override
+    public int joinGroup(String code, int userId) {
+        return groupDao.joinGroup(code, userId);
+    }
 }

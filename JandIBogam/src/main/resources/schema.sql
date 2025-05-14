@@ -437,6 +437,8 @@ select * from meals;
 
 select * from daily_nutrient_summary;
 
+SELECT id FROM `groups` WHERE code = '42644163-3cc3-49d1-8dd5-c05e2e6ac6eb';
+
 
 
 

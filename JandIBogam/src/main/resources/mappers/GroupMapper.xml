@@ -4,14 +4,28 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.mvc.model.dao.GroupDao">
 
+<!--  sql 에서 groups는 예약어라서 백틱으로 감싼것. -->
     <insert id="insertGroup" parameterType="GroupDto" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `groups` (name, code, created_by)
         VALUES (#{name}, #{code}, #{createdBy})
     </insert>
 
+    <!-- 그룹 생성 시 생성자는 바로 그룹에 가입하게. -->
     <insert id="insertUserGroup">
         INSERT INTO user_groups (user_id, group_id)
         VALUES (#{userId}, #{groupId})
+    </insert>
+
+<!--  사용자가 가입을 하는데 이미 그룹에 들어가있으면 가입 실패하게(중복가입 처리)  -->
+    <insert id="joinGroup">
+        INSERT INTO user_groups (user_id, group_id)
+        SELECT #{userId}, g.id
+        FROM `groups` g
+        WHERE g.code = #{code}
+        AND NOT EXISTS (
+            SELECT 1 FROM user_groups ug
+            WHERE ug.user_id = #{userId} AND ug.group_id = g.id
+        )
     </insert>
 
 

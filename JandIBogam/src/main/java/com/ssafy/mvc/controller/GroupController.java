@@ -58,5 +58,26 @@ public class GroupController {
         }
     }
 
+    @PostMapping("/join")
+    public ResponseEntity<?> joinGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
+
+        try {
+//            bearer 빼고 토큰헤더 갖고오기
+            String token = request.getHeader("Authorization").substring(7);
+            Claims claims = jwtTokenProvider.getClaims(token);
+            int userId = claims.get("id", Integer.class);
+
+            int result = groupService.joinGroup(groupDto.getCode(), userId);
+
+            if (result > 0) {
+                return ResponseEntity.status(HttpStatus.OK).body("그룹 가입 성공");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("그룹 가입 실패");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+    }
+
 
 }
