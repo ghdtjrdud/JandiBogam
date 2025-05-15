@@ -8,10 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -21,6 +18,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final JwtTokenProvider jwtTokenProvider;
+//    private final JwtUtil jwtUtil;
 
     @Autowired
     public GroupController(GroupService groupService, JwtTokenProvider jwtTokenProvider) {
@@ -79,5 +77,36 @@ public class GroupController {
         }
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyGroup(HttpServletRequest request) {
+
+        try {
+//            String token = request.getHeader("Authorization").substring(7);
+//            Claims claims = jwtTokenProvider.getClaims(token);
+//            int userId = claims.get("id", Integer.class);
+            System.out.println("hhi!");
+            int userId = jwtTokenProvider.getUserIdFromRequest(request);
+
+            System.out.println("userId : " + userId);
+
+            GroupDto groupDto = groupService.getGroupByUserId(userId);
+
+            if (groupDto != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(groupDto);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("가입된 그룹이 없습니다.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("에러메세지 :" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+
+    }
+
 
 }
+
+
+
+

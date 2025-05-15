@@ -2,7 +2,10 @@ package com.ssafy.mvc.controller;
 
 import com.ssafy.mvc.model.dto.MealDto;
 import com.ssafy.mvc.model.service.MealService;
+import com.ssafy.mvc.security.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,18 +23,33 @@ public class MealController {
 
 
     private final MealService mealService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public MealController(MealService mealService) {
+    public MealController(MealService mealService, JwtTokenProvider jwtTokenProvider) {
         this.mealService = mealService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     //등록
     @PostMapping
-    public ResponseEntity<?> createMeal(@RequestBody MealDto mealDto){
-        MealDto created = mealService.createMeal(mealDto);
-        return created != null ? ResponseEntity.status(HttpStatus.CREATED).body(created)
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("cannot create Meal");
+    public ResponseEntity<?> createMeal(@RequestBody MealDto mealDto, HttpServletRequest request) {
+
+        try {
+            String token = request.getHeader("Authorization").substring(7);
+            Claims claims = jwtTokenProvider.getClaims(token);
+            int userId = claims.get("id", Integer.class);
+
+            mealDto.setUserId(userId);
+
+            MealDto created = mealService.createMeal(mealDto);
+            return created != null ? ResponseEntity.status(HttpStatus.CREATED).body(created)
+                    : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("cannot create Meal");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+
+
     }
 
     //조회 - 상세

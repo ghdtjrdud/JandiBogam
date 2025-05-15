@@ -6,4 +6,6 @@ public interface GroupService {
     int createGroup(GroupDto groupDto);
 
     int joinGroup(String code, int userId);
+
+    GroupDto getGroupByUserId(int userId);
 }

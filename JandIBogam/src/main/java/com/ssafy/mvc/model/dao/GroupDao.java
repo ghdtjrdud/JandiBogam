@@ -12,4 +12,6 @@ public interface GroupDao {
     void insertUserGroup(@Param("userId") int createdBy, @Param("groupId") int id);
 
     int joinGroup(@Param("code") String code, @Param("userId") int userId);
+
+    GroupDto getGroupByUserId(int userId);
 }

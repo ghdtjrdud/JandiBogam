@@ -424,20 +424,21 @@ CREATE TABLE daily_nutrient_summary
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-
-
-
-
-
-
-
 select * from users;
 
 select * from meals;
 
 select * from daily_nutrient_summary;
 
-SELECT id FROM `groups` WHERE code = '42644163-3cc3-49d1-8dd5-c05e2e6ac6eb';
+SELECT
+    g.id,
+    g.name,
+    g.code,
+    g.created_by AS createdBy,
+    g.created_at AS createdAt
+FROM user_groups ug
+         JOIN `groups` g ON ug.group_id = g.id
+WHERE ug.user_id = 2;
 
 
 
