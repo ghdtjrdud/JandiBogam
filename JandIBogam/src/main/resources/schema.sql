@@ -56,7 +56,7 @@ select * from user_diseases;
 CREATE TABLE `groups`
 (
     `id`         INT          NOT NULL AUTO_INCREMENT,
-    `name`       VARCHAR(100) NULL COMMENT '그룹 이름',
+    `name`       VARCHAR(100) NOT NULL COMMENT '그룹 이름',
     `code`       CHAR(36)     NOT NULL UNIQUE COMMENT 'UUID 그룹 코드',
     `created_by` INT          NOT NULL COMMENT '생성자 user_id',
     `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -64,6 +64,7 @@ CREATE TABLE `groups`
     FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
 
 -- 5. 사용자-그룹 매핑 (보호자 구분 없음)
 CREATE TABLE `user_groups`
@@ -423,18 +424,21 @@ CREATE TABLE daily_nutrient_summary
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-
-
-
-
-
-
-
 select * from users;
 
 select * from meals;
 
 select * from daily_nutrient_summary;
+
+SELECT
+    g.id,
+    g.name,
+    g.code,
+    g.created_by AS createdBy,
+    g.created_at AS createdAt
+FROM user_groups ug
+         JOIN `groups` g ON ug.group_id = g.id
+WHERE ug.user_id = 2;
 
 
 

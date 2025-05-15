@@ -3,6 +3,7 @@ package com.ssafy.mvc.security;
 import com.ssafy.mvc.config.JwtConfig;
 import com.ssafy.mvc.model.dto.UserDto;
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -92,7 +93,7 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
         return claims.getSubject();
     }
 
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         String secretKey = jwtConfig.getSecretKey();
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalStateException("JWT Secret key is not configured properly");
@@ -135,6 +136,17 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
 
         // Authentication 객체 생성하여 반환
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
+    }
+
+    //    로그인한 유저의 토큰정보를 갖고와서 userId를 확인하기(모든 api에서 거의 쓰이니 따로 메서드로 빼기)
+    public int getUserIdFromRequest(HttpServletRequest request) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        System.out.println("token : " + token);
+        Claims claims = getClaims(token);
+        System.out.println("claims : " + claims.toString());
+
+        return claims.get("id", Integer.class);
     }
 
 }
