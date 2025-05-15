@@ -1,6 +1,7 @@
 package com.ssafy.mvc.controller;
 
 import com.ssafy.mvc.model.dto.GroupDto;
+import com.ssafy.mvc.model.dto.UserDto;
 import com.ssafy.mvc.model.service.GroupService;
 import com.ssafy.mvc.security.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +28,7 @@ public class GroupController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    //    그룹생성
     @PostMapping("/")
     public ResponseEntity<?> createGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
         try {
@@ -56,6 +59,7 @@ public class GroupController {
         }
     }
 
+    //    그룹 가입
     @PostMapping("/join")
     public ResponseEntity<?> joinGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
 
@@ -77,6 +81,7 @@ public class GroupController {
         }
     }
 
+    //    내가 속한 그룹 조회
     @GetMapping("/my")
     public ResponseEntity<?> getMyGroup(HttpServletRequest request) {
 
@@ -104,6 +109,47 @@ public class GroupController {
 
     }
 
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseEntity<?> leaveGroup(@PathVariable int groupId, HttpServletRequest request) {
+
+        try {
+            int userId = jwtTokenProvider.getUserIdFromRequest(request);
+
+            int result = groupService.leaveGroup(groupId, userId);
+
+            if (result > 0) {
+                return ResponseEntity.status(HttpStatus.OK).body("그룹 탈퇴 성공");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("그룹 탈퇴 실패");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+    }
+
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<?> getGroupMembers(@PathVariable int groupId, HttpServletRequest request) {
+
+        try {
+
+//            여기에서는 딱히 없어도 되는데 혹시 나중에 권한설정이나 이런거 있을수도
+//            어차피 우리는 목록에서부터 가입된거만 보이게 할것
+            int userId = jwtTokenProvider.getUserIdFromRequest(request);
+
+            List<UserDto> list = groupService.getGroupMembers(groupId);
+
+            if (!list.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(list);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("맴버 조회 실패");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+
+    }
 
 }
 

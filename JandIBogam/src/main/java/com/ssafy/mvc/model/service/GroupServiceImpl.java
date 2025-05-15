@@ -2,8 +2,11 @@ package com.ssafy.mvc.model.service;
 
 import com.ssafy.mvc.model.dao.GroupDao;
 import com.ssafy.mvc.model.dto.GroupDto;
+import com.ssafy.mvc.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -33,5 +36,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDto getGroupByUserId(int userId) {
         return groupDao.getGroupByUserId(userId);
+    }
+
+    @Override
+    public int leaveGroup(int groupId, int userId) {
+        return groupDao.leaveGroup(groupId, userId);
+    }
+
+    @Override
+    public List<UserDto> getGroupMembers(int groupId) {
+        return groupDao.getGroupMember(groupId);
     }
 }

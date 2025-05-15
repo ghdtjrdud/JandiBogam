@@ -28,6 +28,7 @@
         )
     </insert>
 
+<!--  내가 가입한 그룹 목록 갖고오기  -->
     <select id="getGroupByUserId" parameterType="int" resultType="GroupDto">
         SELECT
         g.id,
@@ -40,7 +41,23 @@
         WHERE ug.user_id = #{userId}
     </select>
 
+<!--  회원탈퇴하기  -->
+    <delete id="leaveGroup">
+        DELETE
+        FROM user_groups
+        WHERE user_id = #{userId} AND group_id = #{groupId}
+    </delete>
 
+<!--  선택한 그룹의 그룹원 조회  -->
+    <select id="getGroupMember" parameterType="int" resultType="com.ssafy.mvc.model.dto.UserDto">
+        SELECT
+            u.id     AS id,
+            u.name   AS name,
+            u.email  AS email
+        FROM user_groups ug
+        JOIN users u ON ug.user_id = u.id
+        WHERE ug.group_id = #{groupId}
+    </select>
 
 
 </mapper>
