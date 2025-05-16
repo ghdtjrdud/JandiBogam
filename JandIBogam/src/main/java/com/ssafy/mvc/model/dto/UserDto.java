@@ -7,132 +7,30 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
-
-    private long id; // 넉넉하게 long
-    private String loginId; // camelcase
-    private String password;
+    private long id;
+    private String loginId;
+    private String passwordHash;
     private String name;
-    private LocalDate birthDate; // 날짜만 필요한 타입형
+    private LocalDate birthDate;
     private String gender;
     private String email;
     private double height;
     private double weight;
     private String uiTheme;
-    private LocalDateTime createdAt; // 날짜 + 시간정보가 필요할 때
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public long getId() {
-        return id;
-    }
+    // 건강 정보 필드 추가
+    private boolean diabetes; // 당뇨
+    private boolean hypertension; // 고혈압
+    private boolean heartDisease; // 심장질환
+    private boolean kidneyDisease; // 신장질환
+    private boolean liverDisease; // 간질환
 
-    public String getLoginId() {
-        return loginId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public String getUiTheme() {
-        return uiTheme;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setLoginId(String loginId) {
-        this.loginId = loginId;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public void setUiTheme(String uiTheme) {
-        this.uiTheme = uiTheme;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public UserDto(long id, String loginId, String password, String name, LocalDate birthDate, String gender, String email, double height, double weight, String uiTheme, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.loginId = loginId;
-        this.password = password;
-        this.name = name;
-        this.birthDate = birthDate;
-        this.gender = gender;
-        this.email = email;
-        this.height = height;
-        this.weight = weight;
-        this.uiTheme = uiTheme;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public UserDto() {
-    }
+    // 가족 코드 (선택사항)
+    private String familyCode;
 }
