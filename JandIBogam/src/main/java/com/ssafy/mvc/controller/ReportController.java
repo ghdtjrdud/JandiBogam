@@ -1,12 +1,9 @@
 package com.ssafy.mvc.controller;
 
-import com.ssafy.mvc.model.dao.UserDao;
 import com.ssafy.mvc.model.dto.WeeklyReportDto;
 import com.ssafy.mvc.model.service.ReportService;
 import com.ssafy.mvc.security.JwtTokenProvider;
-import com.ssafy.mvc.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
