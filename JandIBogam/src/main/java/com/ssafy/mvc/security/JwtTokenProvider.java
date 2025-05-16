@@ -3,6 +3,7 @@ package com.ssafy.mvc.security;
 import com.ssafy.mvc.config.JwtConfig;
 import com.ssafy.mvc.model.dto.UserDto;
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -92,7 +93,7 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
         return claims.getSubject();
     }
 
-    private Claims getClaims(String token) {
+    public Claims getClaims(String token) {
         String secretKey = jwtConfig.getSecretKey();
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalStateException("JWT Secret key is not configured properly");
@@ -136,5 +137,25 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
         // Authentication 객체 생성하여 반환
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
+
+    public Integer extractUserId(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            throw new JwtException("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
+        }
+
+        String token = bearerToken.substring(7); // "Bearer " 제거
+        Claims claims = getClaims(token);
+
+        Object idObj = claims.get("id");
+        if (idObj instanceof Integer) {
+            return (Integer) idObj;
+        } else if (idObj instanceof Long) {
+            return ((Long) idObj).intValue();
+        } else {
+            throw new JwtException("ID 형식이 유효하지 않습니다.");
+        }
+    }
+
 
 }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.NutrientDao">
+
+    <select id="selectNutrientById" resultType="NutrientDto" parameterType="int">
+        SELECT *
+        FROM nutrients
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectNutrientByName" resultType="NutrientDto" parameterType="String">
+        SELECT *
+        FROM nutrients
+        WHERE name = #{name}
+    </select>
+
+    <select id="selectAllNutrients" resultType="NutrientDto">
+        SELECT *
+        FROM nutrients
+    </select>
+
+    <select id="findAllAsMap" resultType="map">
+        SELECT id, name
+        FROM nutrients
+    </select>
+
+    <select id="findAllNameToIdMap" resultType="NutrientIdNameDto">
+        SELECT id,
+        CASE
+        WHEN name = 'Energy' THEN '에너지'
+        WHEN name = 'Protein' THEN '단백질'
+        WHEN name = 'Fat' THEN '지방'
+        WHEN name = 'Carbohydrate' THEN '탄수화물'
+        WHEN name = 'Sugar' THEN '당류'
+        WHEN name = 'Fiber' THEN '식이섬유'
+        WHEN name = 'Sodium' THEN '나트륨'
+        WHEN name = 'Potassium' THEN '칼륨'
+        WHEN name = 'Cholesterol' THEN '콜레스테롤'
+        WHEN name = 'Saturated Fat' THEN '포화지방'
+        ELSE name
+        END as name
+        FROM nutrients
+    </select>
+
+</mapper>

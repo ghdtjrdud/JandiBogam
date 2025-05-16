@@ -13,6 +13,8 @@ public interface UserDao {
 
     List<UserDto> select();
 
+    UserDto selectById(int id);
+
     int update(UserDto userDto);
 
     int delete(int id);
@@ -20,4 +22,6 @@ public interface UserDao {
     UserDto detail(int id);
 
     UserDto findByLoginId(@NotBlank @Size(min = 6, max = 12) String loginId);
+
+    List<Integer> selectUserDiseases(int userId);
 }

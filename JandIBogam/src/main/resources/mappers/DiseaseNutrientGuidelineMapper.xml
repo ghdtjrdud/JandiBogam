@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.DiseaseNutrientGuidelineDao">
+    <select id="selectByDiseaseId" resultType="NutrientGuideDto">
+        SELECT *
+        FROM disease_nutrient_guidelines
+        WHERE disease_id = #{diseaseId}
+    </select>
+    <select id="selectByDiseaseIds" resultType="NutrientGuideDto">
+        SELECT
+        disease_id AS diseaseId,
+        nutrient_id AS nutrientId,
+        min_value AS min,
+        max_value AS max,
+        is_restriction AS isRestriction,
+        recommendation
+        FROM disease_nutrient_guidelines
+        WHERE disease_id IN
+        <foreach item="id" collection="diseaseIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+<!--
+    <select id="selectByDiseaseIdAndNutrientId" resultType="DiseaseNutrientGuidelineDto">
+        SELECT * FROM disease_nutrient_guidelines
+        WHERE disease_id = #{diseaseId} AND nutrient_id = #{nutrientId}
+    </select>
+-->
+</mapper>

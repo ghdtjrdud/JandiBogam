@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 import com.ssafy.mvc.config.JwtConfig;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -79,5 +80,17 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();  // payload(클레임) 부분 반환
     }
+
+
+//    public Integer extractUserId(HttpServletRequest request) {
+//        String bearerToken = request.getHeader("Authorization");
+//        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+//            throw new JwtException("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
+//        }
+//
+//        String token = bearerToken.substring(7); // "Bearer " 제거
+//        Claims claims = getClaims(token);
+//        return claims.get("id", Integer.class);
+//    }
 
 }

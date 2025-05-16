@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.mvc.model.dao.WeeklyReportMapper">
+
+    <resultMap id="WeeklyNutrientStatsMap" type="WeeklyNutrientStatsDto">
+        <result property="nutrientId" column="nutrient_id" />
+        <result property="nutrientName" column="nutrient_name" />
+        <result property="nutrientUnit" column="unit" />
+        <result property="avg" column="avg" />
+        <result property="max" column="max" />
+        <result property="min" column="min" />
+    </resultMap>
+
+    <select id="getWeeklyStats" resultType="WeeklyNutrientStatsDto">
+        SELECT
+        dns.nutrient_id,
+        CASE
+        WHEN n.name = 'Energy' THEN '에너지'
+        WHEN n.name = 'Protein' THEN '단백질'
+        WHEN n.name = 'Fat' THEN '지방'
+        WHEN n.name = 'Carbohydrate' THEN '탄수화물'
+        WHEN n.name = 'Sugar' THEN '당류'
+        WHEN n.name = 'Fiber' THEN '식이섬유'
+        WHEN n.name = 'Sodium' THEN '나트륨'
+        WHEN n.name = 'Potassium' THEN '칼륨'
+        WHEN n.name = 'Cholesterol' THEN '콜레스테롤'
+        WHEN n.name = 'Saturated Fat' THEN '포화지방'
+        ELSE n.name
+        END as nutrient_name,
+        AVG(dns.total_amount) as avg,
+        MAX(dns.total_amount) as max,
+        MIN(dns.total_amount) as min
+        FROM daily_nutrient_summary dns
+        JOIN nutrients n ON dns.nutrient_id = n.id
+        WHERE dns.user_id = #{userId}
+        AND dns.summary_date BETWEEN #{startDate} AND #{endDate}
+        GROUP BY dns.nutrient_id, n.name, n.unit
+    </select>
+
+    <select id="getMealCount" resultType="int">
+        SELECT COUNT(*) FROM meals
+        WHERE user_id = #{userId}
+        AND eat_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+
+
+
+</mapper>

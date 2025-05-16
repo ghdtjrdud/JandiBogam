@@ -32,6 +32,7 @@ public class SecurityConfig {
                         auth
                                 .requestMatchers("/api/auth/**").permitAll() // 인증 관련 API는 인증 없이 접근 가능
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll() // Swagger UI 접근 허용
+                                .requestMatchers("/api/meals/**").permitAll()  // 테스트를 위해 임시로 permitAll() 사용
                                 .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
                 )
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 적용
