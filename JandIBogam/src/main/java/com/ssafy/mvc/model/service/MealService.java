@@ -18,13 +18,12 @@ public interface MealService {
     List<MealDto> getMealsByFilter(int userId, LocalDate startDate, LocalDate endDate, String timeSlot);
 
     //식단 수정
-    MealDto updateMeal(MealDto mealDto);
+    MealDto updateMeal(int id, int userId, MealDto mealDto);
 
     //식단 삭제
-    boolean deleteMeal(int id);
+    boolean deleteMeal(int id, int userId);
 
-
-
+    MealDto createMealWithFoodSearch(MealDto mealDto);
 
 
 }

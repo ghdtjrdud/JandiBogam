@@ -65,7 +65,6 @@ CREATE TABLE `groups`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
-
 -- 5. 사용자-그룹 매핑 (보호자 구분 없음)
 CREATE TABLE `user_groups`
 (
@@ -185,7 +184,6 @@ CREATE TABLE `weekly_reports`
     `start_date`    DATE          NOT NULL COMMENT '시작 날짜',
     `end_date`      DATE          NOT NULL COMMENT '종료 날짜',
     `meal_count`    INT           NOT NULL DEFAULT 0 COMMENT '식사 횟수',
-    `med_adherence` DECIMAL(5, 2) NOT NULL DEFAULT 0.00 COMMENT '복약 준수율(%)',
     `health_score`  INT           NULL COMMENT '건강 점수',
     `created_at`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -290,6 +288,21 @@ CREATE TABLE disease_nutrient_guidelines
     FOREIGN KEY (disease_id) REFERENCES diseases (id),
     FOREIGN KEY (nutrient_id) REFERENCES nutrients (id)
 );
+
+-- 20. 일일 식단 기록에 따른 영양소 요약 테이블
+CREATE TABLE daily_nutrient_summary (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL COMMENT '사용자 ID',
+    summary_date DATE NOT NULL COMMENT '집계 날짜',
+    nutrient_id INT NOT NULL COMMENT '영양소 ID',
+    total_amount DECIMAL(10, 2) NOT NULL COMMENT '일일 섭취량 합계',
+     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY (user_id, summary_date, nutrient_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (nutrient_id) REFERENCES nutrients(id) ON DELETE CASCADE
+);
+
 
 -- 질병 마스터 데이터 삽입
 INSERT INTO `diseases` (`name`, `description`)
@@ -412,33 +425,20 @@ VALUES
 (6, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 소화를 돕고 독소 배출에 도움이 됩니다'),
 (6, (SELECT id FROM nutrients WHERE name = '당류'), 0, 30, TRUE, '과도한 당류 섭취는 간에 부담을 줄 수 있으므로 제한하세요');
 
-CREATE TABLE daily_nutrient_summary
-(
-    user_id      INT            NOT NULL COMMENT 'users.id',
-    summary_date DATE           NOT NULL COMMENT '집계 날짜',
-    nutrient_id  INT            NOT NULL COMMENT 'nutrients.id',
-    total_amount DECIMAL(10, 2) NOT NULL COMMENT '당일 섭취량 합계',
-    PRIMARY KEY (user_id, summary_date, nutrient_id),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (nutrient_id) REFERENCES nutrients (id) ON DELETE CASCADE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+
 
 select * from users;
 
 select * from meals;
 
+select * from meal_foods;
+
 select * from daily_nutrient_summary;
 
-SELECT
-    g.id,
-    g.name,
-    g.code,
-    g.created_by AS createdBy,
-    g.created_at AS createdAt
-FROM user_groups ug
-         JOIN `groups` g ON ug.group_id = g.id
-WHERE ug.user_id = 2;
+select * from disease_nutrient_guidelines;
+
+select * from nutrients;
+
 
 
 

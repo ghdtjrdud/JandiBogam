@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.DailyNutrientSummaryDao">
+
+    <select id="selectByUserIdAndDateRange" resultType="DailyNutrientSummaryDto">
+        SELECT dns.*, n.name as nutrient_name, n.unit as nutrient_unit
+        FROM daily_nutrient_summary dns
+        JOIN nutrients n ON dns.nutrient_id = n.id
+        WHERE dns.user_id = #{userId}
+        AND dns.summary_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY dns.summary_date, dns.nutrient_id
+    </select>
+
+    <select id="selectByUserIdAndDate" resultType="DailyNutrientSummaryDto">
+        SELECT dns.*, n.name as nutrient_name, n.unit as nutrient_unit
+        FROM daily_nutrient_summary dns
+        JOIN nutrients n ON dns.nutrient_id = n.id
+        WHERE dns.user_id = #{userId} AND dns.summary_date = #{summaryDate}
+        ORDER BY dns.nutrient_id
+    </select>
+
+    <insert id="insert" parameterType="DailyNutrientSummaryDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO daily_nutrient_summary
+        (user_id, summary_date, nutrient_id, total_amount)
+        VALUES
+        (#{userId}, #{summaryDate}, #{nutrientId}, #{totalAmount})
+    </insert>
+
+    <update id="update" parameterType="DailyNutrientSummaryDto">
+        UPDATE daily_nutrient_summary
+        SET total_amount = #{totalAmount},
+        updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = #{userId}
+        AND summary_date = #{summaryDate}
+        AND nutrient_id = #{nutrientId}
+    </update>
+
+    <insert id="upsert">
+        INSERT INTO daily_nutrient_summary
+        (user_id, summary_date, nutrient_id, total_amount)
+        VALUES
+        (#{userId}, #{summaryDate}, #{nutrientId}, #{totalAmount})
+        ON DUPLICATE KEY UPDATE
+        total_amount = VALUES(totalAmount),
+        updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <delete id="deleteByUserIdAndDate">
+        DELETE FROM daily_nutrient_summary
+        WHERE user_id = #{userId} AND summary_date = #{summaryDate}
+    </delete>
+
+    <insert id="batchUpsert">
+        INSERT INTO daily_nutrient_summary
+        (user_id, summary_date, nutrient_id, total_amount)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.summaryDate}, #{item.nutrientId}, #{item.totalAmount})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        total_amount = VALUES(total_amount)
+    </insert>
+</mapper>

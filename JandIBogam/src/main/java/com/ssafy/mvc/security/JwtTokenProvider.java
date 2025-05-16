@@ -139,7 +139,7 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
     }
 
     //    로그인한 유저의 토큰정보를 갖고와서 userId를 확인하기(모든 api에서 거의 쓰이니 따로 메서드로 빼기)
-    public int getUserIdFromRequest(HttpServletRequest request) {
+    public int extractUserId(HttpServletRequest request) {
 
         String token = request.getHeader("Authorization").substring(7);
         System.out.println("token : " + token);

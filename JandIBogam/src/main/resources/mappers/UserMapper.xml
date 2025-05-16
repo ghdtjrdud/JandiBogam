@@ -40,7 +40,7 @@
         FROM users
     </select>
 
-
+<!--
     <update id="update" parameterType="UserDto">
         UPDATE users
         <set>
@@ -59,7 +59,31 @@
         </set>
         WHERE id = #{id}
     </update>
+    -->
 
+    <!--update 이걸로 수정해야되지 않을까요??-->
+    <update id="update" parameterType="UserDto">
+        UPDATE users
+        <set>
+            name = #{name},
+            birth_date = #{birthDate},
+            gender = #{gender},
+            email = #{email},
+            height = #{height},
+            weight = #{weight},
+            theme_pref = #{themePref},
+            diabetes = #{diabetes},
+            hypertension = #{hypertension},
+            heart_disease = #{heartDisease},
+            kidney_disease = #{kidneyDisease},
+            liver_disease = #{liverDisease},
+            <if test="familyCode != null">
+                family_code = #{familyCode},
+            </if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
 
 
     <delete id="delete" parameterType="int">
@@ -107,6 +131,18 @@
         updated_at AS updatedAt
         FROM users
         WHERE login_id = #{loginId}
+    </select>
+
+    <select id="selectById" resultType="int">
+        SELECT *
+        FROM users
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectUserDiseases" resultType="Int" parameterType="int">
+        SELECT disease_id
+        FROM user_diseases
+        WHERE user_id = #{userId}
     </select>
 
 </mapper>
