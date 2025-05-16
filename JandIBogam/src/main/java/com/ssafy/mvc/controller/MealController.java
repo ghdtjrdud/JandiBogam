@@ -5,12 +5,9 @@ import com.ssafy.mvc.model.dto.MealDto;
 import com.ssafy.mvc.model.service.MealNutrientService;
 import com.ssafy.mvc.model.service.MealService;
 import com.ssafy.mvc.security.JwtTokenProvider;
-import com.ssafy.mvc.security.JwtUtil;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,7 +19,6 @@ import java.util.List;
 @SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/meals")
-//@RequiredArgsConstructor
 public class MealController {
 
 

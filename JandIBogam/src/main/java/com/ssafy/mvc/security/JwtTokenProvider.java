@@ -138,24 +138,15 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
-    public Integer extractUserId(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            throw new JwtException("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
-        }
+    //    로그인한 유저의 토큰정보를 갖고와서 userId를 확인하기(모든 api에서 거의 쓰이니 따로 메서드로 빼기)
+    public int extractUserId(HttpServletRequest request) {
 
-        String token = bearerToken.substring(7); // "Bearer " 제거
+        String token = request.getHeader("Authorization").substring(7);
+        System.out.println("token : " + token);
         Claims claims = getClaims(token);
+        System.out.println("claims : " + claims.toString());
 
-        Object idObj = claims.get("id");
-        if (idObj instanceof Integer) {
-            return (Integer) idObj;
-        } else if (idObj instanceof Long) {
-            return ((Long) idObj).intValue();
-        } else {
-            throw new JwtException("ID 형식이 유효하지 않습니다.");
-        }
+        return claims.get("id", Integer.class);
     }
-
 
 }
