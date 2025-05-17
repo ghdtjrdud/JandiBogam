@@ -117,12 +117,17 @@ public class MealServiceImpl implements MealService {
     // 4. 식단 수정
     @Override
     public MealDto updateMeal(int id, int userId, MealDto mealDto) {
-        MealDto existingMeal = mealDao.selectById(mealDto.getId());
-        if (existingMeal == null) return null;
+        MealDto existingMeal = mealDao.selectById(id);
+        if (existingMeal == null || existingMeal.getUserId() != userId) {
+            return null;
+        }
+
+        mealDto.setId(id);
+        mealDto.setUserId(userId);
 
         int r1 = mealDao.updateMeal(mealDto);
         if (r1 > 0) {
-            mealDao.deleteMealFoods(mealDto.getId());
+            mealDao.deleteMealFoods(id);
 
             if (mealDto.getFoodNames() != null && !mealDto.getFoodNames().isEmpty()) {
                 List<Integer> foodIds = new ArrayList<>();

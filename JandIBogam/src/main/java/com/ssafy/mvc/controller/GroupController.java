@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/api/groups")
 public class GroupController {
 
     private final GroupService groupService;
@@ -29,7 +29,7 @@ public class GroupController {
     }
 
     //    그룹생성
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> createGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
         try {
             //헤더에서 토큰 꺼내기
