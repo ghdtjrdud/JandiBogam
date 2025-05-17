@@ -5,6 +5,7 @@
 
 <mapper namespace="com.ssafy.mvc.model.dao.UserDao">
 
+<!--  회원등록  -->
     <insert id="insert" parameterType="UserDto">
         INSERT INTO users
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -23,6 +24,7 @@
     </insert>
 
 
+<!--  유저조회  -->
     <select id="select" resultType="UserDto">
         SELECT
         id,
@@ -144,5 +146,12 @@
         FROM user_diseases
         WHERE user_id = #{userId}
     </select>
+
+    <update id="updateTheme">
+        UPDATE users
+        SET theme_pref = #{newTheme},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
 
 </mapper>

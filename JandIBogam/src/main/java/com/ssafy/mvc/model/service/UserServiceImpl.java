@@ -3,6 +3,7 @@ package com.ssafy.mvc.model.service;
 import com.ssafy.mvc.model.dao.UserDao;
 import com.ssafy.mvc.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,6 +47,11 @@ public class UserServiceImpl implements UserService {
     public UserDto detail(int id) {
 
         return userDao.detail(id);
+    }
+
+    @Override
+    public boolean updateTheme(int id, String newTheme) {
+        return userDao.updateTheme(id, newTheme);
     }
 
 
