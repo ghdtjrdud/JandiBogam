@@ -1,9 +1,14 @@
 package com.ssafy.mvc.model.service;
 
-import com.ssafy.mvc.model.dao.*;
+import com.ssafy.mvc.model.dao.UserDao;
+import com.ssafy.mvc.model.dao.WeeklyReportDao;
+import com.ssafy.mvc.model.dao.WeeklyReportMapper;
 import com.ssafy.mvc.model.dto.NutrientGuideDto;
+import com.ssafy.mvc.model.dto.UserDto;
 import com.ssafy.mvc.model.dto.WeeklyNutrientStatsDto;
 import com.ssafy.mvc.model.dto.WeeklyReportDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,24 +20,18 @@ import java.util.Map;
 
 @Transactional
 @Service
+@RequiredArgsConstructor
 public class ReportService {
     private final WeeklyReportMapper weeklyReportMapper;
     private final WeeklyReportDao weeklyReportDao;
     private final UserDao userDao;
-    private final NutrientDao nutrientDao;
     private final DiseaseService diseaseService;
     private final MealNutrientService mealNutrientService;
+    private final OpenAiService openAiService;
 
-    public ReportService(WeeklyReportMapper weeklyReportMapper, WeeklyReportDao weeklyReportDao, UserDao userDao, NutrientDao nutrientDao, DiseaseService diseaseService, MealNutrientService mealNutrientService) {
-        this.weeklyReportMapper = weeklyReportMapper;
-        this.weeklyReportDao = weeklyReportDao;
-        this.userDao = userDao;
-        this.nutrientDao = nutrientDao;
-        this.diseaseService = diseaseService;
-        this.mealNutrientService = mealNutrientService;
-    }
-
-    // 주간 영양소 리포트 생성
+    /**
+     * 수동/스케줄러용: 주간 리포트 생성 + AI 추천
+     */
     public WeeklyReportDto generateReport(int userId, LocalDate startDate, LocalDate endDate) {
         // 1. 일일 영양소 합계 계산
         mealNutrientService.calculateMealNutrientsForDateRange(userId, startDate, endDate);
@@ -60,18 +59,41 @@ public class ReportService {
             }
         }
 
-        // 6. 리포트 생성
-        WeeklyReportDto report = new WeeklyReportDto();
-        report.setUserId(userId);
-        report.setStartDate(startDate);
-        report.setEndDate(endDate);
-        report.setMealCount(mealCount);
-        report.setNutrients(stats);
-        report.setHealthScore(calculateHealthScore(stats));
+        // 6. 리포트 DTO 조립
+        WeeklyReportDto report = WeeklyReportDto.builder()
+                .userId(userId)
+                .startDate(startDate)
+                .endDate(endDate)
+                .mealCount(mealCount)
+                .nutrients(stats)
+                .healthScore(calculateHealthScore(stats))
+                .build();
+
+        // — AI 호출 & 추천 세팅 —
+        String prompt = buildforgpt(report);
+        String recommendation = openAiService.recommendDiet(prompt);
+        report.setRecommendation(recommendation);
 
         // 7. DB 저장
         weeklyReportDao.insert(report);
+
         return report;
+    }
+
+    /**
+     * 매일 새벽 2시에 자동 실행: 모든 사용자에 대해 지난주 리포트 생성 + AI 호출
+     */
+    @Scheduled(cron = "0 0 2 * * *", zone = "Asia/Seoul")
+    public void scheduledWeeklyReport() {
+        LocalDate end   = LocalDate.now().minusDays(1);
+        LocalDate start = end.minusDays(6);
+
+        // 모든 사용자 조회
+        List<UserDto> users = userDao.select();
+        for (UserDto user : users) {
+            int uid = (int) user.getId();
+            generateReport(uid, start, end);
+        }
     }
 
     // 최신 리포트 조회
@@ -91,50 +113,62 @@ public class ReportService {
                 .orElse(null);
     }
 
-    // 건강 점수 계산 (적정 영양소 비율)
+    // 건강 점수 계산
     private Integer calculateHealthScore(List<WeeklyNutrientStatsDto> stats) {
         if (stats == null || stats.isEmpty()) return 0;
-
         long optimalCount = stats.stream()
                 .filter(stat -> "적정".equals(stat.getStatus()))
                 .count();
-
         return (int) ((optimalCount * 100.0) / stats.size());
     }
 
-    // 준수율 계산 로직 개선
+    // 준수율 계산
     private BigDecimal calculateCompliance(BigDecimal avg, NutrientGuideDto guide) {
         BigDecimal min = guide.getMin();
         BigDecimal max = guide.getMax();
-        if (avg == null || min == null || max == null) {
-            return BigDecimal.ZERO;
-        }
+        if (avg == null || min == null || max == null) return BigDecimal.ZERO;
         try {
             if (guide.isRestriction()) {
                 if (avg.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
-                return guide.getMax().multiply(BigDecimal.valueOf(100))
+                return max.multiply(BigDecimal.valueOf(100))
                         .divide(max, 2, RoundingMode.HALF_UP);
             } else {
-                if (guide.getMin().compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
+                if (min.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
                 return avg.multiply(BigDecimal.valueOf(100))
                         .divide(min, 2, RoundingMode.HALF_UP);
             }
-        }catch(ArithmeticException e){
+        } catch (ArithmeticException e) {
             return BigDecimal.ZERO;
         }
     }
 
     // 상태 판정
     private String calculateStatus(BigDecimal avg, NutrientGuideDto guide) {
-        if (avg == null) {
-            return "미확인";
-        }
+        if (avg == null) return "미확인";
         if (guide.isRestriction()) {
-            if(guide.getMax() == null) return "미확인";
+            if (guide.getMax() == null) return "미확인";
             return avg.compareTo(guide.getMax()) > 0 ? "초과" : "적정";
         } else {
-            if(guide.getMin() == null) return "미확인";
+            if (guide.getMin() == null) return "미확인";
             return avg.compareTo(guide.getMin()) < 0 ? "부족" : "적정";
         }
+    }
+
+    // GPT 프롬프트용 문자열 생성
+    private String buildforgpt(WeeklyReportDto report) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("사용자 ").append(report.getUserId())
+                .append("님의 주간 리포트 (")
+                .append(report.getStartDate()).append(" ~ ")
+                .append(report.getEndDate()).append(")\n");
+        sb.append("식사 횟수: ").append(report.getMealCount()).append("\n");
+        sb.append("건강 점수: ").append(report.getHealthScore()).append("%\n");
+        sb.append("영양소별 통계:\n");
+        for (WeeklyNutrientStatsDto stat : report.getNutrients()) {
+            sb.append("- ").append(stat.getNutrientName())
+                    .append(": 평균 ").append(stat.getAvg())
+                    .append(", 상태 ").append(stat.getStatus()).append("\n");
+        }
+        return sb.toString();
     }
 }

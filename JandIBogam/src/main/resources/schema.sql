@@ -304,6 +304,8 @@ CREATE TABLE daily_nutrient_summary (
 );
 
 
+
+
 -- 질병 마스터 데이터 삽입
 INSERT INTO `diseases` (`name`, `description`)
 VALUES ('없음', '해당 없음'),
@@ -424,6 +426,7 @@ VALUES
 (6, (SELECT id FROM nutrients WHERE name = '콜레스테롤'), 0, 300, TRUE, '콜레스테롤은 하루 300mg 이하로 제한하세요'),
 (6, (SELECT id FROM nutrients WHERE name = '식이섬유'), 20, 25, FALSE, '식이섬유는 소화를 돕고 독소 배출에 도움이 됩니다'),
 (6, (SELECT id FROM nutrients WHERE name = '당류'), 0, 30, TRUE, '과도한 당류 섭취는 간에 부담을 줄 수 있으므로 제한하세요');
+
 
 
 
