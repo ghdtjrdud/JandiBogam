@@ -29,7 +29,7 @@ public class GroupController {
     }
 
     //    그룹생성
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> createGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
         try {
             //헤더에서 토큰 꺼내기
@@ -135,7 +135,7 @@ public class GroupController {
 
 //            여기에서는 딱히 없어도 되는데 혹시 나중에 권한설정이나 이런거 있을수도
 //            어차피 우리는 목록에서부터 가입된거만 보이게 할것
-            jwtTokenProvider.extractUserId(request);
+            int userId = jwtTokenProvider.extractUserId(request);
 
             List<UserDto> list = groupService.getGroupMembers(groupId);
 

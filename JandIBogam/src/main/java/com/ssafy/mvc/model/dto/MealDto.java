@@ -20,7 +20,6 @@ public class MealDto {
     private LocalDate eatDate;
     private String timeSlot; //enum 처리해야 돼
     private String photoUrl;
-
     private String memo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -11,8 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -96,6 +98,7 @@ public class MealController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateMeal(@PathVariable int id, @RequestBody MealDto mealDto, HttpServletRequest request){
         int userId = jwtTokenProvider.extractUserId(request);
+        mealDto.setId(id);
         MealDto updated = mealService.updateMeal(id, userId, mealDto);
         if(updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
@@ -122,11 +125,17 @@ public class MealController {
     }
 
     //영양소 섭취 - 하루
-    @PostMapping("/nutrients/daily")
-    public ResponseEntity<?> calculateDailyNutrients(HttpServletRequest request, @PathVariable LocalDate date){
-        int userId = jwtTokenProvider.extractUserId(request);
-        mealNutrientService.calculateDailyNutrients(userId, date);
-        return ResponseEntity.status(HttpStatus.OK).body("calculated daily nutrients");
+    @PostMapping("/nutrients/daily/{date}")
+    public ResponseEntity<?> calculateDailyNutrients(HttpServletRequest request,
+                                                     @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            int userId = jwtTokenProvider.extractUserId(request);
+            mealNutrientService.calculateDailyNutrients(userId, date);
+            return ResponseEntity.status(HttpStatus.OK).body("calculated daily nutrients");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("영양소 계산 중 오류 발생: " + e.getMessage());
+        }
     }
 
     //영양소 섭취 - 일주일(일정 기간)

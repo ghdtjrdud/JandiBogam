@@ -1,6 +1,5 @@
 package com.ssafy.mvc.controller;
 
-import com.ssafy.mvc.model.dao.UserDao;
 import com.ssafy.mvc.model.dto.WeeklyReportDto;
 import com.ssafy.mvc.model.service.ReportService;
 import com.ssafy.mvc.security.JwtTokenProvider;

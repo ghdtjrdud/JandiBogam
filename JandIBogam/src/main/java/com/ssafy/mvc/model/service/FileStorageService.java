@@ -16,11 +16,15 @@ import java.util.UUID;
 public class FileStorageService {
 
     @Value("${file.upload-dir:./uploads/meals}")
-    private String uploadDir;
+    private String baseUploadDir;
 
-    public String storeFile(MultipartFile file) throws IOException {
+    @Value("${file.web-path:/uploads/meals}")
+    private String webPath;
+
+    public String storeFileWithUser(MultipartFile file, int userId) throws IOException {
         //디렉토리 생성
-        Path uploadDirPath = Paths.get(uploadDir);
+        String uploadDir = baseUploadDir + "/" + userId;
+        Path uploadDirPath = Paths.get(uploadDir).toAbsolutePath().normalize();
         if(!Files.exists(uploadDirPath)) {
             Files.createDirectories(uploadDirPath);
         }
@@ -32,13 +36,15 @@ public class FileStorageService {
         }
 
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-        String newFileName = UUID.randomUUID().toString() + fileExtension;
+        String newFileName = UUID.randomUUID() + fileExtension;
 
         //파일 저장
         Path filePath = uploadDirPath.resolve(newFileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         //접근 가능한 url 형태로 반환
-        return "/uploads/meals/" + newFileName;
+        return webPath + "/" + userId + "/" + newFileName;
     }
+
+
 }
