@@ -22,6 +22,7 @@ public class WeeklyReportDto {
     private int mealCount;
     private Integer healthScore;
     private LocalDateTime createdAt;
+    private String recommendation; // gpt 추천 식단내용
 
     private List<WeeklyNutrientStatsDto> nutrients;
 
