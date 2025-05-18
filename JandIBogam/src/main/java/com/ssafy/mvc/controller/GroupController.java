@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/api/groups")
 public class GroupController {
 
     private final GroupService groupService;
