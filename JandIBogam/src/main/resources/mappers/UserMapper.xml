@@ -5,17 +5,18 @@
 
 <mapper namespace="com.ssafy.mvc.model.dao.UserDao">
 
+<!--  회원등록  -->
     <insert id="insert" parameterType="UserDto">
         INSERT INTO users
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            login_id, password_hash, name, birth_date, gender, email, height, weight,theme_pref
+            login_id, password_hash, name, birth_date, gender, email, height, weight
             , diabetes, hypertension, heart_disease, kidney_disease, liver_disease
             <if test="familyCode != null">, family_code</if>
             , created_at, updated_at
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            #{loginId}, #{passwordHash}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}, #{uiTheme}
+            #{loginId}, #{passwordHash}, #{name}, #{birthDate}, #{gender}, #{email}, #{height}, #{weight}
             , #{diabetes}, #{hypertension}, #{heartDisease}, #{kidneyDisease}, #{liverDisease}
             <if test="familyCode != null">, #{familyCode}</if>
             , #{createdAt}, #{updatedAt}
@@ -23,6 +24,7 @@
     </insert>
 
 
+<!--  유저조회  -->
     <select id="select" resultType="UserDto">
         SELECT
         id,
@@ -70,11 +72,9 @@
             gender = #{gender},
             email = #{email},
             height = #{height},
-            weight = #{weight}
-            <if test="uiTheme != null">
-                , theme_pref = #{uiTheme}
-            </if>
-            , diabetes = #{diabetes},
+            weight = #{weight},
+            theme_pref = #{uiTheme}
+            diabetes = #{diabetes},
             hypertension = #{hypertension},
             heart_disease = #{heartDisease},
             kidney_disease = #{kidneyDisease},
@@ -146,5 +146,12 @@
         FROM user_diseases
         WHERE user_id = #{userId}
     </select>
+
+    <update id="updateTheme">
+        UPDATE users
+        SET theme_pref = #{newTheme},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
 
 </mapper>

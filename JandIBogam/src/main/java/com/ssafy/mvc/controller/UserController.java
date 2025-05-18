@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.ssafy.mvc.model.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -91,5 +92,22 @@ public class UserController {
 
     }
 
+    @PatchMapping("/{id}/theme")
+    public ResponseEntity<?> updateTheme(@PathVariable int id, @RequestBody Map<String, String> request) {
 
+        String newTheme = request.get("themePreference");
+
+        if (newTheme == null || !(newTheme.equals("default") || newTheme.equals("senior"))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 테마입니다.");
+        }
+
+        boolean success = userService.updateTheme(id, newTheme);
+
+        if (success) {
+            return ResponseEntity.status(HttpStatus.OK).body("테마 변경 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("테마 변경 실패");
+        }
+
+    }
 }

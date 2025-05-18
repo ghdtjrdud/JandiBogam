@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -26,12 +27,21 @@ public class AuthController {
             description = "새로운 사용자를 등록합니다.",
             responses = {
                     @ApiResponse(responseCode = "201", description = "회원가입 성공"),
-                    @ApiResponse(responseCode = "400", description = "잘못된 입력"),
+                    @ApiResponse(responseCode = "400", description = "잘못된 입력",
+                            content = @Content(schema = @Schema(example = "{\"error\":\"비밀번호는…\"}"))),
                     @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디")
             }
     )
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody AuthDto.SignupRequest signupRequest) {
+
+//        비밀번호 유효성 검사
+        String pwd = signupRequest.getPassword();
+        String pwRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
+        if (pwd == null || !pwd.matches(pwRegex)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("규칙에 맞지 않습니다.");
+        }
+
         try {
             authService.signup(signupRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");

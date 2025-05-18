@@ -3,6 +3,7 @@ package com.ssafy.mvc.model.dao;
 import com.ssafy.mvc.model.dto.UserDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -24,4 +25,6 @@ public interface UserDao {
     UserDto findByLoginId(@NotBlank @Size(min = 6, max = 12) String loginId);
 
     List<Integer> selectUserDiseases(int userId);
+
+    boolean updateTheme(@Param("id") int id, @Param("newTheme") String newTheme);
 }
