@@ -15,4 +15,6 @@ public interface UserService {
     int delete(int id);
 
     UserDto detail(int id);
+
+    boolean updateTheme(int id, String newTheme);
 }
