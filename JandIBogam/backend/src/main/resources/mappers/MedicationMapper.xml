@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.MedicationDao">
+
+    <insert id="insertMedication" parameterType="MedicationDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO medications ( user_id, med_date, time_slot, drug_name, drug_type, created_at, updated_at )
+        VALUES (#{userId}, #{medDate}, #{timeSlot}, #{drugName}, #{drugType}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="selectMedicationById" resultType="MedicationDto" parameterType="int">
+        SELECT *
+        FROM medications
+        WHERE id=#{id}
+    </select>
+
+    <select id="selectMedicationByUserId" resultType="MedicationDto" parameterType="int">
+        SELECT *
+        FROM medications
+        WHERE user_id = #{userId}
+        ORDER BY med_date DESC, FIELD(time_slot, '아침', '점심', '저녁')
+    </select>
+
+    <select id="selectAllMedications" resultType="MedicationDto">
+        SELECT *
+        FROM medications
+    </select>
+
+    <update id="updateMedication" parameterType="MedicationDto">
+        UPDATE medications
+        SET drug_name = #{drugName},
+        drug_type = #{drugType},
+        time_slot = #{timeSlot},
+        updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteMedication" parameterType="int">
+        DELETE FROM medications
+        WHERE id = #{id}
+    </delete>
+
+
+</mapper>

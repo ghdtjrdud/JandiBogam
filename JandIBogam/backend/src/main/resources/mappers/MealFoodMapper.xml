@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.mvc.model.dao.MealFoodDao">
+    <resultMap id="MealFoodResultMap" type="MealFoodDto">
+        <!-- 추가: mealId와 foodId 매핑 -->
+        <result property="mealId" column="meal_id"/>
+        <result property="foodId" column="food_id"/>
+        <!-- 수정: foodNutrientDto의 모든 필드 매핑 -->
+        <association property="foodNutrientDto" javaType="FoodNutrientDto">
+            <id property="id" column="fn_id"/>
+            <result property="foodName" column="fn_food_name"/>
+            <result property="servingSize" column="fn_serving_size"/>
+            <result property="energy" column="fn_energy"/>
+            <result property="protein" column="fn_protein"/>
+            <result property="fat" column="fn_fat"/>
+            <result property="carbohydrate" column="fn_carbohydrate"/>
+            <result property="sugar" column="fn_sugar"/>
+            <result property="fiber" column="fn_fiber"/>
+            <result property="potassium" column="fn_potassium"/>
+            <result property="sodium" column="fn_sodium"/>
+            <result property="cholesterol" column="fn_cholesterol"/>
+            <result property="saturatedFat" column="fn_saturated_fat"/>
+        </association>
+    </resultMap>
+
+
+
+    <!-- 식사 ID로 식사-음식 매핑 정보 조회 (영양소 정보 포함) -->
+    <select id="selectByMealId" resultMap="MealFoodResultMap">
+        SELECT
+        mf.meal_id,
+        mf.food_id,
+        fn.id as fn_id,
+        fn.food_name as fn_food_name,
+        fn.serving_size as fn_serving_size,
+        fn.energy as fn_energy,
+        fn.protein as fn_protein,
+        fn.fat as fn_fat,
+        fn.carbohydrate as fn_carbohydrate,
+        fn.sugar as fn_sugar,
+        fn.fiber as fn_fiber,
+        fn.potassium as fn_potassium,
+        fn.sodium as fn_sodium,
+        fn.cholesterol as fn_cholesterol,
+        fn.saturated_fat as fn_saturated_fat
+        FROM
+        meal_foods mf
+        JOIN
+        food_nutrients fn ON mf.food_id = fn.id
+        WHERE
+        mf.meal_id = #{mealId}
+    </select>
+
+    <!-- 식사-음식 매핑 정보 저장 -->
+    <insert id="insert">
+        INSERT INTO meal_foods
+        (meal_id, food_id)
+        VALUES
+        (#{mealId}, #{foodId})
+    </insert>
+
+    <!-- 여러 식사-음식 매핑 정보 일괄 저장 -->
+    <insert id="insertMultiple">
+        INSERT INTO meal_foods
+        (meal_id, food_id)
+        VALUES
+        <foreach collection="foodIds" item="foodId" separator=",">
+            (#{mealId}, #{foodId})
+        </foreach>
+    </insert>
+
+    <!-- 식사 ID로 모든 식사-음식 매핑 정보 삭제 -->
+    <delete id="deleteByMealId">
+        DELETE FROM meal_foods
+        WHERE meal_id = #{mealId}
+    </delete>
+
+
+</mapper>
