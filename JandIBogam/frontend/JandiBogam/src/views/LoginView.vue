@@ -4,20 +4,20 @@
     <div class="w-1/2 bg-[#C7D7CB] flex items-center justify-center p-6">
       <div class="w-full text-center px-8">
         <img
-          src="/src/assets/images/logo(new).png"
+          src="/src/assets/images/logo(m).png"
           alt="Dining Bom Logo"
           class="mx-auto mb-8 mt-2 w-44 h-auto"
         />
-        <p class="mb-4 text-2xl text-[#BAA89B]">식사와 돌봄의 따뜻한 만남</p>
-        <p class="text-2xl text-[#BAA89B]">가족과 함께하는 건강한 일상</p>
+        <h3 class="mb-4 text-2xl text-[#BAA89B]">식사와 돌봄의 따뜻한 만남</h3>
+        <h3 class="text-2xl text-[#BAA89B]">가족과 함께하는 건강한 일상</h3>
       </div>
     </div>
 
     <!-- 우측: 로그인 폼 영역 -->
     <div class="w-1/2 bg-white flex items-center justify-center p-6">
       <div class="w-[420px] px-12 py-16 bg-white rounded-3xl shadow-lg flex flex-col items-center">
-        <h2 class="mb-4 text-center text-4xl font-bold text-[#6A7D73]">로그인</h2>
-        <p class="mb-10 text-center text-[#9E8C7F]">건강한 일상을 함께합니다</p>
+        <h1 class="mb-5 text-center text-4xl font-bold text-[#6A7D73]">로그인</h1>
+        <h3 class="mb-10 text-center text-[#9E8C7F]">건강한 일상을 함께합니다</h3>
 
         <form @submit.prevent="handleLogin" class="w-full flex flex-col gap-8">
           <div>

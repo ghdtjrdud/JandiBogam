@@ -1,13 +1,5 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-
-// 공용 버튼 컴포넌트 import
-import BaseButton from './components/common/BaseButton.vue';
-
-function onClick() {
-  alert('BaseButton 클릭됨!')
-}
-
 </script>
 
 <template>
