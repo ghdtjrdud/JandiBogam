@@ -110,6 +110,7 @@ public class GroupController {
 
     }
 
+//    그룹탈퇴
     @DeleteMapping("/{groupId}/leave")
     public ResponseEntity<?> leaveGroup(@PathVariable int groupId, HttpServletRequest request) {
 
@@ -129,6 +130,7 @@ public class GroupController {
         }
     }
 
+//    맴버조회(가입한 그룹만 어차피 목록에서 보이기때문에 따로 권한 설정  x)
     @GetMapping("/{groupId}/members")
     public ResponseEntity<?> getGroupMembers(@PathVariable int groupId, HttpServletRequest request) {
 
