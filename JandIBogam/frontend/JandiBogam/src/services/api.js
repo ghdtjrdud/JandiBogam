@@ -11,13 +11,13 @@ const apiClient = axios.create({
 })
 
 // 요청 인터셉터 (토큰 자동 추가)
-apiClient.interceptors.request.user(
+apiClient.interceptors.request.use(
     config => {
         // 요청 전송 전 처리
         // 토큰 가져와서 헤더에 추가
         const token = localStorage.getItem('accessToken')
         if(token){
-            config.Headers['Authorization'] = `Bearer ${token}`
+            config.headers['Authorization'] = `Bearer ${token}`
         }
         return config
     },
@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
 
         // 401 에러(인증 실패)이고 토큰 재발급 시도가 아직 안 된 경우
         if(error.response && error.response.status === 401){
-            
+
             // 401 인증 실패 시 바로 로그아우 ㅅ처리
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
@@ -40,3 +40,13 @@ apiClient.interceptors.response.use(
         return Promise.reject(error)
     }
 )
+
+// api.js에 추가
+export const authAPI = {
+    // 로그인 API
+    login: (credentials) => {
+        return apiClient.post('/auth/login', credentials);
+    }
+}
+
+export default apiClient;

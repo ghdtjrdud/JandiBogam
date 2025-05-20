@@ -3,6 +3,7 @@ import globals from 'globals'
 import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import vueParser from 'vue-eslint-parser' // ✅ 이 줄 추가
 
 export default defineConfig([
   {
@@ -14,6 +15,11 @@ export default defineConfig([
 
   {
     languageOptions: {
+      parser: vueParser, // ✅ 이 줄 추가
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+      },
       globals: {
         ...globals.browser,
       },
@@ -21,6 +27,6 @@ export default defineConfig([
   },
 
   js.configs.recommended,
-  ...pluginVue.configs['flat/vue3-recommended'], // ✅ 이 줄만 바꾸면 됨!
+  ...pluginVue.configs['flat/vue3-recommended'],
   skipFormatting,
 ])

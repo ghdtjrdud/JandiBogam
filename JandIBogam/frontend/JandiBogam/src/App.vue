@@ -11,22 +11,6 @@ function onClick() {
 </script>
 
 <template>
-  <header>
-    <!-- 로고, HelloWorld 삭제! -->
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-    <!-- DaisyUI + Tailwind 테스트용 버튼 -->
-    <div class="p-10">
-      <h1 class="text-2xl font-bold mb-6">Hello, DaisyUI + Tailwind + Vue!</h1>
-      <BaseButton type="primary" @click="onClick">BaseButton - primary</BaseButton>
-      <BaseButton type="accent" class="m1-2">BaseButton - Accent</BaseButton>
-      <button class="btn btn-primary m1-2">DaisyUI 기본 버튼</button>
-    </div>
-  </header>
   <RouterView />
 </template>
 
