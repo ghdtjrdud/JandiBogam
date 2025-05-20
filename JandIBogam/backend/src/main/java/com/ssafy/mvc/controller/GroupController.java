@@ -20,7 +20,9 @@ public class GroupController {
 
     private final GroupService groupService;
     private final JwtTokenProvider jwtTokenProvider;
-//    private final JwtUtil jwtUtil;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @Autowired
     public GroupController(GroupService groupService, JwtTokenProvider jwtTokenProvider) {
@@ -30,18 +32,20 @@ public class GroupController {
 
     //    그룹생성
     @PostMapping
-    public ResponseEntity<?> createGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
+    public ResponseEntity<?> createGroup(@RequestBody GroupDto groupDto) {
         try {
             //헤더에서 토큰 꺼내기
-            String bearerToken = request.getHeader("Authorization");
-            if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 없습니다.");
-            }
-            String token = bearerToken.substring(7); // "Bearer " 제거
+//            String bearerToken = request.getHeader("Authorization");
+//            if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰이 없습니다.");
+//            }
+//            String token = bearerToken.substring(7); // "Bearer " 제거
+//
+//            //토큰에서 사용자 ID 꺼내기
+//            Claims claims = jwtTokenProvider.getClaims(token);
+//            int userId = claims.get("id", Integer.class); // 이게 createdBy가 됨
 
-            //토큰에서 사용자 ID 꺼내기
-            Claims claims = jwtTokenProvider.getClaims(token);
-            int userId = claims.get("id", Integer.class); // 이게 createdBy가 됨
+            int userId = jwtTokenProvider.extractUserId(request);
 
             // 3. 그룹 정보 구성
             groupDto.setCode(UUID.randomUUID().toString());
@@ -61,13 +65,11 @@ public class GroupController {
 
     //    그룹 가입
     @PostMapping("/join")
-    public ResponseEntity<?> joinGroup(@RequestBody GroupDto groupDto, HttpServletRequest request) {
+    public ResponseEntity<?> joinGroup(@RequestBody GroupDto groupDto) {
 
         try {
-//            bearer 빼고 토큰헤더 갖고오기
-            String token = request.getHeader("Authorization").substring(7);
-            Claims claims = jwtTokenProvider.getClaims(token);
-            int userId = claims.get("id", Integer.class);
+
+            int userId = jwtTokenProvider.extractUserId(request);
 
             int result = groupService.joinGroup(groupDto.getCode(), userId);
 
@@ -89,7 +91,6 @@ public class GroupController {
 //            String token = request.getHeader("Authorization").substring(7);
 //            Claims claims = jwtTokenProvider.getClaims(token);
 //            int userId = claims.get("id", Integer.class);
-            System.out.println("hhi!");
             int userId = jwtTokenProvider.extractUserId(request);
 
             System.out.println("userId : " + userId);
