@@ -45,34 +45,34 @@ onMounted(fetchMyInfo)
     <!-- 사용자 프로필 정보 섹션 -->
     <div class="grid grid-cols-4 gap-8 mb-8">
       <!-- 왼쪽 : 개인정보 카드 -->
-      <div class="col-span-2 bg-white rounded-lg p-8 border border-brand-border shadow">
-        <h2 class="text-xl font-bold mb-6 text-brand-primary">개인 정보</h2>
+      <div class="col-span-2 bg-white rounded-lg p-8 border border-[#B29888] shadow">
+        <h2 class="text-xl font-bold mb-6 text-[#6A7D73]">개인 정보</h2>
         <div v-if="loading">불러오는 중...</div>
         <div v-else-if="error">{{ error }}</div>
         <div v-else-if="user" class="space-y-4">
           <div class="flex">
-            <div class="w-24 text-brand-secondary">이름</div>
+            <div class="w-24 text-[#9E8C7F]">이름</div>
             <div>{{ user.name }}</div>
           </div>
           <div class="flex">
-            <div class="w-24 text-brand-secondary">성별</div>
+            <div class="w-24 text-[#9E8C7F]">성별</div>
             <div>{{ genderText }}</div>
           </div>
           <div class="flex">
-            <div class="w-24 text-brand-secondary">생년월일</div>
+            <div class="w-24 text-[#9E8C7F]">생년월일</div>
             <div>{{ user.birth_date }}</div>
           </div>
           <div class="flex">
-            <div class="w-24 text-brand-secondary">기저질환</div>
+            <div class="w-24 text-[#9E8C7F]">기저질환</div>
             <div>{{ illnessText }}</div>
           </div>
           <div class="flex">
-            <div class="w-24 text-brand-secondary">가입일</div>
+            <div class="w-24 text-[#9E8C7F]">가입일</div>
             <div>{{ user.created_at }}</div>
           </div>
           <div class="mt-6">
             <button
-              class="bg-brand-accent text-brand-primary px-4 py-2 rounded-md text-sm hover:bg-brand-hover hover:text-white transition-colors"
+              class="bg-[#C7D7CB] text-[#6A7D73] px-4 py-2 rounded-md text-sm hover:bg-[#5A6B63] hover:text-white transition-colors"
             >
               프로필 수정
             </button>
@@ -81,23 +81,23 @@ onMounted(fetchMyInfo)
       </div>
 
       <!-- 오른쪽 : 그룹 관리 카드 -->
-      <div class="col-span-2 bg-white rounded-lg p-8 border border-brand-border shadow">
-        <h2 class="text-xl font-bold mb-6 text-brand-primary">그룹 관리</h2>
+      <div class="col-span-2 bg-white rounded-lg p-8 border border-[#B29888] shadow">
+        <h2 class="text-xl font-bold mb-6 text-[#6A7D73]">그룹 관리</h2>
 
         <!-- 그룹 코드 -->
         <div class="mb-6">
           <div class="flex justify-between items-center mb-2">
-            <div class="text-brand-secondary">그룹 코드</div>
+            <div class="text-[#9E8C7F]">그룹 코드</div>
             <div class="flex items-center">
-              <span class="text-brand-primary font-medium mr-2">FAM1234</span>
+              <span class="text-[#6A7D73] font-medium mr-2">FAM1234</span>
               <span
-                class="bg-brand-accent text-brand-primary text-xs px-2 py-1 rounded cursor-pointer hover:bg-brand-primary hover:text-white transition-colors"
+                class="bg-[#C7D7CB] text-[#6A7D73] text-xs px-2 py-1 rounded cursor-pointer hover:bg-[#6A7D73] hover:text-white transition-colors"
                 >복사</span
               >
             </div>
           </div>
           <button
-            class="w-full bg-brand-primary text-white py-2 rounded-md text-sm mb-6 hover:bg-brand-hover transition-colors"
+            class="w-full bg-[#6A7D73] text-white py-2 rounded-md text-sm mb-6 hover:bg-[#5A6B63] transition-colors"
           >
             본가 그룹 코드 설정하기
           </button>
@@ -105,16 +105,16 @@ onMounted(fetchMyInfo)
 
         <!-- 그룹 코드 등록 -->
         <div class="mb-8">
-          <div class="text-brand-secondary mb-2">그룹 코드 등록</div>
+          <div class="text-[#9E8C7F] mb-2">그룹 코드 등록</div>
           <div class="flex">
             <input
               v-model="groupCode"
               type="text"
-              class="flex-1 border border-brand-border rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-brand-primary"
+              class="flex-1 border border-[#B29888] rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-[#6A7D73]"
               placeholder="그룹 코드를 입력하세요"
             />
             <button
-              class="bg-brand-primary text-white px-4 py-2 rounded-r-md text-sm hover:bg-brand-hover transition-colors"
+              class="bg-[#6A7D73] text-white px-4 py-2 rounded-r-md text-sm hover:bg-[#5A6B63] transition-colors"
             >
               등록
             </button>
@@ -125,16 +125,16 @@ onMounted(fetchMyInfo)
         <div class="mb-6">
           <div class="flex items-center mb-4">
             <div class="mr-4">
-              <div class="bg-brand-accent p-2 rounded-md">
-                <span class="text-brand-primary text-xl">👨‍👩‍👧</span>
+              <div class="bg-[#C7D7CB] p-2 rounded-md">
+                <span class="text-[#6A7D73] text-xl">👨‍👩‍👧</span>
               </div>
             </div>
             <div class="flex-1">
-              <div class="text-brand-primary font-medium">가족</div>
-              <div class="text-brand-secondary text-sm">구성원 3명</div>
+              <div class="text-[#6A7D73] font-medium">가족</div>
+              <div class="text-[#9E8C7F] text-sm">구성원 3명</div>
             </div>
             <button
-              class="bg-brand-lightbg text-brand-primary px-3 py-1 rounded-md text-sm hover:bg-brand-accent transition-colors"
+              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
             >
               상세 관리
             </button>
@@ -143,16 +143,16 @@ onMounted(fetchMyInfo)
           <!-- 의료진 목록 -->
           <div class="flex items-center mb-4">
             <div class="mr-4">
-              <div class="bg-brand-accent p-2 rounded-md">
-                <span class="text-brand-primary text-xl">💊</span>
+              <div class="bg-[#C7D7CB] p-2 rounded-md">
+                <span class="text-[#6A7D73] text-xl">💊</span>
               </div>
             </div>
             <div class="flex-1">
-              <div class="text-brand-primary font-medium">의료진</div>
-              <div class="text-brand-secondary text-sm">구성원 2명</div>
+              <div class="text-[#6A7D73] font-medium">의료진</div>
+              <div class="text-[#9E8C7F] text-sm">구성원 2명</div>
             </div>
             <button
-              class="bg-brand-lightbg text-brand-primary px-3 py-1 rounded-md text-sm hover:bg-brand-accent transition-colors"
+              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
             >
               상세 관리
             </button>
@@ -161,16 +161,16 @@ onMounted(fetchMyInfo)
           <!-- 친구들 목록 -->
           <div class="flex items-center">
             <div class="mr-4">
-              <div class="bg-brand-accent p-2 rounded-md">
-                <span class="text-brand-primary text-xl">👥</span>
+              <div class="bg-[#C7D7CB] p-2 rounded-md">
+                <span class="text-[#6A7D73] text-xl">👥</span>
               </div>
             </div>
             <div class="flex-1">
-              <div class="text-brand-primary font-medium">친구들</div>
-              <div class="text-brand-secondary text-sm">구성원 4명</div>
+              <div class="text-[#6A7D73] font-medium">친구들</div>
+              <div class="text-[#9E8C7F] text-sm">구성원 4명</div>
             </div>
             <button
-              class="bg-brand-lightbg text-brand-primary px-3 py-1 rounded-md text-sm hover:bg-brand-accent transition-colors"
+              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
             >
               상세 관리
             </button>
@@ -181,37 +181,32 @@ onMounted(fetchMyInfo)
 
     <!-- 테마 설정 -->
     <div class="mt-8">
-      <div class="bg-white rounded-lg p-6 border border-brand-border">
-        <h2 class="text-lg font-medium mb-6 text-brand-primary">테마 설정</h2>
+      <div class="bg-white rounded-lg p-6 border border-[#B29888]">
+        <h2 class="text-lg font-medium mb-6 text-[#6A7D73]">테마 설정</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- 고령자 모드 -->
           <div
-            class="border border-brand-accent rounded-lg p-4 bg-brand-lightbg flex items-center justify-center flex-col cursor-pointer hover:shadow-md transition-shadow"
+            class="border border-[#C7D7CB] rounded-lg p-4 bg-[#F6FAF7] flex items-center justify-center flex-col cursor-pointer hover:shadow-md transition-shadow"
           >
-            <div class="text-brand-primary text-3xl mb-2">😊</div>
-            <div class="font-medium text-brand-primary mb-1">고령자 모드</div>
-            <div class="text-xs text-brand-secondary text-center mb-2">
+            <div class="text-[#6A7D73] text-3xl mb-2">😊</div>
+            <div class="font-medium text-[#6A7D73] mb-1">고령자 모드</div>
+            <div class="text-xs text-[#9E8C7F] text-center mb-2">
               큰 글씨와 간편한 인터페이스로 편하게 사용하실 수 있습니다
             </div>
           </div>
 
           <!-- 일반 모드 -->
           <div
-            class="border border-brand-border rounded-lg p-4 flex items-center justify-center flex-col cursor-pointer hover:shadow-md transition-shadow"
+            class="border border-[#B29888] rounded-lg p-4 flex items-center justify-center flex-col cursor-pointer hover:shadow-md transition-shadow"
           >
-            <div class="text-brand-secondary text-3xl mb-2">👤</div>
-            <div class="font-medium text-brand-primary mb-1">일반 모드</div>
-            <div class="text-xs text-brand-secondary text-center mb-2">
+            <div class="text-[#9E8C7F] text-3xl mb-2">👤</div>
+            <div class="font-medium text-[#6A7D73] mb-1">일반 모드</div>
+            <div class="text-xs text-[#9E8C7F] text-center mb-2">
               표준 글씨와 기능을 사용할 수 있습니다
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="bg-brand-lightbg text-brand-primary p-10 rounded-xl">
-    <h2 class="text-2xl">Tailwind 커스텀 컬러 테스트</h2>
-    <p>이 영역이 연한 초록 배경(#F6FAF7), 초록 글씨(#6A7D73)라면 정상입니다.</p>
   </div>
 </template>

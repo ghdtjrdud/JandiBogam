@@ -333,4 +333,8 @@ const handleSignup = async () => {
     toast.error('회원가입 처리 중 오류가 발생했습니다');
   }
 };
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> df20e65a94fa80dc6f56dca8f19a934932eb2100
