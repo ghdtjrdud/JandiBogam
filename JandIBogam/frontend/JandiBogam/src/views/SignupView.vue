@@ -195,5 +195,142 @@
 </template>
 
 <script setup>
+import { ref, reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+import { useAuthStore } from '@/stores/auth';
 
+const router = useRouter();
+const toast = useToast();
+const authStore = useAuthStore();
+
+const signupForm = reactive({
+  loginId: '',
+  password: '',
+  passwordConfirm: '',
+  name: '',
+  gender: '',
+  birthdate: '',
+  familyCode: '',
+  healthInfo: {
+    diabetes: false,
+    hypertension: false,
+    heartDisease: false,
+    kidneyDisease: false,
+    liverDisease: false
+  }
+});
+
+// 유효성 검사 오류 메시지
+const errors = reactive({
+  id: '',
+  password: '',
+  passwordConfirm: '',
+  name: '',
+  birthdate: ''
+});
+
+// 계산된 속성: 폼 유효성 여부
+const isFormValid = computed(() => {
+  return !errors.id &&
+         !errors.password &&
+         !errors.passwordConfirm &&
+         !errors.name &&
+         !errors.birthdate &&
+         signupForm.id &&
+         signupForm.password &&
+         signupForm.name &&
+         signupForm.gender &&
+         signupForm.birthdate;
+});
+
+// 유효성 검사 함수
+const validateForm = () => {
+  let isValid = true;
+
+  // ID 유효성 검사
+  if (!signupForm.id.match(/^[a-zA-Z0-9]{6,12}$/)) {
+    errors.id = '6-12자 영문/숫자 조합으로 입력해주세요';
+    isValid = false;
+  } else {
+    errors.id = '';
+  }
+
+  // 비밀번호 유효성 검사
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+  if (!passwordRegex.test(signupForm.password)) {
+    errors.password = '영문+숫자+특수문자 8자 이상 필요';
+    isValid = false;
+  } else {
+    errors.password = '';
+  }
+
+  // 비밀번호 확인
+  if (signupForm.password !== signupForm.passwordConfirm) {
+    errors.passwordConfirm = '비밀번호가 일치하지 않습니다';
+    isValid = false;
+  } else {
+    errors.passwordConfirm = '';
+  }
+
+  // 이름 확인
+  if (!signupForm.name) {
+    errors.name = '이름을 입력해주세요';
+    isValid = false;
+  } else {
+    errors.name = '';
+  }
+
+  // 생년월일 필수 확인
+  if (!signupForm.birthdate) {
+    errors.birthdate = '생년월일을 선택해주세요';
+    isValid = false;
+  } else {
+    errors.birthdate = '';
+  }
+
+  return isValid;
+};
+
+// 회원가입 처리
+const handleSignup = async () => {
+  if (!validateForm()) return;
+
+  try {
+    // 서버에 전송할 데이터 준비 - 백엔드 SignupRequest 형식에 맞게 수정
+    const userData = {
+      // 백엔드 컨트롤러의 SignupRequest DTO에 맞는 필드명 사용
+      loginId: signupForm.id, // 아이디 필드명 변경
+      password: signupForm.password,
+      name: signupForm.name,
+      gender: signupForm.gender === 'male' ? 'M' : 'F',
+      // ISO 형식(YYYY-MM-DD)으로 날짜 변환
+      birthDate: signupForm.birthdate instanceof Date
+        ? signupForm.birthdate.toISOString().split('T')[0]
+        : signupForm.birthdate,
+      // 선택적 필드들
+      familyCode: signupForm.familyCode || null,
+      // 건강 상태 정보를 배열로 변환
+      healthConditions: Object.entries(signupForm.healthInfo)
+        .filter(([, value]) => value)
+        .map(([key]) => key)
+    };
+
+    // Pinia 스토어의 register 액션 호출
+    const success = await authStore.register(userData);
+
+    if (success) {
+      toast.success('회원가입이 완료되었습니다!');
+      router.push('/login'); // 회원가입 후 로그인 페이지로 이동
+    } else {
+      // authStore.error 또는 authStore.getError()를 사용 (스토어 구현에 따라 다름)
+      toast.error(authStore.error || '회원가입에 실패했습니다');
+    }
+  } catch (error) {
+    console.error('회원가입 에러:', error);
+    toast.error('회원가입 처리 중 오류가 발생했습니다');
+  }
+};
 </script>
