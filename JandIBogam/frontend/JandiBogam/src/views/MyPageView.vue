@@ -1,43 +1,92 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import userService from '@/services/user.service'
+import { ref, watch, computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import UserService from '@/services/UserService'
 
+const authStore = useAuthStore()
+
+console.log('▶ authStore.user:', authStore.user)
+
+// 내 정보
 const user = ref(null)
-const loading = ref(false)
-const error = ref(null)
-const groupCode = ref('')
+const loadingUser = ref(false)
+const errorUser = ref(null)
 
-const userId = 2
+// 그룹 정보
+const groups = ref([])
+const loadingGroups = ref(false)
+const errorGroups = ref(null)
 
-const fetchMyInfo = async () => {
-  loading.value = true
+// 유저 아이디는 authStore.user가 세팅된 후에만 값이 생깁니다
+const userId = computed(() => authStore.user?.id)
+
+// —————————————————————————————————————————
+// 1) 내 정보 가져오기
+async function fetchMyInfo(id) {
+  console.log('▶ fetchMyInfo 호출, id =', id)
+
+  loadingUser.value = true
+  errorUser.value = null
   try {
-    const response = await userService.getMyInfo(userId)
-    user.value = response.data
-  } catch (e) {
-    error.value = '내 정보를 불러오지 못했습니다.'
+    const { data } = await UserService.getMyInfo(id)
+    user.value = data
+  } catch {
+    errorUser.value = '내 정보를 불러오지 못했습니다.'
   } finally {
-    loading.value = false
+    loadingUser.value = false
   }
 }
 
+// 2) 그룹 목록 가져오기
+async function fetchMyGroups() {
+  loadingGroups.value = true
+  errorGroups.value = null
+  try {
+    const { data } = await UserService.getMyGroups()
+    groups.value = Array.isArray(data) ? data : [data]
+  } catch {
+    errorGroups.value = '그룹 정보를 불러오지 못했습니다.'
+  } finally {
+    loadingGroups.value = false
+  }
+}
+
+// —————————————————————————————————————————
+// authStore.user가 바뀌어서 userId가 생기면(=로그인 복원 or 로그인 직후)
+// 자동으로 두 API를 호출하도록 watch 설정
+watch(
+  () => userId.value,
+  (id) => {
+    console.log('watch 감지됨! userId:', id)
+
+    if (id) {
+      console.log('✅ fetchMyInfo 호출 준비 완료')
+
+      fetchMyInfo(id)
+      fetchMyGroups()
+    } else {
+      console.warn('⚠️ userId가 undefined 또는 falsy 상태입니다')
+    }
+  },
+  { immediate: true }, // 컴포넌트 마운트 시에도 실행
+)
+
+// —————————————————————————————————————————
+// computed 텍스트
 const genderText = computed(() => {
   if (!user.value) return ''
   return user.value.gender === 'F' ? '여성' : '남성'
 })
-
 const illnessText = computed(() => {
   if (!user.value) return ''
-  const illnessList = []
-  if (user.value.diabetes) illnessList.push('당뇨')
-  if (user.value.hypertension) illnessList.push('고혈압')
-  if (user.value.heart_disease) illnessList.push('심장질환')
-  if (user.value.kidney_disease) illnessList.push('신장질환')
-  if (user.value.liver_disease) illnessList.push('간질환')
-  return illnessList.length ? illnessList.join(', ') : '없음'
+  const list = []
+  if (user.value.diabetes) list.push('당뇨')
+  if (user.value.hypertension) list.push('고혈압')
+  if (user.value.heart_disease) list.push('심장질환')
+  if (user.value.kidney_disease) list.push('신장질환')
+  if (user.value.liver_disease) list.push('간질환')
+  return list.length ? list.join(', ') : '없음'
 })
-
-onMounted(fetchMyInfo)
 </script>
 
 <template>
@@ -47,8 +96,10 @@ onMounted(fetchMyInfo)
       <!-- 왼쪽 : 개인정보 카드 -->
       <div class="col-span-2 bg-white rounded-lg p-8 border border-[#B29888] shadow">
         <h2 class="text-xl font-bold mb-6 text-[#6A7D73]">개인 정보</h2>
-        <div v-if="loading">불러오는 중...</div>
-        <div v-else-if="error">{{ error }}</div>
+
+        <!-- ✏️ 변수명 수정 -->
+        <div v-if="loadingUser">불러오는 중...</div>
+        <div v-else-if="errorUser" class="text-red-500">{{ errorUser }}</div>
         <div v-else-if="user" class="space-y-4">
           <div class="flex">
             <div class="w-24 text-[#9E8C7F]">이름</div>
@@ -84,97 +135,28 @@ onMounted(fetchMyInfo)
       <div class="col-span-2 bg-white rounded-lg p-8 border border-[#B29888] shadow">
         <h2 class="text-xl font-bold mb-6 text-[#6A7D73]">그룹 관리</h2>
 
-        <!-- 그룹 코드 -->
-        <div class="mb-6">
-          <div class="flex justify-between items-center mb-2">
-            <div class="text-[#9E8C7F]">그룹 코드</div>
-            <div class="flex items-center">
-              <span class="text-[#6A7D73] font-medium mr-2">FAM1234</span>
-              <span
-                class="bg-[#C7D7CB] text-[#6A7D73] text-xs px-2 py-1 rounded cursor-pointer hover:bg-[#6A7D73] hover:text-white transition-colors"
-                >복사</span
+        <div v-if="loadingGroups">그룹 불러오는 중...</div>
+        <div v-else-if="errorGroups" class="text-red-500">{{ errorGroups }}</div>
+        <div v-else>
+          <div v-if="groups.length === 0" class="text-[#9E8C7F]">가입된 그룹이 없습니다.</div>
+          <ul v-else class="space-y-4">
+            <li
+              v-for="group in groups"
+              :key="group.id"
+              class="flex items-center justify-between bg-[#F6FAF7] p-4 rounded-lg border border-[#C7D7CB]"
+            >
+              <div>
+                <div class="text-[#6A7D73] font-medium">{{ group.name }}</div>
+                <div class="text-xs text-[#9E8C7F]">코드: {{ group.code }}</div>
+              </div>
+              <button
+                @click="fetchMyGroups"
+                class="text-xs bg-[#C7D7CB] text-[#6A7D73] px-3 py-1 rounded hover:bg-[#5A6B63] hover:text-white transition-colors"
               >
-            </div>
-          </div>
-          <button
-            class="w-full bg-[#6A7D73] text-white py-2 rounded-md text-sm mb-6 hover:bg-[#5A6B63] transition-colors"
-          >
-            본가 그룹 코드 설정하기
-          </button>
-        </div>
-
-        <!-- 그룹 코드 등록 -->
-        <div class="mb-8">
-          <div class="text-[#9E8C7F] mb-2">그룹 코드 등록</div>
-          <div class="flex">
-            <input
-              v-model="groupCode"
-              type="text"
-              class="flex-1 border border-[#B29888] rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-[#6A7D73]"
-              placeholder="그룹 코드를 입력하세요"
-            />
-            <button
-              class="bg-[#6A7D73] text-white px-4 py-2 rounded-r-md text-sm hover:bg-[#5A6B63] transition-colors"
-            >
-              등록
-            </button>
-          </div>
-        </div>
-
-        <!-- 가족 목록 -->
-        <div class="mb-6">
-          <div class="flex items-center mb-4">
-            <div class="mr-4">
-              <div class="bg-[#C7D7CB] p-2 rounded-md">
-                <span class="text-[#6A7D73] text-xl">👨‍👩‍👧</span>
-              </div>
-            </div>
-            <div class="flex-1">
-              <div class="text-[#6A7D73] font-medium">가족</div>
-              <div class="text-[#9E8C7F] text-sm">구성원 3명</div>
-            </div>
-            <button
-              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
-            >
-              상세 관리
-            </button>
-          </div>
-
-          <!-- 의료진 목록 -->
-          <div class="flex items-center mb-4">
-            <div class="mr-4">
-              <div class="bg-[#C7D7CB] p-2 rounded-md">
-                <span class="text-[#6A7D73] text-xl">💊</span>
-              </div>
-            </div>
-            <div class="flex-1">
-              <div class="text-[#6A7D73] font-medium">의료진</div>
-              <div class="text-[#9E8C7F] text-sm">구성원 2명</div>
-            </div>
-            <button
-              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
-            >
-              상세 관리
-            </button>
-          </div>
-
-          <!-- 친구들 목록 -->
-          <div class="flex items-center">
-            <div class="mr-4">
-              <div class="bg-[#C7D7CB] p-2 rounded-md">
-                <span class="text-[#6A7D73] text-xl">👥</span>
-              </div>
-            </div>
-            <div class="flex-1">
-              <div class="text-[#6A7D73] font-medium">친구들</div>
-              <div class="text-[#9E8C7F] text-sm">구성원 4명</div>
-            </div>
-            <button
-              class="bg-[#F6FAF7] text-[#6A7D73] px-3 py-1 rounded-md text-sm hover:bg-[#C7D7CB] transition-colors"
-            >
-              상세 관리
-            </button>
-          </div>
+                탈퇴
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
