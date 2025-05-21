@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -153,6 +155,22 @@ public class GroupController {
         }
 
     }
+
+    @GetMapping("/{groupId}/code")
+    public ResponseEntity<Map<String, String>> getGroupCode(
+            @PathVariable int groupId,
+            HttpServletRequest request) {
+
+        // 1) JWT 토큰 검증: 로그인 여부만 확인
+        jwtTokenProvider.extractUserId(request);
+
+        // 2) 서비스에서 그룹 코드 조회
+        String code = groupService.getGroupCode(groupId);
+
+        // 3) 200 OK + { "code": "ABC123" } 반환
+        return ResponseEntity.ok(Collections.singletonMap("code", code));
+    }
+
 
 }
 

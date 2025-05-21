@@ -59,5 +59,16 @@
         WHERE ug.group_id = #{groupId}
     </select>
 
+    <!-- 2) 그룹 코드 조회 -->
+    <select id="getGroupCode"
+            parameterType="int"
+            resultType="string">
+        SELECT code
+        FROM groups
+        WHERE id = #{groupId}
+    </select>
+
+
+
 
 </mapper>

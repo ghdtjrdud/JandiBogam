@@ -15,4 +15,6 @@ public interface GroupService {
     int leaveGroup(int groupId, int userId);
 
     List<UserDto> getGroupMembers(int groupId);
+
+    String getGroupCode(int groupId);
 }
