@@ -63,16 +63,6 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
-import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { useToast } from 'vue-toastification';
-
-const router = useRouter();
-const authStore = useAuthStore();
-const toast = useToast();
-=======
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -81,7 +71,6 @@ import { useToast } from 'vue-toastification'
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
->>>>>>> df20e65a94fa80dc6f56dca8f19a934932eb2100
 
 const loginForm = reactive({
   id: '',
@@ -91,34 +80,14 @@ const loginForm = reactive({
 const handleLogin = async () => {
   // 폼 유효성 검사
   if (!loginForm.id || !loginForm.password) {
-<<<<<<< HEAD
-    toast.error('아이디와 비밀번호를 모두 입력해주세요.');
-    return;
-=======
     toast.error('아이디와 비밀번호를 모두 입력해주세요.')
     return
->>>>>>> df20e65a94fa80dc6f56dca8f19a934932eb2100
   }
 
   try {
     // 백엔드 요구 형식에 맞게 데이터 준비
     const credentials = {
       loginId: loginForm.id,
-<<<<<<< HEAD
-      password: loginForm.password
-    };
-
-    // Pinia 스토어의 login 액션 호출
-    const success = await authStore.login(credentials);
-
-    if (success) {
-      toast.success('로그인되었습니다');
-      router.push('/dashboard'); // 로그인 후 리다이렉트할 페이지
-    }
-  } catch (err) {
-    console.error('로그인 오류:', err);
-    toast.error('로그인 중 오류가 발생했습니다');
-=======
       password: loginForm.password,
     }
 
@@ -132,7 +101,6 @@ const handleLogin = async () => {
   } catch (err) {
     console.error('로그인 오류:', err)
     toast.error('로그인 중 오류가 발생했습니다')
->>>>>>> df20e65a94fa80dc6f56dca8f19a934932eb2100
   }
 }
 </script>
