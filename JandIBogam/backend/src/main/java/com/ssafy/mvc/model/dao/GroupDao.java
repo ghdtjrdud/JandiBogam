@@ -21,4 +21,6 @@ public interface GroupDao {
     int leaveGroup(@Param("groupId") int groupId, @Param("userId") int userId);
 
     List<UserDto> getGroupMember(int groupId);
+
+    String getGroupCode(int groupId);
 }

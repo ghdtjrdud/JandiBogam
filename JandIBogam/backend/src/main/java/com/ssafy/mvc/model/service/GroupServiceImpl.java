@@ -47,4 +47,9 @@ public class GroupServiceImpl implements GroupService {
     public List<UserDto> getGroupMembers(int groupId) {
         return groupDao.getGroupMember(groupId);
     }
+
+    @Override
+    public String getGroupCode(int groupId) {
+        return groupDao.getGroupCode(groupId);
+    }
 }
