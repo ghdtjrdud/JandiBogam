@@ -1,23 +1,46 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import userService from '@/services/user.service'
+import { useAuthStore } from '@/stores/auth'
+import UserService from '@/services/UserService'
 
 const user = ref(null)
 const loading = ref(false)
 const error = ref(null)
-const groupCode = ref('')
 
-const userId = 2
+// const groupCode = ref('') // 그룹코드 등록
+
+const groups = ref([]) // 가입된 그룹 목록
+const loadingGroups = ref(false) // 그룹 로딩 중 플래그
+const errorGroups = ref(null) // 그룹 로딩 에러
+
+const authStore = useAuthStore()
+
+const userId = authStore.user?.id
 
 const fetchMyInfo = async () => {
   loading.value = true
   try {
-    const response = await userService.getMyInfo(userId)
+    const response = await UserService.getMyInfo(userId)
     user.value = response.data
   } catch (e) {
     error.value = '내 정보를 불러오지 못했습니다.'
   } finally {
     loading.value = false
+  }
+}
+
+async function fetchMyGroups() {
+  loadingGroups.value = true
+  errorGroups.value = null
+  try {
+    // userId가 undefined일 경우 호출하지 않도록 방어
+    if (!userId) throw new Error('유저 정보가 없습니다')
+    const { data } = await UserService.getMyGroups()
+    groups.value = Array.isArray(data) ? data : [data]
+  } catch (e) {
+    errorGroups.value = '그룹 정보를 불러오지 못했습니다.'
+  } finally {
+    loadingGroups.value = false
   }
 }
 
@@ -37,7 +60,10 @@ const illnessText = computed(() => {
   return illnessList.length ? illnessList.join(', ') : '없음'
 })
 
-onMounted(fetchMyInfo)
+onMounted(() => {
+  fetchMyInfo()
+  fetchMyGroups()
+})
 </script>
 
 <template>
