@@ -1,7 +1,9 @@
 package com.ssafy.mvc.controller;
 
 import com.ssafy.mvc.model.dto.AuthDto;
+import com.ssafy.mvc.model.dto.UserDto;
 import com.ssafy.mvc.model.service.AuthService;
+import com.ssafy.mvc.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @Operation(
             summary = "회원가입",
@@ -68,8 +74,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthDto.LoginRequest loginRequest) {
         try {
+//            1. 토큰 발급
             AuthDto.TokenResponse tokenResponse = authService.login(loginRequest);
-            return ResponseEntity.ok(tokenResponse);
+//            2. 유저 정보 조회
+            UserDto user = userService.findByLoginId(loginRequest.getLoginId());
+
+//            3. 응답 Map 에 user 객체 추가
+            Map<String, Object> result = new HashMap<>();
+            result.put("accessToken", tokenResponse.getAccessToken());
+            result.put("refreshToken", tokenResponse.getRefreshToken());
+            result.put("tokenType", "Bearer");
+            result.put("user", user);
+
+            return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e) {

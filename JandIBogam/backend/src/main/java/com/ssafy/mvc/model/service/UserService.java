@@ -17,4 +17,6 @@ public interface UserService {
     UserDto detail(int id);
 
     boolean updateTheme(int id, String newTheme);
+
+    UserDto findByLoginId(String loginId);
 }

@@ -54,5 +54,10 @@ public class UserServiceImpl implements UserService {
         return userDao.updateTheme(id, newTheme);
     }
 
+    @Override
+    public UserDto findByLoginId(String loginId) {
+        return userDao.findByLoginId(loginId);
+    }
+
 
 }

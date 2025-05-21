@@ -87,12 +87,9 @@ public class GroupController {
 
     //    내가 속한 그룹 조회
     @GetMapping("/my")
-    public ResponseEntity<?> getMyGroup(HttpServletRequest request) {
+    public ResponseEntity<?> getMyGroup() {
 
         try {
-//            String token = request.getHeader("Authorization").substring(7);
-//            Claims claims = jwtTokenProvider.getClaims(token);
-//            int userId = claims.get("id", Integer.class);
             int userId = jwtTokenProvider.extractUserId(request);
 
             System.out.println("userId : " + userId);
