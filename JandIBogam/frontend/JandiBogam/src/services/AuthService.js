@@ -1,38 +1,39 @@
-import axios from 'axios';
+// src/services/AuthService.js
+import apiClient from './api'
 
-// API 기본 URL (환경 변수 또는 설정 파일에서 가져오는 것이 좋습니다)
-const API_URL = '/api';
-
-class AuthService {
+const AuthService = {
   async register(userData) {
-    return axios.post(`${API_URL}/auth/register`, userData);
-  }
+    return apiClient.post('/auth/register', userData)
+  },
 
   async login(credentials) {
-    const response = await axios.post(`${API_URL}/auth/login`, credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+    const response = await apiClient.post('/auth/login', credentials)
+    const { accessToken, user } = response.data
+
+    if (!accessToken || !user) {
+      throw new Error('로그인 응답에 accessToken이나 user가 없습니다.')
     }
-    return response;
-  }
+
+    // 토큰 저장
+    localStorage.setItem('accessToken', accessToken)
+    // 사용자 정보 저장
+    localStorage.setItem('user', JSON.stringify(user))
+
+    // apiClient는 인터셉터로 자동 헤더 관리하므로 추가로 설정할 필요 없음!
+
+    return response
+  },
 
   logout() {
-    localStorage.removeItem('token');
-  }
-
-  getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
-  }
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('user')
+    // apiClient의 헤더도 자동 관리됨(토큰 없으면 헤더 미포함)
+  },
 
   isLoggedIn() {
-    const token = localStorage.getItem('token');
-    return !!token;
-  }
-
-  // 토큰을 사용하여 사용자 정보 조회
-  async getUserInfo() {
-    return axios.get(`${API_URL}/auth/me`);
-  }
+    const token = localStorage.getItem('accessToken')
+    return !!token
+  },
 }
 
-export default new AuthService();
+export default AuthService

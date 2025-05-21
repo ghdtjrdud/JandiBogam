@@ -1,12 +1,31 @@
+<!-- 로그인 하기전에는 헤더가 안보이게 -->
+<template>
+  <div>
+    <router-view v-if="isAuthPage" />
+    <div v-else class="min-h-screen w-full">
+      <Header />
+      <main class="w-full max-w-full">
+        <router-view />
+      </main>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import Header from './components/common/Header.vue'
 
+const route = useRoute() // 반응형
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
+
+const isAuthPage = computed(() => {
+  return ['/login', '/signup', 'find-credentials'].includes(route.path)
+})
 
 const loginForm = reactive({
   loginId: '', // 백엔드 요구사항에 맞춰 loginId로 변경
@@ -38,64 +57,25 @@ const handleLogin = async () => {
 }
 </script>
 
-<template>
-  <RouterView />
-</template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style>
+/* 전역 스타일 - 컨테이너 최대 너비 제거 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  overflow-x: hidden;
 }
 
-/* .logo, HelloWorld 관련 스타일 삭제 */
-
-nav {
+#app {
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  max-width: 100%;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  /* .logo 관련 스타일 삭제 */
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+/* 기존 tailwind 컨테이너 클래스 오버라이드 */
+.container {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
 }
 </style>
