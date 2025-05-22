@@ -92,39 +92,22 @@ const userId = computed(() => authStore.user?.id)
 const groupId = route.params.id
 
 // 그룹, 멤버 데이터 예시 (API 연동 부분 교체)
-const group = ref({
-  name: '가족',
-  code: 'FAM1234',
-  createdAt: '2025-01-15',
-})
-const members = ref([
-  {
-    id: 1,
-    name: '김철수',
-    email: 'chulsoo@email.com',
-    joinedAt: '2025-01-16',
-  },
-  {
-    id: 2,
-    name: '김미영',
-    email: 'miyoung@email.com',
-    joinedAt: '2025-01-17',
-  },
-  {
-    id: 3,
-    name: '김영수',
-    email: 'youngsoo@email.com',
-    joinedAt: '2025-01-20',
-  },
-])
+const group = ref({})
+const members = ref([])
 
-// 실제 API로 교체해야 할 부분
+// 그룹 상세정보 조회, 그룹 멤버 목록 조회
 onMounted(async () => {
-  // const groupId = route.params.id
-  // const { data: groupData } = await UserService.getGroupDetail(groupId)
-  // group.value = groupData
-  // const { data: memberList } = await UserService.getGroupMembers(groupId)
-  // members.value = memberList
+  try {
+    const { data: groupData } = await UserService.getGroupDetail(groupId)
+    group.value = groupData
+
+    // console.log('groupData:', groupData)
+
+    const { data: memberList } = await UserService.getGroupMembers(groupId)
+    members.value = memberList
+  } catch (e) {
+    toast.error('그룹 정보/멤버 조회 실패: ' + (e?.response?.data || e.message))
+  }
 })
 
 function copyGroupCode() {
@@ -142,10 +125,11 @@ function formatDate(date) {
 }
 
 async function handleLeaveGroup() {
-  // 실제 API 호출 필요
   if (!confirm('정말로 그룹에서 탈퇴하시겠습니까?')) return
   try {
-    // await UserService.leaveGroup(group.value.id)
+    // group.value.id 또는 groupId가 제대로 된 값인지 콘솔로 확인
+    // console.log('탈퇴 요청 group id:', group.value.id)
+    await UserService.leaveGroup(group.value.id) // 이게 0이면 안 됨!
     toast.success('그룹에서 탈퇴되었습니다.')
     router.push('/mypage')
   } catch (e) {
