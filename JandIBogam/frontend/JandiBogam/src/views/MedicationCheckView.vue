@@ -7,10 +7,11 @@
       </div>
 
       <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-md border p-8">
-
         <!-- 약 이름 -->
         <div class="mb-6">
-          <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2">약 이름</label>
+          <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2"
+            >약 이름</label
+          >
           <input
             type="text"
             id="medicine-name"
@@ -22,7 +23,9 @@
 
         <!-- 약 종류 -->
         <div class="mb-6">
-          <label for="medicine-type" class="block text-lg font-medium text-gray-700 mb-2">약 종류</label>
+          <label for="medicine-type" class="block text-lg font-medium text-gray-700 mb-2"
+            >약 종류</label
+          >
           <select
             id="medicine-type"
             v-model="medicineType"
@@ -37,18 +40,17 @@
 
         <!-- 복용 날짜 -->
         <div class="mb-6">
-          <label for="med-date" class="block text-lg font-medium text-gray-700 mb-2">복용 날짜</label>
-          <input
-            id="med-date"
-            type="date"
-            v-model="medDate"
-            class="input input-bordered w-full"
-          />
+          <label for="med-date" class="block text-lg font-medium text-gray-700 mb-2"
+            >복용 날짜</label
+          >
+          <input id="med-date" type="date" v-model="medDate" class="input input-bordered w-full" />
         </div>
 
         <!-- 복용 시간대 -->
         <div class="mb-6">
-          <p class="block text-lg font-medium text-gray-700 mb-2">복용 시간대 (여러 개 선택 가능)</p>
+          <p class="block text-lg font-medium text-gray-700 mb-2">
+            복용 시간대 (여러 개 선택 가능)
+          </p>
           <div class="space-y-3">
             <div v-for="option in timeOptions" :key="option.value" class="form-control">
               <label class="cursor-pointer flex items-center gap-2">
@@ -128,8 +130,6 @@ const timeOptions = [
   { label: '취침 전', value: 'bedtime', time: '22:00' },
 ]
 
-const medDate = ref(new Date().toISOString().split('T')[0]) // 기본값 오늘
-
 const getOptionByTime = (time) => {
   return timeOptions.find((option) => option.time === time)
 }
@@ -189,8 +189,6 @@ const handleSubmit = async () => {
     toast.error('토큰이 없습니다. 다시 로그인해주세요.')
     return
   }
-
-
 
   if (!medicineName.value || !medicineType.value || selectedTimes.value.length === 0) {
     toast.error('모든 필드를 입력해주세요')
