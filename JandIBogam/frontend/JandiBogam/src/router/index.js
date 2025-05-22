@@ -33,7 +33,7 @@ const router = createRouter({
     },
     // 식단 관련 라우트
     {
-      path: '/group/:id/meals',
+      path: '/meals/:userId?',
       name: 'MealList',
       component: MealListView,
       meta: { requiresAuth: true },
