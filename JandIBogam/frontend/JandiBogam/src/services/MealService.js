@@ -14,10 +14,6 @@ const MealService = {
     return apiClient.post('/meals/with-search', payload)
   },
 
-  async getMealsByUserId(userId) {
-    return apiClient.get(`/meals/filter?userId=${userId}`)
-  },
-
   async getMealById(mealId) {
     return apiClient.get(`/meals/${mealId}`)
   },
@@ -36,6 +32,31 @@ const MealService = {
 
   async deleteMeal(mealId) {
     return apiClient.delete(`/meals/${mealId}`)
+  },
+
+  async getMealsByFilter(params = {}){
+    const queryParams = new URLSearchParams()
+
+    if(params.startDate) queryParams.append('startDate',params.startDate)
+    if(params.endDate) queryParams.append('endDate', params.endDate)
+    if(params.timeSlot && params.timeSlot !== '전체'){
+      queryParams.append('timeSlot', params.timeSlot)
+    }
+
+    const url = `/meals/filter${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+    return apiClient.get(url)
+  },
+
+  async getMealById(mealId) {
+    return apiClient.get(`/meals/${mealId}`)
+  },
+
+  async deleteMeal(mealId) {
+    return apiClient.delete(`/meals/${mealId}`)
+  },
+
+  async getMealsByUserId(userId, params = {}) {
+    return this.getMealsByFilter(params) // JWT로 사용자 인증하므로 userId 불필요
   }
 
 }
@@ -50,6 +71,15 @@ function convertMealTimeToKorean(mealTime) {
     'dinner': '저녁'
   }
   return timeMap[mealTime] || '아침'
+}
+
+function convertKoreanToMealTime(koreanTime) {
+  const timeMap = {
+    '아침': 'breakfast',
+    '점심': 'lunch',
+    '저녁': 'dinner'
+  }
+  return timeMap[koreanTime] || 'breakfast'
 }
 
 export default MealService
