@@ -26,8 +26,6 @@ apiClient.interceptors.response.use(
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       console.warn(`‼️ API 인증 실패! [${error.response.status}]`, error.config.url)
 
-      console.log('error.response:', error.response) // 콘솔
-
       // ✅ 로그인 요청이 아닌 경우에만 자동 리다이렉트
       const isLoginRequest = error.config.url?.includes('/auth/login')
 

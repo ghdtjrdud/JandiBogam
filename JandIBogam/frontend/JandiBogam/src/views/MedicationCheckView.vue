@@ -6,7 +6,8 @@
         <p class="text-gray-600">규칙적인 복약으로 건강을 지켜보세요</p>
       </div>
 
-      <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-md border p-8">
+      <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md border p-8">
+
         <!-- 약 이름 -->
         <div class="mb-6">
           <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2"
@@ -299,9 +300,9 @@ onMounted(() => {
   border-color: #6a7d73;
   outline: none;
 }
-.shadow-md {
+/* .shadow-md {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
+} */
 @media (min-width: 768px) {
   main {
     max-width: 1280px;

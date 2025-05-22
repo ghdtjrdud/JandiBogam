@@ -11,6 +11,7 @@ import MedicationCheckView from '@/views/MedicationCheckView.vue'
 import WeeklyReportView from '@/views/WeeklyReportView.vue'
 import FindCredentialsView from '../views/FindCredentialsView.vue'
 import MyPageView from '../views/MyPageView.vue'
+import GroupDetailView from '@/views/GroupDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -92,6 +93,12 @@ const router = createRouter({
       path: '/mypage', // ← /mypage 경로 등록
       name: 'mypage',
       component: MyPageView, // ← 컴포넌트 연결
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/group/:id/detail',
+      name: 'GroupDetail',
+      component: GroupDetailView,
       meta: { requiresAuth: true },
     },
   ],

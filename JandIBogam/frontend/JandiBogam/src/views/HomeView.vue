@@ -155,14 +155,14 @@ const getMemberEmoji = (index) => {
 
 // 가족 구성원 클릭 시 그들의 식단 기록 조회페이지로 넘어가
 const goToMealList = (memberId) => {
-  router.push(`/group/${memberId}/meals`)
+  router.push(`/meals/${memberId}`)
 }
 
 //로그인한 사용자 기준: 식단 기록, 복약 체크, 주간 리포트 페이지로 이동
 const goToPage = (page) => {
   switch (page) {
     case `meal`:
-      router.push('/meal/record')
+      router.push('/meals')
       break
     case 'medication':
       router.push('/medication')
