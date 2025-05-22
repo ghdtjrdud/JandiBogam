@@ -2,10 +2,6 @@
 import apiClient from './api'
 
 const AuthService = {
-  async register(userData) {
-    return apiClient.post('/auth/register', userData)
-  },
-
   async login(credentials) {
     const response = await apiClient.post('/auth/login', credentials)
     const { accessToken, user } = response.data
@@ -14,20 +10,49 @@ const AuthService = {
       throw new Error('로그인 응답에 accessToken이나 user가 없습니다.')
     }
 
-    // 토큰 저장
-    localStorage.setItem('accessToken', accessToken)
-    // 사용자 정보 저장
-    localStorage.setItem('user', JSON.stringify(user))
-
-    // apiClient는 인터셉터로 자동 헤더 관리하므로 추가로 설정할 필요 없음!
+    // ❌ localStorage 저장 부분 제거 (auth.js에서 처리)
+    // localStorage.setItem('accessToken', accessToken)
+    // localStorage.setItem('user', JSON.stringify(user))
 
     return response
   },
 
-  logout() {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('user')
-    // apiClient의 헤더도 자동 관리됨(토큰 없으면 헤더 미포함)
+  async register(userData) {
+    return apiClient.post('/auth/signup', userData)
+  },
+
+  async logout() {
+    try {
+      // 서버에 로그아웃 요청 (선택사항)
+      await apiClient.post('/auth/logout')
+    } catch (error) {
+      console.error('서버 로그아웃 에러:', error)
+    } finally {
+      // 로컬 데이터 정리
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('refreshToken')
+    }
+  },
+
+  async getAllUsers() {
+    return apiClient.get('/users')
+  },
+
+  async getUserInfo(userId) {
+    return apiClient.get(`/users/${userId}`)
+  },
+
+  async updateUser(userId, userData) {
+    return apiClient.put(`/users/${userId}`, userData)
+  },
+
+  async updateUserTheme(userId, theme) {
+    return apiClient.patch(`/users/${userId}/theme`, { themePreference: theme })
+  },
+
+  async deleteUser(userId) {
+    return apiClient.delete(`/users/${userId}`)
   },
 
   isLoggedIn() {

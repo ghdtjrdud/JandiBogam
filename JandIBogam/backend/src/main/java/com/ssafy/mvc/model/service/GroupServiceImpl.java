@@ -34,7 +34,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupDto getGroupByUserId(int userId) {
+    public List<GroupDto> getGroupByUserId(int userId) {
         return groupDao.getGroupByUserId(userId);
     }
 
@@ -51,5 +51,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public String getGroupCode(int groupId) {
         return groupDao.getGroupCode(groupId);
+    }
+
+    @Override
+    public GroupDto detailGroup(int groupId) {
+        return groupDao.detailGroup(groupId);
     }
 }

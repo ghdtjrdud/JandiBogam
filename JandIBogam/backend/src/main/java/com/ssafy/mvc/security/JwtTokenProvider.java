@@ -139,14 +139,43 @@ public class JwtTokenProvider { //**jwt 토큰 생성, 검증, 정보 추출 기
     }
 
     //    로그인한 유저의 토큰정보를 갖고와서 userId를 확인하기(모든 api에서 거의 쓰이니 따로 메서드로 빼기)
+    // 수정된 extractUserId 메소드
     public int extractUserId(HttpServletRequest request) {
+        try {
+            String authHeader = request.getHeader("Authorization");
+            System.out.println("🔍 Authorization 헤더: " + authHeader);
 
-        String token = request.getHeader("Authorization").substring(7);
-        System.out.println("token : " + token);
-        Claims claims = getClaims(token);
-        System.out.println("claims : " + claims.toString());
+            // null 체크 및 형식 검증
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                System.out.println("❌ Authorization 헤더가 없거나 잘못된 형식입니다.");
+                throw new IllegalArgumentException("유효하지 않은 Authorization 헤더입니다.");
+            }
 
-        return claims.get("id", Integer.class);
+            String token = authHeader.substring(7);
+            System.out.println("🔑 추출된 토큰: " + token.substring(0, Math.min(20, token.length())) + "...");
+
+            // 토큰 유효성 검증
+            if (!validateToken(token)) {
+                System.out.println("❌ 토큰 검증에 실패했습니다.");
+                throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            }
+
+            Claims claims = getClaims(token);
+            System.out.println("📋 Claims: " + claims.toString());
+
+            Integer userId = claims.get("id", Integer.class);
+            if (userId == null) {
+                System.out.println("❌ 토큰에서 사용자 ID를 찾을 수 없습니다.");
+                throw new IllegalArgumentException("토큰에 사용자 ID가 없습니다.");
+            }
+
+            System.out.println("✅ 추출된 사용자 ID: " + userId);
+            return userId;
+
+        } catch (Exception e) {
+            System.out.println("❌ extractUserId 에러: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("토큰에서 사용자 ID 추출에 실패했습니다: " + e.getMessage(), e);
+        }
     }
-
 }

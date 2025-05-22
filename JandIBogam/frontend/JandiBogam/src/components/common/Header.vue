@@ -26,7 +26,7 @@
 
         <!-- 식단 관리 -->
         <router-link
-          to="/meal"
+          to="/meals"
           class="transition-colors duration-200 relative text-lg"
           :class="
             $route.path.includes('/meal')
@@ -97,7 +97,7 @@
           <span class="text-gray-700 font-bold text-lg">{{ userName }} 님</span>
           <button
             @click="logout"
-            class="text-sm text-gray-600 hover:text-red-600 border border-gray-300 px-3 py-1 rounded transition-colors duration-200"
+            class="text-sm text-gray-600 hover:text-red-600 border border-gray-300 px-3 py-1 rounded-full transition-colors duration-200"
           >
             로그아웃
           </button>

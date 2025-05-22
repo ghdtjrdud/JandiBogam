@@ -87,20 +87,15 @@ public class GroupController {
 
     //    내가 속한 그룹 조회
     @GetMapping("/my")
-    public ResponseEntity<?> getMyGroup(HttpServletRequest request) {
+    public ResponseEntity<?> getMyGroup() {
 
         try {
-//            String token = request.getHeader("Authorization").substring(7);
-//            Claims claims = jwtTokenProvider.getClaims(token);
-//            int userId = claims.get("id", Integer.class);
             int userId = jwtTokenProvider.extractUserId(request);
 
-            System.out.println("userId : " + userId);
+            List<GroupDto> groupList = groupService.getGroupByUserId(userId);
 
-            GroupDto groupDto = groupService.getGroupByUserId(userId);
-
-            if (groupDto != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(groupDto);
+            if (groupList != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(groupList);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("가입된 그룹이 없습니다.");
             }
@@ -112,7 +107,7 @@ public class GroupController {
 
     }
 
-//    그룹탈퇴
+    //    그룹탈퇴
     @DeleteMapping("/{groupId}/leave")
     public ResponseEntity<?> leaveGroup(@PathVariable int groupId, HttpServletRequest request) {
 
@@ -132,7 +127,7 @@ public class GroupController {
         }
     }
 
-//    맴버조회(가입한 그룹만 어차피 목록에서 보이기때문에 따로 권한 설정  x)
+    //    맴버조회(가입한 그룹만 어차피 목록에서 보이기때문에 따로 권한 설정  x)
     @GetMapping("/{groupId}/members")
     public ResponseEntity<?> getGroupMembers(@PathVariable int groupId, HttpServletRequest request) {
 
@@ -140,7 +135,7 @@ public class GroupController {
 
 //            여기에서는 딱히 없어도 되는데 혹시 나중에 권한설정이나 이런거 있을수도
 //            어차피 우리는 목록에서부터 가입된거만 보이게 할것
-            int userId = jwtTokenProvider.extractUserId(request);
+            jwtTokenProvider.extractUserId(request);
 
             List<UserDto> list = groupService.getGroupMembers(groupId);
 
@@ -158,8 +153,7 @@ public class GroupController {
 
     @GetMapping("/{groupId}/code")
     public ResponseEntity<Map<String, String>> getGroupCode(
-            @PathVariable int groupId,
-            HttpServletRequest request) {
+            @PathVariable int groupId) {
 
         // 1) JWT 토큰 검증: 로그인 여부만 확인
         jwtTokenProvider.extractUserId(request);
@@ -171,6 +165,26 @@ public class GroupController {
         return ResponseEntity.ok(Collections.singletonMap("code", code));
     }
 
+//    그룹 상세조회
+    @GetMapping("/{groupId}")
+    public ResponseEntity<?> detaulGroup(@PathVariable int groupId) {
+
+        try {
+            jwtTokenProvider.extractUserId(request);
+
+            GroupDto groupDto = groupService.detailGroup(groupId);
+
+            if (groupDto != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(groupDto);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다. 상세조회 실패");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패");
+        }
+
+    }
 
 }
 

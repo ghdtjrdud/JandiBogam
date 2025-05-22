@@ -73,7 +73,7 @@
             email = #{email},
             height = #{height},
             weight = #{weight},
-            theme_pref = #{uiTheme}
+<!--            theme_pref = #{uiTheme},-->
             diabetes = #{diabetes},
             hypertension = #{hypertension},
             heart_disease = #{heartDisease},
@@ -105,6 +105,11 @@
         height,
         weight,
         theme_pref AS uiTheme,
+        diabetes AS diabetes,
+        hypertension AS hypertension,
+        heart_disease AS heartDisease,
+        kidney_disease AS kidneyDisease,
+        liver_disease AS liverDisease,
         created_at AS createdAt,
         updated_at AS updatedAt
         FROM users
