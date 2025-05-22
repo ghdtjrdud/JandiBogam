@@ -73,7 +73,7 @@
             email = #{email},
             height = #{height},
             weight = #{weight},
-            theme_pref = #{uiTheme}
+<!--            theme_pref = #{uiTheme},-->
             diabetes = #{diabetes},
             hypertension = #{hypertension},
             heart_disease = #{heartDisease},
