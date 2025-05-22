@@ -74,6 +74,22 @@
         WHERE id = #{groupId}
     </select>
 
+<!--  그룹 상세조회  -->
+    <select id="detailGroup" parameterType="int" resultType="GroupDto">
+        SELECT
+        g.id,
+        g.name,
+        g.created_at as createdAt,
+        (
+            SELECT COUNT(*)
+            FROM user_groups ug2
+            WHERE ug2.group_id = g.id
+        ) AS memberCount,
+        g.code
+        FROM `groups` g
+        WHERE g.id = #{groupId}
+    </select>
+
 
 
 

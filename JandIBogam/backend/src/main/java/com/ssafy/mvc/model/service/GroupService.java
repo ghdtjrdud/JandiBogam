@@ -18,4 +18,5 @@ public interface GroupService {
 
     String getGroupCode(int groupId);
 
+    GroupDto detailGroup(int groupId);
 }
