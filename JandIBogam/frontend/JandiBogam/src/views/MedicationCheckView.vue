@@ -124,6 +124,7 @@ const medDate = ref(new Date().toISOString().split('T')[0]) // 기본값 오늘
 const loading = ref(false) // ✅ 로딩 상태 추가
 
 const isEditing = computed(() => !!medicationId.value)
+const timeSlotString = selectedTimes.value.map(time => time.time).join(',')
 
 const timeOptions = [
   { label: '아침/점심/저녁 식전', value: 'before_meal', time: '08:00' },
