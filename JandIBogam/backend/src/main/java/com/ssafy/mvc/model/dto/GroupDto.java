@@ -15,6 +15,7 @@ public class GroupDto {
     private String name;
     private String code;
     private int createdBy;
+    private int memberCount;
     private LocalDateTime createdAt;
 
 }

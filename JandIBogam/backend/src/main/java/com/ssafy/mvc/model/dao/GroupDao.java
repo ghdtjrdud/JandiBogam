@@ -16,11 +16,12 @@ public interface GroupDao {
 
     int joinGroup(@Param("code") String code, @Param("userId") int userId);
 
-    GroupDto getGroupByUserId(int userId);
+    List<GroupDto> getGroupByUserId(int userId);
 
     int leaveGroup(@Param("groupId") int groupId, @Param("userId") int userId);
 
     List<UserDto> getGroupMember(int groupId);
 
     String getGroupCode(int groupId);
+
 }
