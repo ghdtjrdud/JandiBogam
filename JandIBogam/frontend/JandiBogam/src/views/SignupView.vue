@@ -324,13 +324,13 @@ const handleSignup = async () => {
       liverDisease: signupForm.healthInfo.liverDisease,
     }
 
-    const plainUserData = JSON.parse(JSON.stringify(userData))
+    // const plainUserData = JSON.parse(JSON.stringify(userData))
 
     console.log('signupForm.healthInfo:', signupForm.healthInfo)
     console.log('userData:', userData)
 
     // Pinia 스토어의 register 액션 호출
-    const success = await authStore.register(plainUserData)
+    const success = await authStore.register(userData)
 
     if (success) {
       toast.success('회원가입이 완료되었습니다!')

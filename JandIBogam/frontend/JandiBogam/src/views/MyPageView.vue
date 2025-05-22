@@ -1,11 +1,36 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import UserService from '@/services/UserService'
 
 const authStore = useAuthStore()
 
-// console.log('▶ authStore.user:', authStore.user)
+// 프로필 수정
+const isEditMode = ref(false)
+
+// 수정 폼
+const editForm = reactive({
+  name: '',
+  gender: '',
+  birthDate: '',
+  diabetes: false,
+  hypertension: false,
+  heartDisease: false,
+  kidneyDisease: false,
+  liverDisease: false,
+})
+
+// 수정 시 필요한 정보만 따로
+// const data = {
+//   name: editForm.name,
+//   gender: editForm.gender,
+//   birthDate: editForm.birthDate,
+//   diabetes: editForm.diabetes,
+//   hypertension: editForm.hypertension,
+//   heartDisease: editForm.heartDisease,
+//   kidneyDisease: editForm.kidneyDisease,
+//   liverDisease: editForm.liverDisease,
+// }
 
 // 내 정보
 const user = ref(null)
@@ -23,8 +48,6 @@ const userId = computed(() => authStore.user?.id)
 // —————————————————————————————————————————
 // 1) 내 정보 가져오기
 async function fetchMyInfo(id) {
-  // console.log('▶ fetchMyInfo 호출, id =', id)
-
   loadingUser.value = true
   errorUser.value = null
   try {
@@ -48,6 +71,61 @@ async function fetchMyGroups() {
     errorGroups.value = '그룹 정보를 불러오지 못했습니다.'
   } finally {
     loadingGroups.value = false
+  }
+}
+
+// 수정버튼 누르기
+function startEdit() {
+  isEditMode.value = true
+  Object.assign(editForm, {
+    name: user.value?.name ?? '',
+    gender: user.value?.gender ?? '',
+    birthDate: user.value?.birthDate ?? '',
+    diabetes: user.value?.diabetes ?? false,
+    hypertension: user.value?.hypertension ?? false,
+    heartDisease: user.value?.heartDisease ?? false,
+    kidneyDisease: user.value?.kidneyDisease ?? false,
+    liverDisease: user.value?.liverDisease ?? false,
+  })
+}
+
+// 수정 취소.
+function cancelEdit() {
+  isEditMode.value = false
+}
+
+// 수정 저장.
+async function saveEdit() {
+  console.log('saveEdit 호출됨', userId.value, editForm)
+  console.log('accessToken:', localStorage.getItem('accessToken'))
+  console.log('userId:', userId.value)
+  console.log('editForm:', { ...editForm })
+  if (!userId.value) {
+    console.warn('userId가 없음!', userId.value)
+    return
+  }
+  loadingUser.value = true
+
+  try {
+    const data = {
+      name: editForm.name,
+      gender: editForm.gender,
+      birthDate: editForm.birthDate,
+      diabetes: editForm.diabetes,
+      hypertension: editForm.hypertension,
+      heartDisease: editForm.heartDisease,
+      kidneyDisease: editForm.kidneyDisease,
+      liverDisease: editForm.liverDisease,
+    }
+    console.log('전송 데이터:', data)
+    await UserService.updateMyInfo(userId.value, data)
+    await fetchMyInfo(userId.value)
+    isEditMode.value = false
+  } catch (e) {
+    errorUser.value = '프로필 수정에 실패했습니다'
+    console.error(e)
+  } finally {
+    loadingUser.value = false
   }
 }
 
@@ -113,10 +191,11 @@ const joinedDateText = computed(() => {
       <div class="col-span-2 bg-white rounded-lg p-8 border border-[#B29888] shadow">
         <h2 class="text-xl font-bold mb-6 text-[#6A7D73]">개인 정보</h2>
 
-        <!-- ✏️ 변수명 수정 -->
         <div v-if="loadingUser">불러오는 중...</div>
         <div v-else-if="errorUser" class="text-red-500">{{ errorUser }}</div>
-        <div v-else-if="user" class="space-y-4">
+
+        <!-- 1. 읽기 모드 -->
+        <div v-else-if="!isEditMode && user" class="space-y-4">
           <div class="flex">
             <div class="w-24 text-[#9E8C7F]">이름</div>
             <div>{{ user.name }}</div>
@@ -139,9 +218,63 @@ const joinedDateText = computed(() => {
           </div>
           <div class="mt-6">
             <button
+              @click="startEdit"
               class="bg-[#C7D7CB] text-[#6A7D73] px-4 py-2 rounded-md text-sm hover:bg-[#5A6B63] hover:text-white transition-colors"
             >
               프로필 수정
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 수정 모드 -->
+        <div v-else-if="isEditMode && user" class="space-y-4">
+          <div class="flex">
+            <div class="w-24 text-[#9E8C7F]">이름</div>
+            <input v-model="editForm.name" class="border rounded px-2 py-1" />
+          </div>
+          <div class="flex">
+            <div class="w-24 text-[#9E8C7F]">성별</div>
+            <label> <input type="radio" value="M" v-model="editForm.gender" /> 남성 </label>
+            <label class="ml-3">
+              <input type="radio" value="F" v-model="editForm.gender" /> 여성
+            </label>
+          </div>
+          <div class="flex">
+            <div class="w-24 text-[#9E8C7F]">생년월일</div>
+            <input type="date" v-model="editForm.birthDate" class="border rounded px-2 py-1" />
+          </div>
+          <div class="flex">
+            <div class="w-24 text-[#9E8C7F]">기저질환</div>
+            <label class="mr-2"> <input type="checkbox" v-model="editForm.diabetes" /> 당뇨 </label>
+            <label class="mr-2">
+              <input type="checkbox" v-model="editForm.hypertension" /> 고혈압
+            </label>
+            <label class="mr-2">
+              <input type="checkbox" v-model="editForm.heartDisease" /> 심장질환
+            </label>
+            <label class="mr-2">
+              <input type="checkbox" v-model="editForm.kidneyDisease" /> 신장질환
+            </label>
+            <label> <input type="checkbox" v-model="editForm.liverDisease" /> 간질환 </label>
+          </div>
+          <div class="mt-6">
+            <button
+              @click="
+                () => {
+                  console.log('저장 클릭!')
+                  saveEdit()
+                }
+              "
+              class="bg-[#6A7D73] text-white px-4 py-2 rounded-md text-sm mr-2 hover:bg-[#5A6B63]"
+            >
+              저장
+            </button>
+
+            <button
+              @click="cancelEdit"
+              class="bg-gray-300 text-[#6A7D73] px-4 py-2 rounded-md text-sm hover:bg-gray-400"
+            >
+              취소
             </button>
           </div>
         </div>

@@ -26,17 +26,17 @@
 
         <!-- 식단 관리 -->
         <router-link
-          to="/meal"
+          to="/meal/record"
           class="transition-colors duration-200 relative text-lg"
           :class="
-            $route.path.includes('/meal')
+            $route.path.includes('/meal/record')
               ? 'text-[#4CAF50] font-medium'
               : 'text-gray-600 hover:text-[#4CAF50]'
           "
         >
           식단 관리
           <span
-            v-if="$route.path.includes('/meal')"
+            v-if="$route.path.includes('/meal/record')"
             class="absolute bottom-[-4px] left-0 w-full h-0.5 bg-[#4CAF50]"
           ></span>
         </router-link>

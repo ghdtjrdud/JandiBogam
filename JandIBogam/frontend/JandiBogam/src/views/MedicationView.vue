@@ -18,8 +18,16 @@
           </button>
         </div>
 
+        <!-- 로딩 상태 -->
+        <div v-if="loading" class="bg-white rounded-xl shadow-sm border p-8 text-center">
+          <div class="flex flex-col items-center">
+            <div class="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-500">복약 정보를 불러오는 중...</p>
+          </div>
+        </div>
+
         <!-- 복약 목록 -->
-        <div v-if="medications.length > 0" class="space-y-4">
+        <div v-else-if="medications.length > 0" class="space-y-4">
           <div
             v-for="medication in medications"
             :key="medication.id"
@@ -41,6 +49,9 @@
                     {{ medication.drugType }}
                   </span>
                   <span>복용 시간: {{ formatTimeSlots(medication.timeSlot) }}</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">
+                  복용 날짜: {{ formatDate(medication.medDate) }}
                 </div>
               </div>
             </div>
@@ -85,23 +96,63 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
+import MedicationService from '@/services/MedicationService'
 
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
 const medications = ref([])
+const loading = ref(false)
 
 // 복약 기록 가져오기
 const fetchMedications = async () => {
   try {
-    // 실제로는 로그인된 사용자 ID를 가져와야 함
-    const userId = 1 // 임시 사용자 ID, 실제로는 auth store 등에서 가져옴
-    const response = await axios.get(`/api/medications/users/${userId}`)
+    loading.value = true
+
+    // ✅ 현재 로그인된 사용자 ID 가져오기
+    const userId = authStore.user?.id
+    if (!userId) {
+      toast.error('사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요.')
+      router.push('/login')
+      return
+    }
+
+    console.log('조회할 사용자 ID:', userId)
+
+    // ✅ MedicationService 사용
+    const response = await MedicationService.getMedicationsByUserId(userId)
     medications.value = response.data
+
+    console.log('조회된 복약 정보:', medications.value)
+
   } catch (error) {
-    toast.error('복약 정보를 불러오는데 실패했습니다: ' + error.message)
+    console.error('복약 정보 조회 실패:', error)
+
+    let errorMessage = '복약 정보를 불러오는데 실패했습니다.'
+    if (error.response) {
+      if (error.response.status === 401) {
+        errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.'
+        router.push('/login')
+        return
+      } else if (error.response.status === 403) {
+        errorMessage = '권한이 없습니다.'
+      } else if (error.response.data?.message) {
+        errorMessage = error.response.data.message
+      }
+    }
+
+    toast.error(errorMessage)
+  } finally {
+    loading.value = false
   }
+}
+
+// 날짜 형식 변환
+const formatDate = (dateString) => {
+  if (!dateString) return '날짜 정보 없음'
+  return new Date(dateString).toLocaleDateString('ko-KR')
 }
 
 // 시간대 표시 형식 변환
@@ -141,12 +192,21 @@ const confirmDelete = (id) => {
 // 복약 정보 삭제
 const deleteMedication = async (id) => {
   try {
-    await axios.delete(`/api/medications/${id}`)
+    // ✅ MedicationService 사용
+    await MedicationService.deleteMedication(id)
     toast.success('복약 정보가 삭제되었습니다.')
+
     // 목록 새로고침
     fetchMedications()
   } catch (error) {
-    toast.error('삭제에 실패했습니다: ' + error.message)
+    console.error('삭제 실패:', error)
+
+    let errorMessage = '삭제에 실패했습니다.'
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message
+    }
+
+    toast.error(errorMessage)
   }
 }
 
@@ -188,6 +248,15 @@ onMounted(() => {
 }
 .btn-error:hover {
   background-color: #ff5252;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 @media (min-width: 768px) {

@@ -5,8 +5,8 @@
 <mapper namespace="com.ssafy.mvc.model.dao.MedicationDao">
 
     <insert id="insertMedication" parameterType="MedicationDto" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO medications ( user_id, med_date, time_slot, drug_name, drug_type, created_at, updated_at )
-        VALUES (#{userId}, #{medDate}, #{timeSlot}, #{drugName}, #{drugType}, #{createdAt}, #{updatedAt})
+        INSERT INTO medications ( user_id, med_date, time_slot, drug_name, drug_type)
+        VALUES (#{userId}, #{medDate}, #{timeSlot}, #{drugName}, #{drugType})
     </insert>
 
     <select id="selectMedicationById" resultType="MedicationDto" parameterType="int">
@@ -19,20 +19,23 @@
         SELECT *
         FROM medications
         WHERE user_id = #{userId}
-        ORDER BY med_date DESC, FIELD(time_slot, '아침', '점심', '저녁')
+        ORDER BY med_date DESC, created_at DESC
     </select>
 
     <select id="selectAllMedications" resultType="MedicationDto">
         SELECT *
         FROM medications
+        ORDER BY created_at DESC
     </select>
 
+    <!-- ✅ 수정: 마지막 콤마 제거 및 필드 추가 -->
     <update id="updateMedication" parameterType="MedicationDto">
         UPDATE medications
         SET drug_name = #{drugName},
         drug_type = #{drugType},
         time_slot = #{timeSlot},
-        updated_at = #{updatedAt}
+        med_date = #{medDate},
+        updated_at = NOW()
         WHERE id = #{id}
     </update>
 
@@ -40,6 +43,5 @@
         DELETE FROM medications
         WHERE id = #{id}
     </delete>
-
 
 </mapper>
