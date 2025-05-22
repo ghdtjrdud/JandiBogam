@@ -44,25 +44,37 @@ export const useAuthStore = defineStore('auth', {
 
         const { accessToken, user } = response.data
 
-        // 스토어 상태 업데이트
+        // ✅ 상태 저장
         this.user = user
         this.token = accessToken
 
-        return true
+        // ✅ localStorage 저장
+        localStorage.setItem('accessToken', accessToken)
+        localStorage.setItem('user', JSON.stringify(user))
+
+        return { success: true }
       } catch (error) {
         console.error('로그인 에러:', error)
 
+        let errorMessage = '로그인에 실패했습니다.'
+
         if (error.response) {
           if (error.response.status === 401) {
-            this.error = '아이디 또는 비밀번호가 일치하지 않습니다.'
+            errorMessage = '아이디 또는 비밀번호가 일치하지 않습니다.'
           } else {
-            this.error = error.response.data?.message || '로그인에 실패했습니다'
+            errorMessage = error.response.data?.message || '로그인에 실패했습니다.'
           }
         } else {
-          this.error = '서버 연결에 실패했습니다.'
+          errorMessage = '서버 연결에 실패했습니다.'
         }
 
-        return false
+        // ✅ 실패 시 상태 초기화
+        this.user = null
+        this.token = null
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('user')
+
+        return { success: false, message: errorMessage }
       } finally {
         this.loading = false
       }
@@ -80,6 +92,11 @@ export const useAuthStore = defineStore('auth', {
           name: userData.name,
           gender: userData.gender,
           birthDate: userData.birthdate,
+          diabetes: userData.diabetes,
+          hypertension: userData.hypertension,
+          heartDisease: userData.heartDisease,
+          kidneyDisease: userData.kidneyDisease,
+          liverDisease: userData.liverDisease,
         }
 
         await AuthService.register(signupData)

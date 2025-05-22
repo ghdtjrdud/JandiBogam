@@ -430,7 +430,7 @@ VALUES
 
 
 
-select * from users;
+select * from users where id = 8;
 
 select * from meals;
 

@@ -10,11 +10,12 @@ public interface GroupService {
 
     int joinGroup(String code, int userId);
 
-    GroupDto getGroupByUserId(int userId);
+    List<GroupDto> getGroupByUserId(int userId);
 
     int leaveGroup(int groupId, int userId);
 
     List<UserDto> getGroupMembers(int groupId);
 
     String getGroupCode(int groupId);
+
 }

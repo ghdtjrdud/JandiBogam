@@ -92,12 +92,10 @@ public class GroupController {
         try {
             int userId = jwtTokenProvider.extractUserId(request);
 
-            System.out.println("userId : " + userId);
+            List<GroupDto> groupList = groupService.getGroupByUserId(userId);
 
-            GroupDto groupDto = groupService.getGroupByUserId(userId);
-
-            if (groupDto != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(groupDto);
+            if (groupList != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(groupList);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("가입된 그룹이 없습니다.");
             }

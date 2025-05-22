@@ -35,11 +35,17 @@
         g.name,
         g.code,
         g.created_by AS createdBy,
-        g.created_at AS createdAt
+        g.created_at AS createdAt,
+        (
+        SELECT COUNT(*)
+        FROM user_groups ug2
+        WHERE ug2.group_id = g.id
+        ) AS memberCount
         FROM user_groups ug
         JOIN `groups` g ON ug.group_id = g.id
         WHERE ug.user_id = #{userId}
     </select>
+
 
 <!--  회원탈퇴하기  -->
     <delete id="leaveGroup">

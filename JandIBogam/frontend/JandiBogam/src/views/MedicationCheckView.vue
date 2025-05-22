@@ -6,11 +6,13 @@
         <p class="text-gray-600">규칙적인 복약으로 건강을 지켜보세요</p>
       </div>
 
-      <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-md border p-8">
+      <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md border p-8">
 
         <!-- 약 이름 -->
         <div class="mb-6">
-          <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2">약 이름</label>
+          <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2"
+            >약 이름</label
+          >
           <input
             type="text"
             id="medicine-name"
@@ -22,7 +24,9 @@
 
         <!-- 약 종류 -->
         <div class="mb-6">
-          <label for="medicine-type" class="block text-lg font-medium text-gray-700 mb-2">약 종류</label>
+          <label for="medicine-type" class="block text-lg font-medium text-gray-700 mb-2"
+            >약 종류</label
+          >
           <select
             id="medicine-type"
             v-model="medicineType"
@@ -37,18 +41,17 @@
 
         <!-- 복용 날짜 -->
         <div class="mb-6">
-          <label for="med-date" class="block text-lg font-medium text-gray-700 mb-2">복용 날짜</label>
-          <input
-            id="med-date"
-            type="date"
-            v-model="medDate"
-            class="input input-bordered w-full"
-          />
+          <label for="med-date" class="block text-lg font-medium text-gray-700 mb-2"
+            >복용 날짜</label
+          >
+          <input id="med-date" type="date" v-model="medDate" class="input input-bordered w-full" />
         </div>
 
         <!-- 복용 시간대 -->
         <div class="mb-6">
-          <p class="block text-lg font-medium text-gray-700 mb-2">복용 시간대 (여러 개 선택 가능)</p>
+          <p class="block text-lg font-medium text-gray-700 mb-2">
+            복용 시간대 (여러 개 선택 가능)
+          </p>
           <div class="space-y-3">
             <div v-for="option in timeOptions" :key="option.value" class="form-control">
               <label class="cursor-pointer flex items-center gap-2">
@@ -188,8 +191,6 @@ const handleSubmit = async () => {
     return
   }
 
-
-
   if (!medicineName.value || !medicineType.value || selectedTimes.value.length === 0) {
     toast.error('모든 필드를 입력해주세요')
     return
@@ -204,8 +205,6 @@ const handleSubmit = async () => {
   loading.value = true // ✅ 로딩 시작
 
   try {
-    const timeSlotString = selectedTimes.value.map((time) => time.time).join(',')
-
     const medicationData = {
       drugName: medicineName.value,
       drugType: medicineType.value,
@@ -301,9 +300,9 @@ onMounted(() => {
   border-color: #6a7d73;
   outline: none;
 }
-.shadow-md {
+/* .shadow-md {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
+} */
 @media (min-width: 768px) {
   main {
     max-width: 1280px;

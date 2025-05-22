@@ -4,9 +4,8 @@
     <router-view v-if="isAuthPage" />
     <div v-else class="min-h-screen w-full">
       <Header />
-      <main class="w-full max-w-full">
-        <router-view />
-      </main>
+      <!-- container 클래스 제거하고 각 페이지에서 개별 설정하도록 변경 -->
+      <router-view />
     </div>
   </div>
 </template>
@@ -58,7 +57,7 @@ const handleLogin = async () => {
 </script>
 
 <style>
-/* 전역 스타일 - 컨테이너 최대 너비 제거 */
+/* 전역 스타일 */
 body {
   margin: 0;
   padding: 0;
@@ -67,15 +66,14 @@ body {
 }
 
 #app {
-  width: 100%;
-  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* 기존 tailwind 컨테이너 클래스 오버라이드 */
+/* 모든 container 클래스의 제약 제거 */
 .container {
   max-width: 100% !important;
   width: 100% !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 </style>

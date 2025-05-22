@@ -41,4 +41,9 @@ export default {
   leaveGroup(groupId) {
     return apiClient.delete(`/groups/${groupId}`)
   },
+
+  // 그룹 생성 (POST / groups)
+  createGroup(groupData) {
+    return apiClient.post('/groups', groupData)
+  },
 }
