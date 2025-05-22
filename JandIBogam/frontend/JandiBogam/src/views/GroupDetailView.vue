@@ -133,7 +133,7 @@ async function handleLeaveGroup() {
     toast.success('그룹에서 탈퇴되었습니다.')
     router.push('/mypage')
   } catch (e) {
-    toast.error('탈퇴 실패: ' + (e?.response?.data || e.message))
+    toast.error('탈퇴 실패 : ' + (e?.response?.data || e.message))
   }
 }
 </script>
