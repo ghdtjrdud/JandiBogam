@@ -52,4 +52,9 @@ public class GroupServiceImpl implements GroupService {
     public String getGroupCode(int groupId) {
         return groupDao.getGroupCode(groupId);
     }
+
+    @Override
+    public GroupDto detailGroup(int groupId) {
+        return groupDao.detailGroup(groupId);
+    }
 }
