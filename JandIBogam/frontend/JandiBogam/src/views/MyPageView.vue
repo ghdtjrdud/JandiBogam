@@ -5,7 +5,7 @@ import UserService from '@/services/UserService'
 
 const authStore = useAuthStore()
 
-console.log('▶ authStore.user:', authStore.user)
+// console.log('▶ authStore.user:', authStore.user)
 
 // 내 정보
 const user = ref(null)
@@ -23,7 +23,7 @@ const userId = computed(() => authStore.user?.id)
 // —————————————————————————————————————————
 // 1) 내 정보 가져오기
 async function fetchMyInfo(id) {
-  console.log('▶ fetchMyInfo 호출, id =', id)
+  // console.log('▶ fetchMyInfo 호출, id =', id)
 
   loadingUser.value = true
   errorUser.value = null
@@ -82,10 +82,26 @@ const illnessText = computed(() => {
   const list = []
   if (user.value.diabetes) list.push('당뇨')
   if (user.value.hypertension) list.push('고혈압')
-  if (user.value.heart_disease) list.push('심장질환')
-  if (user.value.kidney_disease) list.push('신장질환')
-  if (user.value.liver_disease) list.push('간질환')
+  if (user.value.heartDisease) list.push('심장질환')
+  if (user.value.kidneyDisease) list.push('신장질환')
+  if (user.value.liverDisease) list.push('간질환')
   return list.length ? list.join(', ') : '없음'
+})
+const birthDateText = computed(() => {
+  // 필드명 맞춰서 사용 (birth_date 또는 birthDate)
+  const raw = user.value?.birthDate || user.value?.birthDate
+  if (!raw) return ''
+  const date = new Date(raw)
+  if (isNaN(date)) return raw // 날짜 파싱 실패 시 원본 출력
+  return `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, '0')}월 ${String(date.getDate()).padStart(2, '0')}일`
+})
+
+const joinedDateText = computed(() => {
+  const raw = user.value?.createdAt || user.value?.createdAt
+  if (!raw) return ''
+  const date = new Date(raw)
+  if (isNaN(date)) return raw
+  return `${date.getFullYear()}년 ${String(date.getMonth() + 1).padStart(2, '0')}월 ${String(date.getDate()).padStart(2, '0')}일`
 })
 </script>
 
@@ -111,7 +127,7 @@ const illnessText = computed(() => {
           </div>
           <div class="flex">
             <div class="w-24 text-[#9E8C7F]">생년월일</div>
-            <div>{{ user.birth_date }}</div>
+            <div>{{ birthDateText }}</div>
           </div>
           <div class="flex">
             <div class="w-24 text-[#9E8C7F]">기저질환</div>
@@ -119,7 +135,7 @@ const illnessText = computed(() => {
           </div>
           <div class="flex">
             <div class="w-24 text-[#9E8C7F]">가입일</div>
-            <div>{{ user.created_at }}</div>
+            <div>{{ joinedDateText }}</div>
           </div>
           <div class="mt-6">
             <button

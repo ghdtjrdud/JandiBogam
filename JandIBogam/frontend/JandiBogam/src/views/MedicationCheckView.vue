@@ -37,6 +37,13 @@
             <option>영양제</option>
           </select>
         </div>
+        <!-- 복용 날짜 -->
+        <div class="mb-6">
+          <label for="med-date" class="block text-lg font-medium text-gray-700 mb-2"
+            >복용 날짜</label
+          >
+          <input id="med-date" type="date" v-model="medDate" class="input input-bordered w-full" />
+        </div>
 
         <!-- 복용 시간대 -->
         <div class="mb-6">
@@ -110,10 +117,12 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const authStore = useAuthStore()
 
 const medicineName = ref('')
 const medicineType = ref('')
@@ -130,14 +139,19 @@ const timeOptions = [
   { label: '취침 전', value: 'bedtime', time: '22:00' },
 ]
 
+const medDate = ref(new Date().toISOString().split('T')[0]) // 기본값 오늘
+
 // 1. 복약 시간 알림 예약 함수 추가
-const scheduleNotification = (timeString, drugName) => {
+const scheduleNotification = (timeString, drugName, dateString) => {
   const [hours, minutes] = timeString.split(':').map(Number)
+
+  const target = new Date(dateString)
+  target.setHours(hours, minutes, 0, 0)
+
   const now = new Date()
-  const targetTime = new Date()
-  targetTime.setHours(hours, minutes, 0, 0)
-  if (targetTime < now) targetTime.setDate(targetTime.getDate() + 1)
-  const msUntilTarget = targetTime - now
+  if (target <= now) return // 과거는 예약 안함
+
+  const msUntilTarget = target - now
 
   setTimeout(() => {
     toast.info(`💊 ${drugName} 복약 시간입니다!`, {
@@ -186,13 +200,18 @@ const handleSubmit = async () => {
     return
   }
 
-  try {
-    const timeSlotString = selectedTimes.value.map((time) => time.time).join(',')
+  if (!authStore.user || !authStore.user.id) {
+    toast.error('로그인이 필요한 기능입니다.')
+    return
+  }
 
+  try {
     const medicationData = {
       drugName: medicineName.value,
       drugType: medicineType.value,
-      timeSlot: timeSlotString,
+      timeSlot: selectedTimes.value.map((time) => time.time).join(','),
+      medDate: medDate.value,
+      userId: authStore.user.id,
     }
 
     if (isEditing.value) {
@@ -205,8 +224,9 @@ const handleSubmit = async () => {
       toast.success('복약 일정이 저장되었습니다!')
 
       // 3. 새 약 등록 시 알림 예약 추가
+      // 복약 등록 성공 시 알림 예약
       selectedTimes.value.forEach((time) => {
-        scheduleNotification(time.time, medicineName.value)
+        scheduleNotification(time.time, medicineName.value, medDate.value)
       })
     }
 

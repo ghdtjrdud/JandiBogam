@@ -134,6 +134,11 @@ export const useAuthStore = defineStore('auth', {
           name: userData.name,
           gender: userData.gender,
           birthDate: userData.birthdate,
+          diabetes: userData.diabetes,
+          hypertension: userData.hypertension,
+          heartDisease: userData.heartDisease,
+          kidneyDisease: userData.kidneyDisease,
+          liverDisease: userData.liverDisease,
         }
 
         await AuthService.register(signupData)
