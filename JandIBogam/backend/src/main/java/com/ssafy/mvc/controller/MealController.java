@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/meals")
@@ -90,7 +92,10 @@ public class MealController {
                                               @RequestParam(defaultValue = "전체") String timeSlot
     ){
         int userId = jwtTokenProvider.extractUserId(request);
-        List<MealDto> mealDtos = mealService.getMealsByFilter(userId, startDate, endDate, timeSlot);
+        List<MealDto> mealDtos = mealDao.selectByUserIdBetweenDates(userId, startDate, endDate);
+        if(!"전체".equals(timeSlot)){
+            mealDtos = mealDtos.stream().filter(meal -> timeSlot.equals(meal.getTimeSlot())).collect(Collectors.toList());
+        }
         return ResponseEntity.status(HttpStatus.OK).body(mealDtos);
     }
 
