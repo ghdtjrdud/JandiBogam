@@ -1,8 +1,8 @@
-// src/services/apiClient.js
+// src/services/api.js
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: '/api', // 백엔드 서버 주소로 변경
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
