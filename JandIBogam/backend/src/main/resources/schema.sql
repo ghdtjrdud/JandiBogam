@@ -119,7 +119,7 @@ CREATE TABLE `medications`
     `drug_name`  VARCHAR(100)          NOT NULL COMMENT '약 이름',
     `drug_type`  VARCHAR(100)          NOT NULL COMMENT '약 종류',
     `med_date`   DATE                  NOT NULL COMMENT '복약 날짜',
-    `time_slot`  ENUM ('아침','점심','저녁') NOT NULL COMMENT '시간대',
+    `time_slot`  VARCHAR(100)          NOT NULL COMMENT '시간대',
     `created_at` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
