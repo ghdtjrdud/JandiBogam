@@ -39,11 +39,21 @@ export default {
    * DELETE {BASE_URL}/groups/{groupId}
    */
   leaveGroup(groupId) {
-    return apiClient.delete(`/groups/${groupId}`)
+    return apiClient.delete(`/groups/${groupId}/leave`)
   },
 
   // 그룹 생성 (POST / groups)
   createGroup(groupData) {
     return apiClient.post('/groups', groupData)
+  },
+
+  // 그룹 상세 (GET / {groupId})
+  getGroupDetail(groupId) {
+    return apiClient.get(`/groups/${groupId}`)
+  },
+
+  // 그룹내 맴버 조회 (GET / {groupId}/members)
+  getGroupMembers(groupId) {
+    return apiClient.get(`/groups/${groupId}/members`)
   },
 }
