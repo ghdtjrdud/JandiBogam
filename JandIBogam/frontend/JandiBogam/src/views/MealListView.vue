@@ -1,133 +1,114 @@
 <template>
-  <div class="min-h-screen bg-white">
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">
-          {{ isMyPage ? '내 식단 기록' : `${targetUser?.name}님의 식단 기록` }}
-        </h1>
-        <p class="text-gray-600">
-          {{
-            isMyPage ? '나의 식사 기록을 확인해보세요' : '가족의 식사 기록을 확인하고 응원해주세요'
-          }}
-        </p>
+  <div class="min-h-screen bg-brand-lightbg">
+    <!-- Main Content - 대시보드와 동일한 레이아웃 적용 -->
+    <main class="max-w-3xl mx-auto px-4 py-8">
+      <!-- Title -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">식단 기록</h2>
       </div>
 
-      <!-- Add New Meal Button (본인만) -->
-      <div v-if="isMyPage" class="flex justify-end mb-6">
+      <!-- Filter Bar with Add Button -->
+      <div class="bg-white rounded-xl p-6 shadow-sm mb-8 flex justify-between items-center">
+        <!-- Filter Section -->
+        <div class="flex gap-6">
+          <div class="flex items-center gap-3">
+            <span class="text-gray-700 font-medium">기간 </span>
+            <select
+              class="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 min-w-[150px] focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option>최근 1주일</option>
+              <option>최근 1개월</option>
+              <option>최근 3개월</option>
+              <option>직접 설정</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-gray-700 font-medium">식사 시간</span>
+            <select
+              class="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 min-w-[150px] focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option>전체</option>
+              <option>아침</option>
+              <option>점심</option>
+              <option>저녁</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Add Button -->
         <button
-          @click="goToMealRecord"
-          class="btn bg-brand-primary hover:bg-brand-hover text-white border-none px-6"
+          @click="goToAddMeal"
+          class="px-6 py-3 bg-[#C7D7CB] hover:bg-green-700 text-white font-bold rounded-2xl transition-colors duration-200"
         >
-          + 새 식단 기록
+          + 식단 추가
         </button>
       </div>
 
-      <!-- Meal Records List -->
-      <div class="max-w-4xl mx-auto">
-        <div v-if="mealRecords.length === 0" class="text-center py-12">
-          <div class="text-6xl mb-4">🍽️</div>
-          <h3 class="text-xl font-medium text-gray-600 mb-2">
-            {{ isMyPage ? '아직 기록된 식단이 없습니다' : '아직 기록된 식단이 없네요' }}
-          </h3>
-          <p class="text-gray-500 mb-6">
-            {{ isMyPage ? '첫 번째 식단을 기록해보세요!' : '곧 맛있는 식단이 올라올 거예요' }}
-          </p>
-          <button
-            v-if="isMyPage"
-            @click="goToMealRecord"
-            class="btn bg-brand-primary hover:bg-brand-hover text-white border-none"
-          >
-            식단 기록하기
-          </button>
-        </div>
+      <!-- Meal Records by Date -->
+      <div class="space-y-8">
+        <div
+          v-for="record in mealRecords"
+          :key="record.date"
+          class="bg-white rounded-xl shadow-sm overflow-hidden"
+        >
+          <!-- Date Header -->
+          <div class="bg-green-50 px-6 py-4 border-b-2 border-green-100">
+            <h3 class="text-xl font-semibold text-gray-800">
+              {{ record.date }} ({{ record.dayOfWeek }})
+            </h3>
+          </div>
 
-        <div v-else class="space-y-4">
-          <div
-            v-for="meal in mealRecords"
-            :key="meal.id"
-            class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-4">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-2">
-                    <span class="text-lg">{{ getMealTimeEmoji(meal.mealTime) }}</span>
-                    <span class="font-medium text-gray-800">{{
-                      getMealTimeText(meal.mealTime)
-                    }}</span>
-                    <span class="text-sm text-gray-500">{{ formatDate(meal.createdAt) }}</span>
-                  </div>
-                  <h3
-                    class="text-xl font-semibold text-gray-800 mb-2 cursor-pointer hover:text-brand-primary"
-                    @click="goToMealDetail(meal.id)"
-                  >
-                    {{ meal.menuName }}
-                  </h3>
-                  <p v-if="meal.memo" class="text-gray-600 text-sm">{{ meal.memo }}</p>
+          <!-- Meal Items -->
+          <div class="p-5">
+            <div
+              v-for="(meal, idx) in record.meals"
+              :key="meal.id"
+              class="flex items-center p-5 hover:bg-green-25 transition-colors duration-200 rounded-lg"
+              :class="idx !== record.meals.length - 1 ? 'border-b border-gray-100 mb-4' : ''"
+            >
+              <!-- Meal Icon -->
+              <div
+                class="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mr-5 flex-shrink-0"
+              >
+                <span class="text-3xl">{{ getMealEmoji(meal.type) }}</span>
+              </div>
+
+              <!-- Meal Content -->
+              <div class="flex-grow">
+                <!-- Meal Type Badge -->
+                <span
+                  class="inline-block px-3 py-1 rounded-full text-sm font-medium mb-2"
+                  :class="getMealBadgeClass(meal.type)"
+                >
+                  {{ meal.typeText }}
+                </span>
+
+                <!-- Meal Menu -->
+                <div class="text-lg font-medium text-gray-800 mb-1">
+                  {{ meal.foods }}
                 </div>
-                <div v-if="meal.imageUrl" class="ml-4">
-                  <img
-                    :src="meal.imageUrl"
-                    :alt="meal.menuName"
-                    class="w-20 h-20 object-cover rounded-lg cursor-pointer"
-                    @click="goToMealDetail(meal.id)"
-                  />
+
+                <!-- Meal Details -->
+                <div class="text-sm text-green-600">
+                  <span v-if="meal.memo"> 메모: {{ meal.memo }} </span>
+                  <span v-else-if="meal.hasPhoto" class="flex items-center gap-1"> 📷 사진 </span>
                 </div>
               </div>
 
-              <!-- 댓글 섹션 -->
-              <div class="border-t pt-4 mt-4">
-                <!-- 기존 댓글 표시 -->
-                <div v-if="meal.comments && meal.comments.length > 0" class="space-y-3 mb-4">
-                  <div
-                    v-for="comment in meal.comments"
-                    :key="comment.id"
-                    class="flex items-start gap-3"
-                  >
-                    <div
-                      class="w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center text-white text-sm"
-                    >
-                      {{ comment.author.name.charAt(0) }}
-                    </div>
-                    <div class="flex-1">
-                      <div class="flex items-center gap-2 mb-1">
-                        <span class="font-medium text-sm text-gray-800">{{
-                          comment.author.name
-                        }}</span>
-                        <span class="text-xs text-gray-500">{{
-                          formatDate(comment.createdAt)
-                        }}</span>
-                      </div>
-                      <p class="text-sm text-gray-700">{{ comment.content }}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 댓글 작성 (모든 사용자) -->
-                <div class="flex gap-3">
-                  <div
-                    class="w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center text-white text-sm"
-                  >
-                    {{ currentUser?.name?.charAt(0) }}
-                  </div>
-                  <div class="flex-1 flex gap-2">
-                    <input
-                      v-model="newComment[meal.id]"
-                      type="text"
-                      placeholder="응원의 댓글을 남겨주세요..."
-                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-brand-primary"
-                      @keyup.enter="addComment(meal.id)"
-                    />
-                    <button
-                      @click="addComment(meal.id)"
-                      :disabled="!newComment[meal.id]?.trim()"
-                      class="px-4 py-2 bg-brand-primary text-white rounded-lg text-sm hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      등록
-                    </button>
-                  </div>
-                </div>
+              <!-- Action Button -->
+              <div>
+                <button
+                  @click="viewMealDetails(meal.id)"
+                  class="px-5 py-2 bg-green-50 text-green-600 border border-green-200 rounded-lg hover:bg-green-100 transition-colors duration-200 font-medium"
+                >
+                  상세보기
+                </button>
+                <button
+                  @click="deleteMeal(meal.id, record.date)"
+                  class="px-5 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium"
+                >
+                  삭제
+                </button>
               </div>
             </div>
           </div>
@@ -138,164 +119,159 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
 
-const mealRecords = ref([])
-const newComment = ref({})
-const targetUser = ref(null)
-const loading = ref(false)
-
-// 현재 로그인한 사용자
-const currentUser = computed(() => authStore.getUser)
-
-// 본인 페이지인지 확인
-const isMyPage = computed(() => {
-  return !route.params.userId || route.params.userId === currentUser.value?.id?.toString()
-})
-
-// 대상 사용자 ID
-const targetUserId = computed(() => {
-  return route.params.userId || currentUser.value?.id
-})
-
-onMounted(() => {
-  loadMealRecords()
-  if (!isMyPage.value) {
-    loadTargetUser()
-  }
-})
-
-const loadMealRecords = async () => {
-  loading.value = true
-  try {
-    // 실제로는 API 호출
-    // const response = await MealService.getMealRecords(targetUserId.value)
-    // mealRecords.value = response.data
-
-    // 샘플 데이터
-    mealRecords.value = [
-      {
-        id: 1,
-        mealTime: 'breakfast',
-        menuName: '현미밥, 된장찌개, 김치',
-        memo: '오늘은 집에서 만든 된장찌개가 특히 맛있었어요',
-        imageUrl: '/api/placeholder/200/200',
-        createdAt: '2025-05-22',
-        comments: [
-          {
-            id: 1,
-            content: '건강한 아침식사네요! 👍',
-            author: { name: '김철수' },
-            createdAt: '2025-05-22',
-          },
-        ],
-      },
-    ]
-  } catch (error) {
-    console.error('식단 기록 조회 실패:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-const loadTargetUser = async () => {
-  try {
-    // 실제로는 API 호출
-    // const response = await UserService.getUserInfo(route.params.userId)
-    // targetUser.value = response.data
-
-    // 샘플 데이터
-    targetUser.value = { name: '김영희' }
-  } catch (error) {
-    console.error('사용자 정보 조회 실패:', error)
-  }
-}
-
-const addComment = async (mealId) => {
-  const content = newComment.value[mealId]?.trim()
-  if (!content) return
-
-  try {
-    // 실제로는 API 호출
-    // await CommentService.addComment(mealId, content)
-
-    // 임시로 댓글 추가
-    const meal = mealRecords.value.find((m) => m.id === mealId)
-    if (meal) {
-      if (!meal.comments) meal.comments = []
-      meal.comments.push({
-        id: Date.now(),
-        content,
-        author: currentUser.value,
-        createdAt: new Date().toISOString(),
-      })
-    }
-
-    newComment.value[mealId] = ''
-  } catch (error) {
-    console.error('댓글 작성 실패:', error)
-  }
-}
-
-const goToMealRecord = () => {
+const goToAddMeal = () => {
   router.push('/meal/record')
 }
 
-const goToMealDetail = (mealId) => {
-  router.push(`/meal/${mealId}/detail`)
-}
-
-const getMealTimeEmoji = (mealTime) => {
-  const emojis = {
+const getMealEmoji = (type) => {
+  const emojiMap = {
     breakfast: '🌅',
-    lunch: '🌞',
+    lunch: '☀️',
     dinner: '🌙',
   }
-  return emojis[mealTime] || '🍽️'
+  return emojiMap[type] || '🍽️'
 }
 
-const getMealTimeText = (mealTime) => {
-  const texts = {
-    breakfast: '아침',
-    lunch: '점심',
-    dinner: '저녁',
+const getMealBadgeClass = (type) => {
+  const classMap = {
+    breakfast: 'bg-green-50 text-green-600',
+    lunch: 'bg-green-50 text-green-600',
+    dinner: 'bg-green-50 text-green-600',
   }
-  return texts[mealTime] || '식사'
+  return classMap[type] || 'bg-gray-50 text-gray-600'
 }
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
+const mealRecords = [
+  {
+    date: '2025년 5월 1일',
+    dayOfWeek: '목',
+    meals: [
+      {
+        id: 1,
+        type: 'breakfast',
+        typeText: '아침',
+        foods: '현미밥, 미역국, 시금치무침, 계란말이',
+        hasPhoto: true,
+        memo: '',
+      },
+      {
+        id: 2,
+        type: 'lunch',
+        typeText: '점심',
+        foods: '잡곡밥, 된장찌개, 갈치구이, 김치',
+        hasPhoto: false,
+        memo: '엄마 된장찌개가 추억 돋네요',
+      },
+    ],
+  },
+  {
+    date: '2025년 4월 30일',
+    dayOfWeek: '수',
+    meals: [
+      {
+        id: 3,
+        type: 'breakfast',
+        typeText: '아침',
+        foods: '죽, 나물반찬, 멸치볶음',
+        hasPhoto: true,
+        memo: '',
+      },
+      {
+        id: 4,
+        type: 'lunch',
+        typeText: '점심',
+        foods: '비빔밥, 콩나물국',
+        hasPhoto: false,
+        memo: '여름에 먹어서 남아서 싱겁좀음',
+      },
+      {
+        id: 5,
+        type: 'dinner',
+        typeText: '저녁',
+        foods: '현미밥, 생선구이, 김치, 콩자반',
+        hasPhoto: true,
+        memo: '',
+      },
+    ],
+  },
+]
 
-  if (date.toDateString() === today.toDateString()) {
-    return '오늘'
-  } else if (date.toDateString() === yesterday.toDateString()) {
-    return '어제'
-  } else {
-    return date.toLocaleDateString('ko-KR', {
-      month: 'long',
-      day: 'numeric',
-    })
+const viewMealDetails = (mealId) => {
+  // 상세보기 페이지로 이동
+  router.push(`/meal/detail/${mealId}`)
+}
+
+const deleteMeal = (mealId, date) => {
+  if (confirm('이 식단 기록을 삭제하시겠습니까?')) {
+    // 해당 식사 기록을 삭제하는 로직
+    mealRecords.value = mealRecords.value
+      .map((record) => {
+        if (record.date === date) {
+          return {
+            ...record,
+            meals: record.meals.filter((meal) => meal.id !== mealId),
+          }
+        }
+        return record
+      })
+      .filter((record) => record.meals.length > 0) // 식사가 없는 날짜는 제거
+
+    alert('식단 기록이 삭제되었습니다.')
   }
 }
 </script>
 
 <style scoped>
-.bg-brand-primary {
-  background-color: #6a7d73;
+/* 추가 스타일링 */
+.bg-green-25 {
+  background-color: #f9fdfb;
 }
-.bg-brand-hover {
-  background-color: #5a6b63;
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .main-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .filter-section {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .meal-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .meal-icon {
+    align-self: center;
+  }
 }
-.text-brand-primary {
-  color: #6a7d73;
+
+/* 전체 레이아웃이 헤더 너비에 맞도록 설정 */
+@media (min-width: 768px) {
+  main {
+    max-width: 1280px; /* 대시보드와 동일한 최대 너비 설정 */
+  }
+}
+
+/* 작은 화면에서 레이아웃 조정 */
+@media (max-width: 767px) {
+  main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 </style>

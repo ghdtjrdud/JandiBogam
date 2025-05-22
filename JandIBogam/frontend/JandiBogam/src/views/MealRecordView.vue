@@ -53,12 +53,12 @@
           <!-- Menu Names -->
           <div class="mb-8">
             <div class="flex items-center mb-4">
-              <label class="text-lg font-semibold text-gray-800">
+              <label class="text-2xl font-semibold text-gray-800">
                 메뉴명<span class="text-red-500">* </span>
               </label>
               <button
                 @click="addMenuField"
-                class="flex items-center gap-2 px-6 py-3 bg-[#C7D7CB] text-white rounded-full hover:bg-[#B29888] transition-colors text-sm font-medium whitespace-nowrap ml-4"
+                class="flex items-center gap-2 px-6 py-3 bg-[#C7D7CB] text-white rounded-2xl hover:bg-[#B29888] transition-colors text-sm font-medium whitespace-nowrap ml-4"
               >
                 추가<span class="material-icons" style="font-size: 20px">add</span>
               </button>
@@ -102,7 +102,7 @@
 
             <!-- Upload Area -->
             <div
-              class="border-2 border-dashed border-brand-border rounded-xl p-8 text-center cursor-pointer hover:bg-brand-accent/30 hover:border-brand-primary transition-all duration-200"
+              class="relative border-2 border-dashed border-brand-border rounded-xl p-8 text-center cursor-pointer hover:bg-brand-accent/30 hover:border-brand-primary transition-all duration-200"
               @click="triggerFileInput"
               @dragover.prevent
               @drop.prevent="handleFileDrop"
@@ -115,39 +115,30 @@
                 @change="handleFileChange"
               />
 
+              <!-- 삭제 버튼: 업로드 박스 우측 상단에 고정 -->
+              <button
+                v-if="previewImage"
+                @click.stop="removeImage"
+                class="absolute top-2 right-2 w-10 h-10 bg-[#C7D7CB] hover:bg-[#B29888] text-white rounded-full shadow flex items-center justify-center transition-all duration-200 z-10"
+                title="사진 삭제"
+              >
+                <span class="material-icons" style="font-size: 20px">remove</span>
+              </button>
+
               <!-- No Image State -->
               <div v-if="!previewImage" class="flex flex-col items-center">
-                <div class="text-5xl mb-4">📷</div>
-                <p class="text-brand-secondary mb-2 text-lg">식사 사진을 추가해주세요</p>
-                <p class="text-brand-muted text-sm">클릭하거나 드래그하여 업로드</p>
+                <div class="text-4xl mb-4">📷</div>
+                <p class="text-brand-secondary text-lg">식사 사진을 추가해주세요</p>
+                <p class="text-brand-muted text-sm">(클릭하거나 드래그하여 업로드)</p>
               </div>
 
               <!-- Image Preview -->
-              <div v-else class="relative inline-block">
+              <div v-else class="flex flex-col items-center">
                 <img
                   :src="previewImage"
                   alt="Meal preview"
-                  class="max-h-64 max-w-full rounded-lg shadow-md"
+                  class="max-h-64 max-w-full rounded-lg shadow-md mx-auto"
                 />
-                <button
-                  @click.stop="removeImage"
-                  class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex items-center justify-center"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
@@ -212,16 +203,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Toast for feedback -->
-      <div v-if="showToast" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <div
-          class="px-6 py-3 rounded-lg shadow-lg"
-          :class="toastType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'"
-        >
-          {{ toastMessage }}
-        </div>
-      </div>
     </main>
   </div>
 </template>
@@ -230,9 +211,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
+import MealService from '@/services/MealService'
+import FileService from '@/services/FileService'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const toast = useToast()
 
 // Form data
 const selectedMealTime = ref('breakfast')
@@ -244,9 +229,7 @@ const selectedFile = ref(null)
 // UI state
 const loading = ref(false)
 const errors = ref({})
-const showToast = ref(false)
-const toastMessage = ref('')
-const toastType = ref('success')
+const loadingText = ref('저장하기')
 
 // File input reference
 const fileInput = ref(null)
@@ -308,13 +291,13 @@ const handleFileDrop = (event) => {
 const handleFile = (file) => {
   // Validate file size (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    showToastMessage('파일 크기는 5MB 이하만 가능합니다.', 'error')
+    toast.error('파일 크기는 5MB 이하만 가능합니다.')
     return
   }
 
   // Validate file type
   if (!file.type.startsWith('image/')) {
-    showToastMessage('이미지 파일만 업로드 가능합니다.', 'error')
+    toast.error('이미지 파일만 업로드 가능합니다.')
     return
   }
 
@@ -352,17 +335,6 @@ const validateForm = () => {
   return isValid
 }
 
-// Toast message
-const showToastMessage = (message, type = 'success') => {
-  toastMessage.value = message
-  toastType.value = type
-  showToast.value = true
-
-  setTimeout(() => {
-    showToast.value = false
-  }, 3000)
-}
-
 // Navigation methods
 const cancel = () => {
   const hasContent =
@@ -377,7 +349,7 @@ const cancel = () => {
   }
 }
 
-// Save meal record
+// Save meal record (복약 등록과 동일한 방식)
 const saveMealRecord = async () => {
   if (!validateForm()) {
     return
@@ -390,32 +362,57 @@ const saveMealRecord = async () => {
       .filter((item) => item.name.trim())
       .map((item) => item.name.trim())
 
+    let photoUrl = null
+
+    if (selectedFile.value) {
+      try {
+        console.log('사진 업로드 중')
+        const imageResponse = await FileService.uploadImage(selectedFile.value)
+        photoUrl = imageResponse.data.photoUrl
+        console.log('사진 업로드 성공:', photoUrl)
+      } catch (imageError) {
+        console.error('사진 업로드 실패', imageError)
+        toast.error('사진 업로드에 실패했습니다. 사진 없이 등록할까요?')
+
+        const proceed = confirm('사진 업로드에 실패했습니다. 사진 없이 등록할까요?')
+        if (!proceed) {
+          loading.value = false
+          return
+        }
+      }
+    }
+
+    loadingText.value = '식단 저장 중...'
     const mealData = {
       mealTime: selectedMealTime.value,
       menus: validMenus,
       memo: memo.value.trim(),
-      userId: authStore.getUser?.id,
-      createdAt: new Date().toISOString(),
+      photoUrl: photoUrl,
     }
 
-    if (selectedFile.value) {
-      mealData.hasImage = true
-    }
+    console.log('식단 데이터 저장 시작...', mealData)
+    const response = await MealService.createMeal(mealData)
 
-    console.log('Saving meal record:', mealData)
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    showToastMessage('식단이 성공적으로 기록되었습니다!', 'success')
+    console.log('식단 저장 성공:', response.data)
+    toast.success('식단이 성공적으로 기록되었습니다!')
 
     // Navigate back to meal list after short delay
     setTimeout(() => {
       router.push('/meals')
-    }, 1500)
+    }, 2000)
   } catch (error) {
     console.error('식단 기록 저장 실패:', error)
-    showToastMessage('식단 기록 저장에 실패했습니다. 다시 시도해주세요.', 'error')
+
+    let errorMessage = '식단 기록 저장에 실패했습니다.'
+    if (error.response?.data) {
+      if (typeof error.response.data === 'string') {
+        errorMessage = error.response.data
+      } else if (error.response.data.message) {
+        errorMessage = error.response.data.message
+      }
+    }
+
+    toast.error(errorMessage)
   } finally {
     loading.value = false
   }
