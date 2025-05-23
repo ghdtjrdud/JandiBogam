@@ -395,25 +395,10 @@ const saveMealRecord = async () => {
 
     console.log('식단 저장 성공:', response.data)
     toast.success('식단이 성공적으로 기록되었습니다!')
-    const myUserId = response.data.userId || response.data.userid || response.data.id
-    console.log('등록 완료 후 myUserId:', myUserId) // 디버깅용
 
     // Navigate back to meal list after short delay
     setTimeout(() => {
-      if (myUserId) {
-        router.push(`/meals/${myUserId}`)
-      } else {
-        // fallback
-        let fallbackId = null
-        const userStr = localStorage.getItem('user')
-        if (userStr) {
-          try {
-            const userObj = JSON.parse(userStr)
-            if (userObj && userObj.id) fallbackId = userObj.id
-          } catch (e) {}
-        }
-        router.push(fallbackId ? `/meals/${fallbackId}` : '/login')
-      }
+      router.push(`/meals/${myUserId}`)
     }, 2000)
   } catch (error) {
     console.error('식단 기록 저장 실패:', error)

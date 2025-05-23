@@ -230,7 +230,7 @@ const fetchMealRecords = async () => {
     error.value = null
     const { startDate, endDate } = getDateRange(selectedPeriod.value)
     const params = {
-      userID: route.params.userId,
+      userId: route.params.userId,
       startDate,
       endDate,
       timeSlot: selectedTimeSlot.value === '전체' ? null : selectedTimeSlot.value,
