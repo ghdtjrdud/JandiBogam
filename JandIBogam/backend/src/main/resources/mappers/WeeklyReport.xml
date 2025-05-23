@@ -5,13 +5,15 @@
 <mapper namespace="com.ssafy.mvc.model.dao.WeeklyReportDao">
 
     <select id="selectWeeklyReportById" resultType="WeeklyReportDto">
-        SELECT *
+        SELECT id, user_id, start_date, end_date, meal_count, health_score,
+        created_at, ai_recommendation, ai_generated_at, health_tips
         FROM weekly_reports
         WHERE id = #{id}
     </select>
 
     <select id="selectWeeklyReportByUserIdAndDataRange" resultType="WeeklyReportDto">
-        SELECT *
+        SELECT id, user_id, start_date, end_date, meal_count, health_score,
+        created_at, ai_recommendation, ai_generated_at, health_tips
         FROM weekly_reports
         WHERE user_id = #{userId}
         AND start_date = #{startDate}
@@ -19,7 +21,8 @@
     </select>
 
     <select id="selectByUserId" resultType="WeeklyReportDto">
-        SELECT *
+        SELECT id, user_id, start_date, end_date, meal_count, health_score,
+        created_at, ai_recommendation, ai_generated_at, health_tips
         FROM weekly_reports
         WHERE user_id = #{userId}
         ORDER BY created_at DESC
@@ -27,15 +30,34 @@
 
     <insert id="insert" parameterType="WeeklyReportDto" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO weekly_reports
-        (user_id, start_date, end_date, meal_count, health_score)
+        (user_id, start_date, end_date, meal_count, health_score, ai_recommendation, ai_generated_at, health_tips)
         VALUES
-        (#{userId}, #{startDate}, #{endDate}, #{mealCount}, #{healthScore})
+        (#{userId}, #{startDate}, #{endDate}, #{mealCount}, #{healthScore}, #{aiRecommendation}, #{aiGeneratedAt}, #{healthTips})
     </insert>
 
     <update id="update" parameterType="WeeklyReportDto">
         UPDATE weekly_reports
         SET meal_count = #{mealCount},
-        health_score = #{healthScore}
+        health_score = #{healthScore},
+        ai_recommendation = #{aiRecommendation},
+        ai_generated_at = #{aiGeneratedAt},
+        health_tips = #{healthTips}
         WHERE id = #{id}
     </update>
+
+    <!-- AI 추천만 업데이트하는 메서드 추가 -->
+    <update id="updateAiRecommendation">
+        UPDATE weekly_reports
+        SET ai_recommendation = #{aiRecommendation},
+        ai_generated_at = #{aiGeneratedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 건강 조언만 업데이트하는 메서드 추가 -->
+    <update id="updateHealthTips">
+        UPDATE weekly_reports
+        SET health_tips = #{healthTips}
+        WHERE id = #{id}
+    </update>
+
 </mapper>
