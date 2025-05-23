@@ -17,6 +17,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect:'/dashboard'
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: HomeView,
@@ -81,7 +85,29 @@ const router = createRouter({
       path: '/report',
       name: 'WeeklyReport',
       component: WeeklyReportView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, title: '주간 건강 리포트' },
+    },
+    {
+      path: '/reports',
+      redirect: '/report'
+    },
+    {
+      path: '/report/weekly',
+      name: 'WeeklyReportWeekly',
+      component: WeeklyReportView,
+      meta: {
+        requiresAuth: true,
+        title: '주간 건강 리포트'
+      }
+    },
+    {
+      path: '/report/:date',
+      name: 'WeeklyReportByDate',
+      component: WeeklyReportView,
+      meta: {
+        requiresAuth: true,
+        title: '주간 건강 리포트'
+      }
     },
 
     {
@@ -90,9 +116,9 @@ const router = createRouter({
       component: FindCredentialsView,
     },
     {
-      path: '/mypage', // ← /mypage 경로 등록
+      path: '/mypage',
       name: 'mypage',
-      component: MyPageView, // ← 컴포넌트 연결
+      component: MyPageView,
       meta: { requiresAuth: true },
     },
     {
@@ -101,6 +127,11 @@ const router = createRouter({
       component: GroupDetailView,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      redirect: '/dashboard' // 존재하지 않는 경로는 대시보드로 리다이렉트
+    }
   ],
 })
 
