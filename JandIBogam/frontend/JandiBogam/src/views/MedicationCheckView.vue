@@ -1,13 +1,12 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
-    <main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">
+   <main class="max-w-3xl mx-auto px-4 py-8">
       <div class="text-center mb-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">복약 일정 추가</h1>
         <p class="text-gray-600">규칙적인 복약으로 건강을 지켜보세요</p>
       </div>
 
       <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md border p-8">
-
         <!-- 약 이름 -->
         <div class="mb-6">
           <label for="medicine-name" class="block text-lg font-medium text-gray-700 mb-2"
@@ -124,7 +123,9 @@ const medDate = ref(new Date().toISOString().split('T')[0]) // 기본값 오늘
 const loading = ref(false) // ✅ 로딩 상태 추가
 
 const isEditing = computed(() => !!medicationId.value)
-const timeSlotString = selectedTimes.value.map(time => time.time).join(',')
+const timeSlotString = computed(() => {
+  return selectedTimes.value.map((time) => time.time).join(',')
+})
 
 const timeOptions = [
   { label: '아침/점심/저녁 식전', value: 'before_meal', time: '08:00' },
@@ -192,8 +193,23 @@ const handleSubmit = async () => {
     return
   }
 
-  if (!medicineName.value || !medicineType.value || selectedTimes.value.length === 0) {
-    toast.error('모든 필드를 입력해주세요')
+  if (!medicineName.value.trim()) {
+    toast.error('약 이름을 입력해주세요')
+    return
+  }
+
+  if (!medicineType.value) {
+    toast.error('약 종류를 선택해주세요')
+    return
+  }
+
+  if (selectedTimes.value.length === 0) {
+    toast.error('복용 시간대를 최소 1개 이상 선택해주세요')
+    return
+  }
+
+  if (!medDate.value) {
+    toast.error('복용 날짜를 선택해주세요')
     return
   }
 
@@ -203,23 +219,21 @@ const handleSubmit = async () => {
     return
   }
 
-  loading.value = true // ✅ 로딩 시작
+  loading.value = true
 
   try {
     const medicationData = {
-      drugName: medicineName.value,
+      drugName: medicineName.value.trim(),
       drugType: medicineType.value,
-      timeSlot: timeSlotString,
+      timeSlot: timeSlotString.value,
       medDate: medDate.value,
       userId,
     }
 
     if (isEditing.value) {
-      // ✅ MedicationService 사용
       await MedicationService.updateMedication(medicationId.value, medicationData)
       toast.success('복약 일정이 수정되었습니다!')
     } else {
-      // ✅ MedicationService 사용
       await MedicationService.createMedication(medicationData)
       toast.success('복약 일정이 저장되었습니다!')
 

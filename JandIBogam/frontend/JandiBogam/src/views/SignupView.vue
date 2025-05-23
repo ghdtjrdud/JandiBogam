@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex justify-center items-center py-8 px-4">
-    <div class="w-full max-w-2xl bg-white rounded-lg shadow-md p-8">
+  <div class="min-h-screen bg-gray-50">
+    <main class="max-w-3xl mx-auto px-4 py-8">
       <!-- Logo and Header -->
       <div class="flex flex-col items-center mb-8">
         <img
@@ -13,6 +13,7 @@
       </div>
 
       <!-- Signup Form -->
+      <div class="max-w-xl mx-auto px-6">
       <form @submit.prevent="handleSignup" class="space-y-6">
         <!-- Basic Information Section -->
         <div>
@@ -184,6 +185,7 @@
           회원가입 완료
         </button>
       </form>
+      </div>
 
       <!-- Return to Login Link -->
       <div class="text-center mt-6">
@@ -191,7 +193,7 @@
           로그인 화면으로 돌아가기
         </router-link>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
