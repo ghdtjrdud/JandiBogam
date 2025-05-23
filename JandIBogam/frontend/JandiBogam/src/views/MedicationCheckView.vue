@@ -73,9 +73,9 @@
             <div>
               <h3 class="font-medium text-brand-primary mb-2">복약 관리 팁</h3>
               <ul class="space-y-2 text-gray-600 text-sm">
-                <li><span class="mr-2">•</span> 식사 위치 보호 시간에 먹는 것이 좋습니다.</li>
-                <li><span class="mr-2">•</span> 식사/식후 복용 지침을 잘 지켜주세요.</li>
-                <li><span class="mr-2">•</span> 복용 시간을 통일해 알림을 설정하세요.</li>
+                <li><span class="mr-2"></span> 식사 위치 보호 시간에 먹는 것이 좋습니다.</li>
+                <li><span class="mr-2"></span> 식사/식후 복용 지침을 잘 지켜주세요.</li>
+                <li><span class="mr-2"></span> 복용 시간을 통일해 알림을 설정하세요.</li>
               </ul>
             </div>
           </div>
@@ -108,7 +108,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
-import MedicationService from '@/services/MedicationService' // ✅ 서비스 import
+import MedicationService from '@/services/MedicationService'
 
 const router = useRouter()
 const route = useRoute()
@@ -119,8 +119,8 @@ const medicineName = ref('')
 const medicineType = ref('')
 const selectedTimes = ref([])
 const medicationId = ref(null)
-const medDate = ref(new Date().toISOString().split('T')[0]) // 기본값 오늘
-const loading = ref(false) // ✅ 로딩 상태 추가
+const medDate = ref(new Date().toISOString().split('T')[0])
+const loading = ref(false)
 
 const isEditing = computed(() => !!medicationId.value)
 const timeSlotString = computed(() => {
@@ -141,7 +141,6 @@ const loadMedicationData = async () => {
   if (route.params.id) {
     try {
       medicationId.value = parseInt(route.params.id)
-      // ✅ MedicationService 사용
       const response = await MedicationService.getMedicationById(medicationId.value)
       const medication = response.data
 
@@ -182,7 +181,7 @@ const handleCancel = () => {
 }
 
 const handleSubmit = async () => {
-  // 디버깅용 - 토큰 확인
+
   const token = localStorage.getItem('accessToken')
   const user = authStore.user
   console.log('현재 토큰:', token)
@@ -249,7 +248,7 @@ const handleSubmit = async () => {
   } catch (error) {
     console.error('저장/수정 실패:', error)
 
-    // 에러 메시지 개선
+
     let errorMessage = '저장에 실패했습니다'
     if (error.response) {
       if (error.response.status === 401) {
@@ -263,7 +262,7 @@ const handleSubmit = async () => {
 
     toast.error(errorMessage)
   } finally {
-    loading.value = false // ✅ 로딩 종료
+    loading.value = false
   }
 }
 
