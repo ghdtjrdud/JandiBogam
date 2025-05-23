@@ -56,4 +56,9 @@ export default {
   getGroupMembers(groupId) {
     return apiClient.get(`/groups/${groupId}/members`)
   },
+
+  // 가입한 그룹의 맴버들 조회(GET / my/members)
+  getAllGroupMembersOfMine() {
+    return apiClient.get('/groups/my/members')
+  },
 }

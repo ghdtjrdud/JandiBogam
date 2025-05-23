@@ -1,20 +1,18 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
-    <!-- Main Content - 헤더 너비에 맞춤 -->
     <main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">
       <!-- Family Members Section -->
       <section class="bg-[#C7D7CB] bg-opacity-50 rounded-2xl p-6 mb-6 shadow-md">
         <div class="flex justify-between items-center mb-5">
-          <p></p>
+          <h2 class="text-lg font-bold text-gray-800">가족 구성원</h2>
         </div>
-
-        <!-- 가족 구성원 나열 -->
-        <div class="flex justify-center flex-wrap gap-x-12 gap-y-8 pb-2">
-          <!-- Family Member Profiles -->
+        <div
+          class="flex flex-row gap-x-8 pb-2 overflow-x-auto overflow-y-hidden scroll-smooth whitespace-nowrap"
+        >
           <div
-            v-for="(member, index) in familyMembers"
-            :key="index"
-            class="flex flex-col items-center cursor-pointer transition-all duration-200 hover:scale-105"
+            v-for="(member, index) in allMembers"
+            :key="member.id"
+            class="flex flex-col items-center cursor-pointer transition-all duration-200 hover:scale-105 min-w-[120px] max-w-[120px]"
             @click="goToMealList(member.id)"
           >
             <div
@@ -25,12 +23,12 @@
               </div>
             </div>
             <h3 class="text-base text-gray-800 font-medium">{{ member.name }}</h3>
-            <p class="text-xs text-gray-600">{{ member.relation }}</p>
+            <p class="text-xs text-gray-600">{{ member.groupName || '' }}</p>
           </div>
-
-          <!-- Add Member Button -->
+          <!-- Add Member Button(더보기) -->
           <div
-            class="flex flex-col items-center cursor-pointer transition-all duration-200 hover:scale-105"
+            class="flex flex-col items-center cursor-pointer transition-all duration-200 hover:scale-105 min-w-[120px] max-w-[120px]"
+            @click="goToMyPage"
           >
             <div
               class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-2 shadow-family-profile"
@@ -39,8 +37,8 @@
                 <span class="emoji-large text-green-500">+</span>
               </div>
             </div>
-            <h3 class="text-base text-gray-800 font-medium">가족 추가</h3>
-            <p class="text-xs text-gray-600">연결하기</p>
+            <h3 class="text-base text-gray-800 font-medium">더보기</h3>
+            <p class="text-xs text-gray-600"></p>
           </div>
         </div>
       </section>
@@ -58,7 +56,6 @@
             <p class="text-sm text-gray-600">오늘의 식사를 기록해주세요</p>
           </div>
         </div>
-
         <!-- 복약 체크 카드 -->
         <div
           class="card bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer h-full"
@@ -70,7 +67,6 @@
             <p class="text-sm text-gray-600">약 복용을 확인해주세요</p>
           </div>
         </div>
-
         <!-- 주간 리포트 카드 -->
         <div
           class="card bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer h-full"
@@ -118,98 +114,133 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import UserService from '@/services/UserService'
 
 const router = useRouter()
+const allMembers = ref([])
 
-// Sample family members data
-const familyMembers = ref([
-  {
-    id: 1,
-    name: '김영희',
-    relation: '가족',
-  },
-  {
-    id: 2,
-    name: '김철수',
-    relation: '가족',
-  },
-  {
-    id: 3,
-    name: '김미영',
-    relation: '가족',
-  },
-  {
-    id: 4,
-    name: '김영수',
-    relation: '친구',
-  },
-])
+// 내 userId 가져오기 함수
+const getMyUserId = () => {
+  // 첫 번째 시도: localStorage에서 'userId' 직접 가져오기
+  const userIdStr = localStorage.getItem('userId')
+  if (userIdStr && !isNaN(userIdStr)) {
+    return Number(userIdStr)
+  }
 
-// 이모지 매핑 함수
+  // 두 번째 시도: localStorage에서 'user' 객체에서 id 추출
+  const userObjStr = localStorage.getItem('user')
+  if (userObjStr) {
+    try {
+      const userObj = JSON.parse(userObjStr)
+      if (userObj.id && !isNaN(userObj.id)) {
+        return Number(userObj.id)
+      }
+    } catch (e) {
+      console.error('사용자 정보 파싱 실패:', e)
+    }
+  }
+
+  return null
+}
+
 const getMemberEmoji = (index) => {
   const emojis = ['👵', '👴', '👩', '👨']
   return emojis[index % emojis.length]
 }
 
-// 가족 구성원 클릭 시 그들의 식단 기록 조회페이지로 넘어가
+// 가족 프로필 클릭 시: 해당 멤버의 식단으로 이동
 const goToMealList = (memberId) => {
+  console.log('가족 멤버 식단으로 이동:', memberId)
+  if (!memberId) {
+    alert('잘못된 사용자입니다')
+    return
+  }
   router.push(`/meals/${memberId}`)
 }
 
-//로그인한 사용자 기준: 식단 기록, 복약 체크, 주간 리포트 페이지로 이동
+// 메인 기능 버튼 클릭 처리
 const goToPage = (page) => {
+  console.log('페이지 이동:', page)
+
+  const myUserId = getMyUserId()
+  console.log('현재 사용자 ID:', myUserId)
+
   switch (page) {
-    case `meal`:
-      router.push('/meals')
+    case 'meal':
+      if (!myUserId) {
+        alert('로그인 정보가 없습니다. 다시 로그인해주세요.')
+        router.push('/login')
+        return
+      }
+      console.log('식단 페이지로 이동:', `/meals/${myUserId}`)
+      router.push(`/meals/${myUserId}`)
       break
     case 'medication':
+      console.log('복약 페이지로 이동')
       router.push('/medication')
       break
     case 'report':
+      console.log('리포트 페이지로 이동')
       router.push('/report')
       break
     default:
+      console.warn('알 수 없는 페이지:', page)
       break
   }
 }
+
+const goToMyPage = () => {
+  console.log('마이페이지로 이동')
+  router.push('/mypage')
+}
+
+// 컴포넌트 마운트 시 가족 멤버 목록 로드
+onMounted(async () => {
+  console.log('컴포넌트 마운트됨')
+  const myUserId = getMyUserId()
+  console.log('내 userId:', myUserId)
+
+  try {
+    const { data } = await UserService.getAllGroupMembersOfMine()
+    console.log('가족 멤버 데이터:', data)
+
+    // 내 자신은 가족 목록에서 제외
+    allMembers.value = data.filter((member) => member.id !== myUserId)
+    console.log('필터링된 가족 멤버:', allMembers.value)
+  } catch (e) {
+    console.error('멤버 조회 실패:', e)
+    // 에러 발생 시 빈 배열로 설정
+    allMembers.value = []
+  }
+})
 </script>
 
 <style scoped>
-/* 이모지 크기 키우기 */
 .emoji-large {
   font-size: 1.5rem;
   line-height: 1;
 }
-
-/* 가족 구성원 카드 간격 조정 */
-.gap-x-12 {
-  column-gap: 3rem; /* 48px */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
-
-.gap-y-8 {
-  row-gap: 2rem; /* 32px */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-
-/* 프로필 그림자 */
 .shadow-family-profile {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .bg-brand-accent {
   background-color: #c7d7cb;
 }
-
 .bg-brand-lightbg {
   background-color: #f6faf7;
 }
-
 .text-brand-primary {
   color: #6a7d73;
 }
-
-/* 카드 호버 효과 */
 .hover\:scale-105:hover {
   transform: scale(1.05);
   transition: transform 0.2s ease-in-out;
@@ -217,30 +248,40 @@ const goToPage = (page) => {
 .hover\:shadow-md:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-
-/* 트랜지션 효과 */
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
-
-/* 카드 내 요소 간격 조정 */
 .card-body {
   padding: 1.25rem;
 }
-
-/* 전체 레이아웃이 헤더 너비에 맞도록 설정 */
-@media (min-width: 768px) {
-  main {
-    max-width: 1280px; /* 최대 너비 설정 */
-  }
+.bg-base-100 {
+  background-color: #ffffff;
+}
+.card {
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* 작은 화면에서 카드 레이아웃 조정 */
+@media (min-width: 768px) {
+  main {
+    max-width: 1280px;
+  }
+}
 @media (max-width: 767px) {
   .grid-cols-3 {
     grid-template-columns: 1fr;
   }
+}
+::-webkit-scrollbar {
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #b29888;
+  border-radius: 8px;
 }
 </style>

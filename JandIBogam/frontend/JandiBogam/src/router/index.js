@@ -17,6 +17,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect: '/dashboard',
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: HomeView,
@@ -83,16 +87,15 @@ const router = createRouter({
       component: WeeklyReportView,
       meta: { requiresAuth: true },
     },
-
     {
       path: '/find-credentials',
       name: 'FindCredentials',
       component: FindCredentialsView,
     },
     {
-      path: '/mypage', // ← /mypage 경로 등록
+      path: '/mypage',
       name: 'mypage',
-      component: MyPageView, // ← 컴포넌트 연결
+      component: MyPageView,
       meta: { requiresAuth: true },
     },
     {
@@ -104,24 +107,57 @@ const router = createRouter({
   ],
 })
 
-// 인증 가드
+// 인증 가드 - 수정된 버전
 router.beforeEach((to, from, next) => {
+  console.log('Router Guard:', {
+    to: to.path,
+    from: from.path,
+    name: to.name,
+    params: to.params,
+  })
+
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const isAuthPage = ['/login', '/signup', '/find-credentials'].includes(to.path)
 
   // 인증이 필요한 페이지에 접근했는데 로그인이 안 되어 있으면 로그인 페이지로
   if (requiresAuth && !authStore.isAuthenticated) {
+    console.log('인증 필요, 로그인으로 이동')
     next('/login')
+    return
   }
+
   // 이미 로그인된 상태에서 로그인/회원가입 페이지에 접근하면 대시보드로
-  else if (isAuthPage && authStore.isAuthenticated) {
+  if (isAuthPage && authStore.isAuthenticated) {
+    console.log('이미 로그인됨, 대시보드로 이동')
     next('/dashboard')
+    return
   }
+
+  // MealList 라우트의 특별 처리
+  if (to.name === 'MealList') {
+    let userId = to.params.userId
+    console.log('MealList 라우트 처리:', { userId, toPath: to.path })
+
+    // userId가 없거나 유효하지 않은 경우에만 리다이렉트
+    if (!userId || isNaN(userId) || Number(userId) <= 0) {
+      const myUserId = localStorage.getItem('userId')
+      console.log('userId 무효, myUserId로 리다이렉트:', myUserId)
+
+      if (myUserId && !isNaN(myUserId)) {
+        next(`/meals/${myUserId}`)
+        return
+      } else {
+        console.log('myUserId도 없음, 로그인으로 이동')
+        next('/login')
+        return
+      }
+    }
+  }
+
   // 그 외 경우는 정상 진행
-  else {
-    next()
-  }
+  console.log('정상 진행')
+  next()
 })
 
 export default router
