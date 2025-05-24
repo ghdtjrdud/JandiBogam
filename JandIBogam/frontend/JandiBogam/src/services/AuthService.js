@@ -10,10 +10,6 @@ const AuthService = {
       throw new Error('로그인 응답에 accessToken이나 user가 없습니다.')
     }
 
-    // ❌ localStorage 저장 부분 제거 (auth.js에서 처리)
-    // localStorage.setItem('accessToken', accessToken)
-    // localStorage.setItem('user', JSON.stringify(user))
-
     return response
   },
 

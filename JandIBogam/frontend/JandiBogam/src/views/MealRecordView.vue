@@ -1,13 +1,66 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
     <!-- Main Content - 대시보드와 동일한 레이아웃 적용 -->
-    <main class="max-w-3xl mx-auto px-4 py-8">
+    <main class="w-full max-w-[1024px] px-8 mx-auto py-10">
       <!--<main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">-->
       <div class="text-center mb-6 lg:mb-8">
         <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">식단 기록하기</h1>
         <p class="text-brand-secondary">오늘 드신 음식을 기록해주세요</p>
       </div>
-
+      <!--날짜 선택 섹션-->
+      <div class="flex justify-center mb-6 lg:mb-8">
+        <div class="bg-white rounded-2xl shadow-sm p-6 w-full max-w-md">
+          <div class="flex flex-col items-center gap-4">
+            <label class="text-lg font-semibold text-gray-800">식사 날짜 선택</label>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span class="text-gray-700 font-medium">📅</span>
+                <input
+                  type="date"
+                  v-model="selectedDate"
+                  :max="maxDate"
+                  class="px-4 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary text-center"
+                />
+              </div>
+              <button
+                @click="setToday"
+                :class="[
+                  'px-4 py-2 text-sm rounded-full transition-colors font-medium',
+                  isToday
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                ]"
+              >
+                오늘
+              </button>
+            </div>
+            <!-- 선택된 날짜 표시 -->
+            <div class="text-center">
+              <p class="text-gray-600 text-sm">
+                {{ formatSelectedDate }}
+                <span
+                  v-if="isToday"
+                  class="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"
+                >
+                  오늘
+                </span>
+                <span
+                  v-else-if="isYesterday"
+                  class="ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                >
+                  어제
+                </span>
+                <span
+                  v-else-if="daysDiff > 1"
+                  class="ml-2 px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+                >
+                  {{ daysDiff }}일 전
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Meal Time Selection -->
       <div class="flex justify-center mb-6 lg:mb-8">
         <div class="flex gap-12 p-1 bg-white rounded-2xl shadow-sm">
@@ -234,6 +287,60 @@ const loadingText = ref('저장하기')
 // File input reference
 const fileInput = ref(null)
 
+const selectedDate = ref('')
+
+// 날짜 관련 computed 속성들
+const maxDate = computed(() => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+})
+
+const isToday = computed(() => {
+  const today = new Date().toISOString().split('T')[0]
+  return selectedDate.value === today
+})
+
+const isYesterday = computed(() => {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  return selectedDate.value === yesterday.toISOString().split('T')[0]
+})
+
+const daysDiff = computed(() => {
+  if (!selectedDate.value) return 0
+
+  const today = new Date()
+  const selected = new Date(selectedDate.value)
+  const diffTime = today.getTime() - selected.getTime()
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+  return diffDays
+})
+
+const formatSelectedDate = computed(() => {
+  if (!selectedDate.value) return ''
+
+  const date = new Date(selectedDate.value)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토']
+  const dayName = dayNames[date.getDay()]
+
+  return `${year}년 ${month}월 ${day}일 (${dayName})`
+})
+
+// 날짜 관련 메서드들
+const setToday = () => {
+  const today = new Date()
+  selectedDate.value = today.toISOString().split('T')[0]
+}
+
+const setDefaultDate = () => {
+  // 기본값을 오늘로 설정
+  setToday()
+}
+
 // Form validation
 const isFormValid = computed(() => {
   return menuItems.value.some((item) => item.name.trim().length > 0)
@@ -241,6 +348,10 @@ const isFormValid = computed(() => {
 
 // Set default meal time based on current time
 onMounted(() => {
+  // 기본 날짜 설정
+  setDefaultDate()
+
+  // 기존 시간대 설정 로직
   const now = new Date()
   const hour = now.getHours()
 
@@ -274,24 +385,24 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
-const handleFileChange = (event) => {
+const handleFileChange = async (event) => {
   const file = event.target.files[0]
   if (file) {
-    handleFile(file)
+    await handleFile(file)
   }
 }
 
-const handleFileDrop = (event) => {
+const handleFileDrop = async (event) => {
   const file = event.dataTransfer.files[0]
   if (file && file.type.startsWith('image/')) {
-    handleFile(file)
+    await handleFile(file)
   }
 }
 
-const handleFile = (file) => {
-  // Validate file size (max 5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    toast.error('파일 크기는 5MB 이하만 가능합니다.')
+const handleFile = async (file) => {
+  // Validate file size (max 10MB for original file)
+  if (file.size > 10 * 1024 * 1024) {
+    toast.error('파일 크기는 10MB 이하만 가능합니다.')
     return
   }
 
@@ -301,12 +412,96 @@ const handleFile = (file) => {
     return
   }
 
-  selectedFile.value = file
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    previewImage.value = e.target.result
+  try {
+    // 이미지 리사이즈 처리
+    const resizedFile = await resizeImage(file, 800, 600, 0.8) // 최대 800x600, 품질 80%
+    selectedFile.value = resizedFile
+
+    // 미리보기용 URL 생성
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      previewImage.value = e.target.result
+    }
+    reader.readAsDataURL(resizedFile)
+
+    console.log(
+      `원본 크기: ${(file.size / 1024 / 1024).toFixed(2)}MB → 압축 후: ${(resizedFile.size / 1024 / 1024).toFixed(2)}MB`,
+    )
+  } catch (error) {
+    console.error('이미지 처리 실패:', error)
+    toast.error('이미지 처리 중 오류가 발생했습니다.')
   }
-  reader.readAsDataURL(file)
+}
+
+const resizeImage = (file, maxWidth = 800, maxHeight = 600, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+
+    img.onload = () => {
+      // 원본 이미지 크기
+      const { width: originalWidth, height: originalHeight } = img
+
+      // 비율 계산
+      let { width, height } = calculateResizeRatio(
+        originalWidth,
+        originalHeight,
+        maxWidth,
+        maxHeight,
+      )
+
+      // 캔버스 크기 설정
+      canvas.width = width
+      canvas.height = height
+
+      // 이미지 품질 향상을 위한 설정
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+
+      // 이미지 그리기
+      ctx.drawImage(img, 0, 0, width, height)
+
+      // Blob으로 변환
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            // File 객체로 변환 (원본 파일명 유지)
+            const resizedFile = new File([blob], file.name, {
+              type: file.type,
+              lastModified: Date.now(),
+            })
+            resolve(resizedFile)
+          } else {
+            reject(new Error('이미지 변환 실패'))
+          }
+        },
+        file.type,
+        quality,
+      )
+    }
+
+    img.onerror = () => reject(new Error('이미지 로드 실패'))
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+// 리사이즈 비율 계산 함수
+const calculateResizeRatio = (originalWidth, originalHeight, maxWidth, maxHeight) => {
+  let width = originalWidth
+  let height = originalHeight
+
+  // 최대 크기보다 큰 경우에만 리사이즈
+  if (width > maxWidth || height > maxHeight) {
+    const widthRatio = maxWidth / width
+    const heightRatio = maxHeight / height
+    const ratio = Math.min(widthRatio, heightRatio)
+
+    width = Math.round(width * ratio)
+    height = Math.round(height * ratio)
+  }
+
+  return { width, height }
 }
 
 const removeImage = () => {
@@ -349,7 +544,7 @@ const cancel = () => {
   }
 }
 
-// Save meal record (복약 등록과 동일한 방식)
+// Save meal record
 const saveMealRecord = async () => {
   if (!validateForm()) {
     return
@@ -384,17 +579,21 @@ const saveMealRecord = async () => {
 
     loadingText.value = '식단 저장 중...'
     const mealData = {
-      mealTime: selectedMealTime.value,
-      menus: validMenus,
+      mealTime: selectedMealTime.value, // 이 부분이 중요!
+      menus: validMenus, // MealService에서 foodNames로 변환됨
       memo: memo.value.trim(),
       photoUrl: photoUrl,
+      eatDate: selectedDate.value,
     }
 
     console.log('식단 데이터 저장 시작...', mealData)
-    const response = await MealService.createMeal(mealData)
+    const response = await MealService.createMealWithFoodSearch(mealData)
 
     console.log('식단 저장 성공:', response.data)
-    toast.success('식단이 성공적으로 기록되었습니다!')
+
+    // 성공 메시지에 날짜 정보 포함
+    const dateText = isToday.value ? '오늘' : formatSelectedDate.value
+    toast.success(`${dateText}의 식단이 성공적으로 기록되었습니다!`)
 
     // Navigate back to meal list after short delay
     setTimeout(() => {
@@ -436,6 +635,26 @@ const saveMealRecord = async () => {
 
 .textarea::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* DatePicker 스타일 커스터마이징 */
+input[type='date'] {
+  color-scheme: light;
+  font-weight: 500;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  filter: invert(0.5);
+}
+
+input[type='date']::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+input[type='date']:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* Smooth transitions */

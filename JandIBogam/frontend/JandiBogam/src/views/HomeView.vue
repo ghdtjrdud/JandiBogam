@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
     <!-- Main Content - 헤더 너비에 맞춤 -->
-    <main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">
+    <main class="w-full max-w-[1024px] px-8 mx-auto py-10">
       <!-- Family Members Section -->
       <section class="bg-[#C7D7CB] bg-opacity-50 rounded-2xl p-6 mb-6 shadow-md">
         <div class="flex justify-between items-center mb-5">

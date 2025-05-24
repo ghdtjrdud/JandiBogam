@@ -155,16 +155,21 @@ public class MealServiceImpl implements MealService {
 
     // 5. 식단 삭제
     @Override
-    public boolean deleteMeal(int id, int userId) {
-        MealDto meal = mealDao.selectById(id);
-        if (meal == null) return false;
+    @Transactional
+    public boolean deleteMeal(int mealId, int userId) {
+        try {
+            // 1. 먼저 meal_foods 테이블의 연관 데이터 삭제
+            mealDao.deleteMealFoods(mealId);
 
-        int result = mealDao.deleteMeal(id, userId);
-        if (result > 0) {
-            mealNutrientService.calculateDailyNutrients(meal.getUserId(), meal.getEatDate());
-            return true;
+            // 2. 그 다음 meals 테이블의 데이터 삭제
+            int result = mealDao.deleteMeal(mealId, userId);
+
+            return result > 0;
+        } catch (Exception e) {
+            System.err.println("식단 삭제 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // 트랜잭션 롤백을 위해 예외 재발생
         }
-        return false;
     }
 
     // 6. 음식 검색 기반 식단 생성
