@@ -25,4 +25,6 @@ public interface GroupDao {
     String getGroupCode(int groupId);
 
     GroupDto detailGroup(int groupId);
+
+    List<UserDto> getAllMyGroupMembers(int userId);
 }

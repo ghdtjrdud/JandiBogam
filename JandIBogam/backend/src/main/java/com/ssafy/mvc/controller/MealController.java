@@ -79,33 +79,39 @@ public class MealController {
 
     //조회 - 상세
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMeal(@PathVariable int id){
+    public ResponseEntity<?> getMeal(@PathVariable int id) {
         MealDto mealDto = mealService.getMeal(id);
         return (mealDto != null) ? ResponseEntity.ok(mealDto) :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Meal not found");
     }
 
     //조회 - 필터링
+// (1) userId를 파라미터로 받는다!
     @GetMapping("/filter")
-    public ResponseEntity<?> getMealsByFilter(HttpServletRequest request, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                                              @RequestParam(defaultValue = "전체") String timeSlot
-    ){
-        int userId = jwtTokenProvider.extractUserId(request);
+    public ResponseEntity<?> getMealsByFilter(
+            @RequestParam int userId, // 쿼리에서 userId 받아오기!
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "전체") String timeSlot
+    ) {
+        // (2) 받은 userId로 그대로 조회!
         List<MealDto> mealDtos = mealDao.selectByUserIdBetweenDates(userId, startDate, endDate);
-        if(!"전체".equals(timeSlot)){
-            mealDtos = mealDtos.stream().filter(meal -> timeSlot.equals(meal.getTimeSlot())).collect(Collectors.toList());
+        if (!"전체".equals(timeSlot)) {
+            mealDtos = mealDtos.stream()
+                    .filter(meal -> timeSlot.equals(meal.getTimeSlot()))
+                    .collect(Collectors.toList());
         }
         return ResponseEntity.status(HttpStatus.OK).body(mealDtos);
     }
 
+
     //수정
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMeal(@PathVariable int id, @RequestBody MealDto mealDto, HttpServletRequest request){
+    public ResponseEntity<?> updateMeal(@PathVariable int id, @RequestBody MealDto mealDto, HttpServletRequest request) {
         int userId = jwtTokenProvider.extractUserId(request);
         mealDto.setId(id);
         MealDto updated = mealService.updateMeal(id, userId, mealDto);
-        if(updated != null) {
+        if (updated != null) {
             return ResponseEntity.status(HttpStatus.OK).body(updated);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Meal not found");
@@ -113,17 +119,17 @@ public class MealController {
 
     //삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMeal(@PathVariable int id, HttpServletRequest request){
+    public ResponseEntity<?> deleteMeal(@PathVariable int id, HttpServletRequest request) {
         int userId = jwtTokenProvider.extractUserId(request);
         boolean deleted = mealService.deleteMeal(id, userId);
-        if(deleted){
+        if (deleted) {
             return ResponseEntity.status(HttpStatus.OK).body("deleted");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("failed to delete");
     }
 
     @GetMapping("/daily/{date}")
-    public ResponseEntity<?> getUserMealsByDate(HttpServletRequest request, @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+    public ResponseEntity<?> getUserMealsByDate(HttpServletRequest request, @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         int userId = jwtTokenProvider.extractUserId(request);
         List<MealDto> meals = mealDao.selectByUserIdAndEatDate(userId, date);
         return ResponseEntity.status(HttpStatus.OK).body(meals);
@@ -146,7 +152,7 @@ public class MealController {
     //영양소 섭취 - 일주일(일정 기간)
     @PostMapping("/nutrients/weekly")
     public ResponseEntity<?> calculateWeeklyNutrients(HttpServletRequest request, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         int userId = jwtTokenProvider.extractUserId(request);
         mealNutrientService.calculateMealNutrientsForDateRange(userId, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body("calculated weekly nutrients");
@@ -174,7 +180,6 @@ public class MealController {
             return ResponseEntity.internalServerError().body("서버 오류");
         }
     }
-
 
 
 }

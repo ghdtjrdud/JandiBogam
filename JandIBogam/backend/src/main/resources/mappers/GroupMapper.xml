@@ -90,6 +90,24 @@
         WHERE g.id = #{groupId}
     </select>
 
+    <!-- 사용자가 가입한 그룹 들의 맴버 조회 -->
+    <select id="getAllMyGroupMembers" parameterType="int" resultType="com.ssafy.mvc.model.dto.UserDto">
+        SELECT
+        u.id,
+        u.name,
+        (SELECT g.name
+        FROM user_groups ug2
+        JOIN `groups` g ON ug2.group_id = g.id
+        WHERE ug2.user_id = u.id
+        LIMIT 1) AS groupName
+        FROM user_groups ug
+        JOIN users u ON ug.user_id = u.id
+        WHERE ug.group_id IN (
+        SELECT group_id FROM user_groups WHERE user_id = #{userId}
+        )
+        GROUP BY u.id
+    </select>
+
 
 
 

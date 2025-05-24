@@ -83,7 +83,7 @@ CREATE TABLE `meals`
     `id`         INT                        NOT NULL AUTO_INCREMENT,
     `user_id`    INT                        NOT NULL COMMENT '등록자 user_id',
     `eat_date`   DATE                       NOT NULL COMMENT '식사 날짜',
-    `time_slot`  ENUM ('아침','점심','저녁','간식') NOT NULL COMMENT '시간대',
+    `time_slot`  ENUM ('아침','점심','저녁') NOT NULL COMMENT '시간대',
     `photo_url`  VARCHAR(255)               NULL COMMENT '음식 사진 URL',
     `memo`       VARCHAR(255)               NULL COMMENT '메모',
     `created_at` DATETIME                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -432,18 +432,4 @@ VALUES
 
 select * from users where id = 8;
 
-select * from meals;
-
-select * from meal_foods;
-
-select * from daily_nutrient_summary;
-
-select * from disease_nutrient_guidelines;
-
-select * from nutrients;
-
-
-
-
-
-
+select * from meals where id = ;

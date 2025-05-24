@@ -31,7 +31,8 @@ public class UserDto {
     private String familyCode;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    // getAllMembersOfMyGroups 메서드를 위한 필드
+    private String groupName;
 
 
 

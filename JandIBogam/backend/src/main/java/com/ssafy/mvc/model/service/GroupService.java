@@ -19,4 +19,6 @@ public interface GroupService {
     String getGroupCode(int groupId);
 
     GroupDto detailGroup(int groupId);
+
+    List<UserDto> getAllMyGroupMembers(int userId);
 }

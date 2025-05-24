@@ -165,7 +165,7 @@ public class GroupController {
         return ResponseEntity.ok(Collections.singletonMap("code", code));
     }
 
-//    그룹 상세조회
+    //    그룹 상세조회
     @GetMapping("/{groupId}")
     public ResponseEntity<?> detaulGroup(@PathVariable int groupId) {
 
@@ -186,6 +186,19 @@ public class GroupController {
 
     }
 
+//    서비스에서 사용자가 가입한 그룹들의 맴버 조회
+    @GetMapping("/my/members")
+    public ResponseEntity<?> getAllMyGroupMembers() {
+        try {
+            int userId = jwtTokenProvider.extractUserId(request);
+
+            List<UserDto> members = groupService.getAllMyGroupMembers(userId);
+
+            return ResponseEntity.status(HttpStatus.OK).body(members);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT 인증 실패: " + e.getMessage());
+        }
+    }
 }
 
 

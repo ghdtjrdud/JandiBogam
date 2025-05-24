@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.ssafy.mvc.model.dao.FoodNutrientDao;
+import com.ssafy.mvc.model.dao.MealFoodDao;
 import com.ssafy.mvc.model.dto.FoodNutrientDto;
 import com.ssafy.mvc.model.dto.NutrientDto;
 import com.ssafy.mvc.model.dto.NutrientIdNameDto;
@@ -33,15 +34,17 @@ public class MealServiceImpl implements MealService {
     private final NutrientDao nutrientDao;
     private final FoodNutrientDao foodNutrientDao;
     private final Map<String, Integer> nutrientNameIdMap = new ConcurrentHashMap<>();
+    private final MealFoodDao mealFoodDao;
 
     @Autowired
     public MealServiceImpl(MealDao mealDao,
                            MealNutrientService mealNutrientService,
-                           NutrientDao nutrientDao, FoodNutrientDao foodNutrientDao) {
+                           NutrientDao nutrientDao, FoodNutrientDao foodNutrientDao, MealFoodDao mealFoodDao) {
         this.mealDao = mealDao;
         this.mealNutrientService = mealNutrientService;
         this.nutrientDao = nutrientDao;
         this.foodNutrientDao = foodNutrientDao;
+        this.mealFoodDao = mealFoodDao;
     }
 
     @PostConstruct
@@ -158,6 +161,9 @@ public class MealServiceImpl implements MealService {
     public boolean deleteMeal(int id, int userId) {
         MealDto meal = mealDao.selectById(id);
         if (meal == null) return false;
+
+        // 1. meal_foods에서 먼저 삭제
+        mealFoodDao.deleteByMealId(id);
 
         int result = mealDao.deleteMeal(id, userId);
         if (result > 0) {
