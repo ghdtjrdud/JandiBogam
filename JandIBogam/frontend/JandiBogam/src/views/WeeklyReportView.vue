@@ -99,7 +99,7 @@
         <div class="bg-green-50 rounded-lg shadow-md p-10 mb-8 text-center">
           <div class="text-5xl mb-3">
             <span v-if="healthScore >= 80">😊</span>
-            <span v-else-if="healthScore < 40">😔</span>
+            <span v-else-if="healthScore < 50">😔</span>
             <span v-else>😐</span>
           </div>
           <h2 class="text-4xl font-bold text-gray-800 mb-3">{{ healthScore }}점</h2>

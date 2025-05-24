@@ -51,7 +51,7 @@
           :class="[
             'px-5 py-2 rounded-full transition-colors duration-200 text-lg',
             $route.path.startsWith('/medication')
-              ? 'text-[#4CAF50] font-medium'
+              ? 'bg-[#e7f1e9] text-[#4CAF50] font-medium relative'
               : 'text-gray-600 hover:text-[#4CAF50]'
           ]"
         >

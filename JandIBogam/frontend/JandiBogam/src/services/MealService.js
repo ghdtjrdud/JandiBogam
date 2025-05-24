@@ -15,11 +15,12 @@ const MealService = {
     return apiClient.post('/meals/with-search', payload)
   },
 
-  // createMealWithFoodSearch - 동일한 로직 사용
+  // createMealWithFoodSearch
   async createMealWithFoodSearch(mealData) {
     return this.createMeal(mealData)
   },
 
+  // 식단 상세 조회
   async getMealById(mealId) {
     return apiClient.get(`/meals/${mealId}`)
   },

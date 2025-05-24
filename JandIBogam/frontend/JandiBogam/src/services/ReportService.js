@@ -1,7 +1,7 @@
 import apiClient from './api'
 
 const ReportService = {
-  //ai 호출임시 비활성화
+  //ai 호출임시 비활성화 -> false로 바꿔주면 됨
   AI_ENABLED: true,
 
   // 완전한 주간 리포트 조회 (건강 분석 + AI 추천)

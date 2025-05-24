@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
     <!-- Main Content - 대시보드와 동일한 레이아웃 적용 -->
-    <main class="max-w-3xl mx-auto px-4 py-8">
+    <main class="w-full max-w-[1024px] px-8 mx-auto py-10">
       <!--<main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">-->
       <div class="text-center mb-6 lg:mb-8">
         <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">식단 기록하기</h1>

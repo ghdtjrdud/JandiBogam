@@ -1,12 +1,9 @@
-<!-- 로그인 하기전에는 헤더가 안보이게 -->
 <template>
   <div>
     <router-view v-if="isAuthPage" />
-    <div v-else class="min-h-screen w-full">
-      <Header />
-      <!-- container 클래스 제거하고 각 페이지에서 개별 설정하도록 변경 -->
+    <BaseLayout v-else>
       <router-view />
-    </div>
+    </BaseLayout>
   </div>
 </template>
 
@@ -15,7 +12,8 @@ import { computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import Header from './components/common/Header.vue'
+import BaseLayout from './components/common/BaseLayout.vue'
+import { onMounted } from 'vue'
 
 const route = useRoute() // 반응형
 const router = useRouter()
@@ -54,10 +52,13 @@ const handleLogin = async () => {
     toast.error('로그인 중 오류가 발생했습니다')
   }
 }
+
+onMounted(()=>{
+  document.documentElement.setAttribute('data-theme','diningbom')
+})
 </script>
 
 <style>
-/* 전역 스타일 */
 body {
   margin: 0;
   padding: 0;
@@ -69,11 +70,10 @@ body {
   overflow-x: hidden;
 }
 
-/* 모든 container 클래스의 제약 제거 */
-.container {
-  max-width: 100% !important;
-  width: 100% !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+/* container 관련 스타일 제거하거나 특정 클래스로 변경 */
+.full-width-container {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
 }
 </style>
