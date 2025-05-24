@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -80,4 +82,84 @@ public class ReportController {
         WeeklyReportDto dto = reportService.generateReport(userId, startDate, endDate);
         return ResponseEntity.ok(dto);
     }
+
+    // AI 식단 추천만 조회 (텍스트 형태)
+    @GetMapping("/weekly/ai-recommendation")
+    public ResponseEntity<?> getAiDietRecommendation(
+            HttpServletRequest request,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        int userId = jwtTokenProvider.extractUserId(request);
+
+        // 기간이 지정되지 않으면 지난주로 설정
+        if (startDate == null || endDate == null) {
+            LocalDate today = LocalDate.now();
+            endDate = today.minusDays(today.getDayOfWeek().getValue()); // 지난 주 일요일
+            startDate = endDate.minusDays(6); // 지난 주 월요일
+        }
+
+        try {
+            String recommendation = reportService.generateDietRecommendation(userId, startDate, endDate);
+            return ResponseEntity.ok(Map.of(
+                    "recommendation", recommendation,
+                    "period", Map.of("start", startDate, "end", endDate),
+                    "generatedAt", LocalDate.now()
+            ));
+        } catch (Exception e) {
+            System.err.println("AI 추천 생성 실패: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "AI 추천 생성 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
+    // 완전한 주간 리포트 조회 (건강 분석 + AI 추천)
+    @GetMapping("/weekly/complete")
+    public ResponseEntity<?> getCompleteWeeklyReport(
+            HttpServletRequest request,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        int userId = jwtTokenProvider.extractUserId(request);
+
+        if (date == null) {
+            date = LocalDate.now();
+        }
+
+        try {
+            // 1. 기본 리포트 조회/생성
+            WeeklyReportDto report = reportService.getWeeklyReportByDate(userId, date);
+            if (report == null) {
+                LocalDate endDate = date;
+                LocalDate startDate = endDate.minusDays(6);
+                report = reportService.generateReport(userId, startDate, endDate);
+            }
+
+            // 2. AI 추천 별도 생성
+            String aiRecommendation = null;
+            try {
+                aiRecommendation = reportService.generateDietRecommendation(
+                        userId, report.getStartDate(), report.getEndDate());
+            } catch (Exception aiError) {
+                System.err.println("AI 추천 생성 실패 (리포트는 정상): " + aiError.getMessage());
+                // AI 실패해도 기본 리포트는 반환
+            }
+
+            // 3. 통합 응답 생성
+            Map<String, Object> completeReport = new HashMap<>();
+            completeReport.put("healthAnalysis", report);
+            completeReport.put("aiRecommendation", aiRecommendation);
+            completeReport.put("generatedAt", LocalDate.now());
+
+            return ResponseEntity.ok(completeReport);
+
+        } catch (Exception e) {
+            System.err.println("완전한 리포트 생성 실패: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "리포트 생성 중 오류가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
+
 }

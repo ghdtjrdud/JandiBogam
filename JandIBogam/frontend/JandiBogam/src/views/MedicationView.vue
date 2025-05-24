@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
-    <main class="max-w-full w-full mx-auto px-8 py-6" style="max-width: calc(100% - 32px)">
+    <main class="max-w-3xl mx-auto px-4 py-8">
       <div class="text-center mb-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">복약 관리</h1>
         <p class="text-gray-600">내 복약 기록을 확인하고 관리하세요</p>

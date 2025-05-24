@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-brand-lightbg">
-    <main class="max-w-3xl mx-auto px-4 py-8">
+    <!-- Main Content - 대시보드와 동일한 레이아웃 적용 -->
+    <main class="w-full max-w-[1024px] px-8 mx-auto py-10">
       <!-- Title -->
       <div class="mb-8">
         <h2 class="text-3xl font-bold text-gray-800">식단 기록</h2>
@@ -113,10 +114,17 @@
                   <div class="text-lg font-medium text-gray-800 mb-2">
                     {{ meal.foods }}
                   </div>
-                  <div class="text-sm text-gray-500">
-                    <span v-if="meal.memo"> 메모: {{ meal.memo }} </span>
-                    <span v-else-if="meal.hasPhoto" class="flex items-center gap-1"> 📷 사진 </span>
+
+                  <!-- Meal Details -->
+                  <div class="text-sm text-gray-500 flex flex-col gap-2">
+                    <span v-if="meal.hasPhoto" class="flex items-center gap-1">
+                      📷 사진
+                    </span>
+                    <span v-if="meal.memo">
+                      메모: {{ meal.memo }}
+                    </span>
                   </div>
+
                 </div>
 
                 <!-- Action Buttons -->

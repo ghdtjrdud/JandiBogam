@@ -179,13 +179,16 @@ CREATE TABLE `user_tips`
 -- 13. 주간 건강 리포트 테이블
 CREATE TABLE `weekly_reports`
 (
-    `id`            INT           NOT NULL AUTO_INCREMENT,
-    `user_id`       INT           NOT NULL COMMENT '사용자 ID',
-    `start_date`    DATE          NOT NULL COMMENT '시작 날짜',
-    `end_date`      DATE          NOT NULL COMMENT '종료 날짜',
-    `meal_count`    INT           NOT NULL DEFAULT 0 COMMENT '식사 횟수',
-    `health_score`  INT           NULL COMMENT '건강 점수',
-    `created_at`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id`                INT           NOT NULL AUTO_INCREMENT,
+    `user_id`           INT           NOT NULL COMMENT '사용자 ID',
+    `start_date`        DATE          NOT NULL COMMENT '시작 날짜',
+    `end_date`          DATE          NOT NULL COMMENT '종료 날짜',
+    `meal_count`        INT           NOT NULL DEFAULT 0 COMMENT '식사 횟수',
+    `health_score`      INT           NULL COMMENT '건강 점수',
+    `ai_recommendation` TEXT          COMMENT 'AI 식단 추천 내용',
+    `ai_generated_at`   DATETIME      NULL COMMENT 'AI 추천 생성 시간',
+    `health_tips`       DATETIME      COMMENT 'AI 개인화 건강 조언',
+    `created_at`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX (`user_id`, `start_date`, `end_date`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -430,6 +433,4 @@ VALUES
 
 
 
-select * from users where id = 8;
-
-select * from meals where id = ;
+select * from users;

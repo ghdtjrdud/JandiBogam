@@ -8,6 +8,7 @@ import com.ssafy.mvc.security.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/meals")
 public class MealController {
-
 
     private final MealDao mealDao;
     private final MealNutrientService mealNutrientService;
@@ -79,10 +79,17 @@ public class MealController {
 
     //조회 - 상세
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMeal(@PathVariable int id) {
-        MealDto mealDto = mealService.getMeal(id);
-        return (mealDto != null) ? ResponseEntity.ok(mealDto) :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Meal not found");
+    public ResponseEntity<?> getMeal(@PathVariable int id, HttpServletRequest request){
+        try{
+            int userId = jwtTokenProvider.extractUserId(request);
+            MealDto mealDto = mealService.getMeal(id);
+            return (mealDto != null) ? ResponseEntity.ok(mealDto) :
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).body("Meal not found");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("식단 조회 실패: " + e.getMessage());
+        }
     }
 
     //조회 - 필터링

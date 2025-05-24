@@ -21,6 +21,10 @@ const router = createRouter({
       redirect: '/dashboard',
     },
     {
+      path: '/',
+      redirect: '/dashboard',
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: HomeView,
@@ -85,8 +89,31 @@ const router = createRouter({
       path: '/report',
       name: 'WeeklyReport',
       component: WeeklyReportView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, title: '주간 건강 리포트' },
     },
+    {
+      path: '/reports',
+      redirect: '/report',
+    },
+    {
+      path: '/report/weekly',
+      name: 'WeeklyReportWeekly',
+      component: WeeklyReportView,
+      meta: {
+        requiresAuth: true,
+        title: '주간 건강 리포트',
+      },
+    },
+    {
+      path: '/report/:date',
+      name: 'WeeklyReportByDate',
+      component: WeeklyReportView,
+      meta: {
+        requiresAuth: true,
+        title: '주간 건강 리포트',
+      },
+    },
+
     {
       path: '/find-credentials',
       name: 'FindCredentials',
@@ -103,6 +130,11 @@ const router = createRouter({
       name: 'GroupDetail',
       component: GroupDetailView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      redirect: '/dashboard', // 존재하지 않는 경로는 대시보드로 리다이렉트
     },
   ],
 })
