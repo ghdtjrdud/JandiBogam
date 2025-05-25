@@ -136,6 +136,12 @@ const router = createRouter({
       name: 'NotFound',
       redirect: '/dashboard', // 존재하지 않는 경로는 대시보드로 리다이렉트
     },
+    {
+      path: '/meal/:id/edit',
+      name: 'MealEdit',
+      component: MealEditView, // ← 수정 폼 컴포넌트
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

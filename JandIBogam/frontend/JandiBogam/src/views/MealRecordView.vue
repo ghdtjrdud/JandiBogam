@@ -268,8 +268,26 @@ import { useToast } from 'vue-toastification'
 import MealService from '@/services/MealService'
 import FileService from '@/services/FileService'
 
+function getMyUserId() {
+  // localStorage에서 userId 직접 꺼내기 (문자열일 수 있으므로 숫자로 변환)
+  const userId = localStorage.getItem('userId')
+  if (userId && !isNaN(userId)) return Number(userId)
+
+  // user 객체에서 꺼내는 경우 (예비용)
+  const userStr = localStorage.getItem('user')
+  if (userStr) {
+    try {
+      const userObj = JSON.parse(userStr)
+      if (userObj.id && !isNaN(userObj.id)) return Number(userObj.id)
+    } catch (e) {
+      console.error('user 파싱 실패:', e)
+    }
+  }
+  return null
+}
+
 const router = useRouter()
-const authStore = useAuthStore()
+// const authStore = useAuthStore()
 const toast = useToast()
 
 // Form data
@@ -588,6 +606,8 @@ const saveMealRecord = async () => {
 
     console.log('식단 데이터 저장 시작...', mealData)
     const response = await MealService.createMealWithFoodSearch(mealData)
+
+    const myUserId = getMyUserId()
 
     console.log('식단 저장 성공:', response.data)
 

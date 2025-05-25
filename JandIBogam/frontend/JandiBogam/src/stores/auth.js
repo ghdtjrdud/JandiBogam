@@ -28,6 +28,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = user
       this.token = token
       localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('userId', user?.id ?? '') // ✅ 추가
       localStorage.setItem('accessToken', token)
     },
 
@@ -48,9 +49,10 @@ export const useAuthStore = defineStore('auth', {
         this.user = user
         this.token = accessToken
 
-        // ✅ localStorage 저장
+        // ✅ localStorage 저장 (userId 추가)
         localStorage.setItem('accessToken', accessToken)
         localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('userId', user?.id ?? '') // ✅ 추가
 
         return { success: true }
       } catch (error) {
@@ -73,6 +75,7 @@ export const useAuthStore = defineStore('auth', {
         this.token = null
         localStorage.removeItem('accessToken')
         localStorage.removeItem('user')
+        localStorage.removeItem('userId') // ✅ 추가
 
         return { success: false, message: errorMessage }
       } finally {
@@ -133,6 +136,10 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
         this.token = null
         this.loading = false
+        // ✅ 모든 인증 정보 삭제
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('user')
+        localStorage.removeItem('userId')
       }
     },
 
@@ -192,6 +199,7 @@ export const useAuthStore = defineStore('auth', {
         if (this.user && this.user.id === userId) {
           this.user = response.data
           localStorage.setItem('user', JSON.stringify(response.data))
+          localStorage.setItem('userId', response.data.id ?? '') // ✅ 추가
         }
 
         return true
@@ -237,6 +245,10 @@ export const useAuthStore = defineStore('auth', {
         try {
           this.token = token
           this.user = JSON.parse(userRaw)
+          // ✅ 복원 시에도 userId 보장
+          if (this.user && this.user.id) {
+            localStorage.setItem('userId', this.user.id)
+          }
         } catch (e) {
           console.warn('로컬스토리지의 user 파싱 실패:', userRaw, e)
           this.user = null
@@ -244,11 +256,13 @@ export const useAuthStore = defineStore('auth', {
           // 파싱 실패 시 로컬스토리지 정리
           localStorage.removeItem('user')
           localStorage.removeItem('accessToken')
+          localStorage.removeItem('userId')
           localStorage.removeItem('refreshToken')
         }
       } else {
         this.token = null
         this.user = null
+        localStorage.removeItem('userId')
       }
 
       this.authLoaded = true

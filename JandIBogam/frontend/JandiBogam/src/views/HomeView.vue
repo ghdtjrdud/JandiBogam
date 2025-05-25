@@ -165,12 +165,13 @@ const goToMealList = (memberId) => {
 const goToPage = (page) => {
   console.log('페이지 이동:', page)
 
-  const myUserId = getMyUserId()
+  const myUserId = Number(getMyUserId())
   console.log('현재 사용자 ID:', myUserId)
 
   switch (page) {
     case 'meal':
-      if (!myUserId) {
+      // userId가 유효하지 않으면 로그인으로 보냄
+      if (!myUserId || isNaN(myUserId) || myUserId <= 0) {
         alert('로그인 정보가 없습니다. 다시 로그인해주세요.')
         router.push('/login')
         return

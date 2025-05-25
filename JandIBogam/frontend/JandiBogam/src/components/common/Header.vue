@@ -19,7 +19,7 @@
             'px-5 py-2 rounded-full transition-colors duration-200 text-lg',
             $route.path === '/dashboard'
               ? 'bg-[#e7f1e9] text-[#4CAF50] font-medium relative'
-              : 'text-gray-600 hover:text-[#4CAF50]'
+              : 'text-gray-600 hover:text-[#4CAF50]',
           ]"
         >
           홈
@@ -46,7 +46,6 @@
           식단 관리
           <span
             v-if="$route.path.startsWith('/meals')"
-            v-if="$route.path.startsWith('/meals')"
             class="absolute bottom-[-4px] left-0 w-full h-0.5 bg-[#4CAF50]"
           ></span>
         </router-link>
@@ -63,7 +62,6 @@
         >
           복약 관리
           <span
-            v-if="$route.path.startsWith('/medication')"
             v-if="$route.path.startsWith('/medication')"
             class="absolute bottom-[-4px] left-0 w-full h-0.5 bg-[#4CAF50]"
           ></span>
@@ -82,7 +80,6 @@
           건강 리포트
           <span
             v-if="$route.path.startsWith('/report')"
-            v-if="$route.path.startsWith('/report')"
             class="absolute bottom-[-4px] left-0 w-full h-0.5 bg-[#4CAF50]"
           ></span>
         </router-link>
@@ -100,18 +97,15 @@
           마이페이지
           <span
             v-if="$route.path.startsWith('/mypage')"
-            v-if="$route.path.startsWith('/mypage')"
             class="absolute bottom-[-4px] left-0 w-full h-0.5 bg-[#4CAF50]"
           ></span>
         </router-link>
 
         <!-- 사용자 정보 및 로그아웃 -->
         <div class="flex items-center gap-6 ml-4">
-        <div class="flex items-center gap-6 ml-4">
           <span class="text-gray-700 font-bold text-lg">{{ userName }} 님</span>
           <button
             @click="logout"
-            class="text-sm text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full shadow transition duration-200"
             class="text-sm text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full shadow transition duration-200"
           >
             로그아웃
