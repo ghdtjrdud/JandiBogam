@@ -117,31 +117,16 @@
 
                   <!-- Meal Details -->
                   <div class="text-sm text-gray-500 flex flex-col gap-2">
-                    <span v-if="meal.hasPhoto" class="flex items-center gap-1">
-                      📷 사진
-                    </span>
-                    <span v-if="meal.memo">
-                      메모: {{ meal.memo }}
-                    </span>
+                    <span v-if="meal.hasPhoto" class="flex items-center gap-1"> 📷 사진 </span>
+                    <span v-if="meal.memo"> 메모: {{ meal.memo }} </span>
                   </div>
-
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex gap-2">
-                  <button
-                    @click="viewMealDetails(meal.id)"
-                    class="px-5 py-2 bg-green-50 text-green-600 border border-green-200 rounded-2xl hover:bg-green-100 transition-colors duration-200 font-medium"
-                  >
-                    상세보기
-                  </button>
-                  <button
-                    v-if="isMyMealList"
-                    @click="confirmDelete(meal.id)"
-                    class="btn btn-error btn-sm text-white bg-red-500 px-3 py-1 rounded"
-                  >
-                    삭제
-                  </button>
+                  <button @click="viewMealDetails(meal.id)">상세보기</button>
+                  <button v-if="isMyMealList" @click="goToEditMeal(meal.id)">수정</button>
+                  <button v-if="isMyMealList" @click="confirmDelete(meal.id)">삭제</button>
                 </div>
               </div>
             </div>
@@ -157,6 +142,10 @@ import { useRouter, useRoute } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import { useToast } from 'vue-toastification'
 import MealService from '@/services/MealService'
+
+function goToEditMeal(mealId) {
+  router.push(`/meal/${mealId}/edit`)
+}
 
 const router = useRouter()
 const route = useRoute()

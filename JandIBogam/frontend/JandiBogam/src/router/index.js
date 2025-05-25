@@ -12,6 +12,7 @@ import WeeklyReportView from '@/views/WeeklyReportView.vue'
 import FindCredentialsView from '../views/FindCredentialsView.vue'
 import MyPageView from '../views/MyPageView.vue'
 import GroupDetailView from '@/views/GroupDetailView.vue'
+import MealEditView from '@/views/MealEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

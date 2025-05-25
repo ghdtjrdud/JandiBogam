@@ -393,7 +393,12 @@ const formatDate = (dateString) => {
     weekday: 'short',
   })
 }
-const goBack = () => router.back()
+const goBack = () => {
+  // localStorage에서 user 객체 꺼내서 id 추출
+  const userObj = JSON.parse(localStorage.getItem('user') || '{}')
+  const myUserId = userObj.id ?? ''
+  router.push(`/meals/${myUserId}`)
+}
 
 // 댓글 관련 함수
 const addComment = async () => {
