@@ -433,4 +433,4 @@ VALUES
 
 
 
-select * from users;
+select * from meal_comments where meal_id = 36;

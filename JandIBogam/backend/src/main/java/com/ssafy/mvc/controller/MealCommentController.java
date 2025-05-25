@@ -3,6 +3,8 @@ package com.ssafy.mvc.controller;
 import com.ssafy.mvc.model.dao.MealCommentDao;
 import com.ssafy.mvc.model.dto.MealCommentDto;
 import com.ssafy.mvc.model.service.MealCommentService;
+import com.ssafy.mvc.security.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,11 @@ public class MealCommentController {
     private final MealCommentService mealCommentService;
 
     @Autowired
+    private HttpServletRequest request;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     public MealCommentController(MealCommentService mealCommentService) {
         this.mealCommentService = mealCommentService;
     }
@@ -25,6 +32,9 @@ public class MealCommentController {
     @PostMapping("/{mealId}/comments")
     public ResponseEntity<?> writeComment(@PathVariable int mealId, @RequestBody MealCommentDto commentDto) {
 
+        int userId = jwtTokenProvider.extractUserId(request);
+
+        commentDto.setUserId(userId);
         commentDto.setMealId(mealId);
         int result = mealCommentService.writeComment(commentDto);
 

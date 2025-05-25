@@ -55,61 +55,84 @@ public class MealServiceImpl implements MealService {
         }
     }
 
-    // 1. 식단 생성 (핵심 로직)
+    // 1. 식단 생성 (핵심 로직) - 개선된 버전
     @Override
     public MealDto createMeal(MealDto mealDto) {
         try {
             logger.info("식단 등록 시작: 사용자={}, 날짜={}, 시간대={}",
                     mealDto.getUserId(), mealDto.getEatDate(), mealDto.getTimeSlot());
+
             int result = mealDao.insertMeal(mealDto);
             if (result <= 0) {
+                logger.error("식단 기본 정보 저장 실패");
                 return null;
             }
 
             // 음식 이름 → ID 변환 로직
             if (mealDto.getFoodNames() != null && !mealDto.getFoodNames().isEmpty()) {
                 List<Integer> foodIds = new ArrayList<>();
+                List<String> notFoundFoods = new ArrayList<>();
 
                 for (String foodName : mealDto.getFoodNames()) {
-                    //음식 이름으로 DB에서 검색
+                    // 음식 이름으로 DB에서 검색
                     List<FoodNutrientDto> foundFoods = mealNutrientService.searchFoodNutrients(foodName);
-                    //검색 결과 있으면 첫번째 결과 id 사용 -> 유사 음식 처리하려고
+
                     if (!foundFoods.isEmpty()) {
                         foodIds.add(foundFoods.get(0).getId());
+                        logger.debug("음식 검색 성공: {} -> ID: {}", foodName, foundFoods.get(0).getId());
+                    } else {
+                        notFoundFoods.add(foodName);
+                        logger.warn("음식 검색 실패: {}", foodName);
                     }
                 }
+
                 if (!foodIds.isEmpty()) {
                     mealDao.insertMealFoods(mealDto.getId(), foodIds);
-                    logger.debug("식단-음식 연결 정보 저장 완료: 식단ID={}, 음식 수={}",
+                    logger.info("식단-음식 연결 정보 저장 완료: 식단ID={}, 저장된 음식 수={}",
                             mealDto.getId(), foodIds.size());
+                }
+
+                // 검색 실패한 음식이 있으면 경고 로그
+                if (!notFoundFoods.isEmpty()) {
+                    logger.error("다음 음식들을 데이터베이스에서 찾을 수 없습니다: {}", notFoundFoods);
                 }
             }
 
+            // 영양소 계산
             mealNutrientService.calculateDailyNutrients(mealDto.getUserId(), mealDto.getEatDate());
-            return mealDto;
+
+            return getMeal(mealDto.getId()); // 저장된 데이터를 다시 조회하여 반환
         } catch (Exception e) {
-            logger.error("식단 생성 중 오류 발생",e);
+            logger.error("식단 생성 중 오류 발생", e);
             return null;
         }
     }
 
-    // 2. 식단 조회
+    // 2. 식단 조회 (개선된 버전)
     @Override
     public MealDto getMeal(int id) {
         MealDto mealDto = mealDao.selectById(id);
         if (mealDto != null) {
             // 음식 ID를 이름으로 변환
-            List<String> foodNames = mealDao.selectMealFoodById(id).stream()
-                    .map(foodId -> {
-                        FoodNutrientDto food = foodNutrientDao.selectById(foodId);
-                        return food != null ? food.getFoodName() : "알 수 없는 음식";
-                    })
-                    .collect(Collectors.toList());
+            List<Integer> foodIds = mealDao.selectMealFoodById(id);
+            List<String> foodNames = new ArrayList<>();
+
+            for (Integer foodId : foodIds) {
+                FoodNutrientDto food = foodNutrientDao.selectById(foodId);
+                if (food != null) {
+                    foodNames.add(food.getFoodName());
+                    logger.debug("음식 ID {} -> 이름: {}", foodId, food.getFoodName());
+                } else {
+                    logger.warn("음식 ID {}에 해당하는 데이터를 찾을 수 없습니다", foodId);
+                    foodNames.add("알 수 없는 음식 (ID: " + foodId + ")");
+                }
+            }
+
             mealDto.setFoodNames(foodNames);
+            logger.info("식단 조회 완료: ID={}, 음식 수={}", id, foodNames.size());
         }
         return mealDto;
     }
-
 
     // 3. 식단 필터 조회
     @Override
@@ -117,54 +140,155 @@ public class MealServiceImpl implements MealService {
         return mealDao.selectMealsByFilter(userId, startDate, endDate, timeSlot);
     }
 
-    // 4. 식단 수정
+    // 4. 식단 수정 - 개선된 버전
     @Override
     public MealDto updateMeal(int id, int userId, MealDto mealDto) {
-        MealDto existingMeal = mealDao.selectById(id);
-        if (existingMeal == null || existingMeal.getUserId() != userId) {
-            return null;
-        }
+        try {
+            logger.info("식단 수정 시작: ID={}, 사용자={}, 전달받은 음식 개수={}",
+                    id, userId, mealDto.getFoodNames() != null ? mealDto.getFoodNames().size() : 0);
 
-        mealDto.setId(id);
-        mealDto.setUserId(userId);
+            // 전달받은 foodNames 로그 출력
+            if (mealDto.getFoodNames() != null) {
+                logger.info("전달받은 음식 목록: {}", mealDto.getFoodNames());
+            }
 
-        int r1 = mealDao.updateMeal(mealDto);
-        if (r1 > 0) {
-            mealDao.deleteMealFoods(id);
+            MealDto existingMeal = mealDao.selectById(id);
+            if (existingMeal == null || existingMeal.getUserId() != userId) {
+                logger.error("식단을 찾을 수 없거나 권한이 없습니다: ID={}, 사용자={}", id, userId);
+                return null;
+            }
 
+            // 기존 날짜 저장 (영양소 재계산용)
+            LocalDate originalDate = existingMeal.getEatDate();
+
+            mealDto.setId(id);
+            mealDto.setUserId(userId);
+
+            // 식단 기본 정보 업데이트
+            int updateResult = mealDao.updateMeal(mealDto);
+            if (updateResult <= 0) {
+                logger.error("식단 기본 정보 업데이트 실패: ID={}", id);
+                return null;
+            }
+            logger.info("식단 기본 정보 업데이트 완료: ID={}", id);
+
+            // 기존 meal_foods 삭제
+            int deleteResult = mealDao.deleteMealFoods(id);
+            logger.info("기존 음식 연결 정보 삭제: ID={}, 삭제된 행 수={}", id, deleteResult);
+
+            // 새로운 음식 정보 처리 - 개선된 로직
             if (mealDto.getFoodNames() != null && !mealDto.getFoodNames().isEmpty()) {
+                logger.info("새로운 음식 정보 처리 시작: 음식 개수={}", mealDto.getFoodNames().size());
+
                 List<Integer> foodIds = new ArrayList<>();
-                for(String foodName : mealDto.getFoodNames()){
-                    List<FoodNutrientDto> foundFoods = mealNutrientService.searchFoodNutrients(foodName);
-                    if(!foundFoods.isEmpty()){
-                        foodIds.add(foundFoods.get(0).getId());
-                    }else{
-                        logger.warn("음식 검색 실패: {}", foodName);
+                List<String> notFoundFoods = new ArrayList<>();
+                List<String> successFoods = new ArrayList<>();
+
+                for (String foodName : mealDto.getFoodNames()) {
+                    if (foodName == null || foodName.trim().isEmpty()) {
+                        logger.warn("빈 음식 이름이 전달됨, 건너뜀");
+                        continue;
+                    }
+
+                    String trimmedFoodName = foodName.trim();
+                    logger.debug("음식 검색 시도: '{}'", trimmedFoodName);
+
+                    try {
+                        List<FoodNutrientDto> foundFoods = mealNutrientService.searchFoodNutrients(trimmedFoodName);
+                        if (!foundFoods.isEmpty()) {
+                            foodIds.add(foundFoods.get(0).getId());
+                            successFoods.add(trimmedFoodName);
+                            logger.info("음식 검색 성공: '{}' -> ID: {}", trimmedFoodName, foundFoods.get(0).getId());
+                        } else {
+                            notFoundFoods.add(trimmedFoodName);
+                            logger.warn("음식 검색 실패 (결과 없음): '{}'", trimmedFoodName);
+                        }
+                    } catch (Exception e) {
+                        logger.error("음식 검색 중 예외 발생: '{}', 오류: {}", trimmedFoodName, e.getMessage());
+                        notFoundFoods.add(trimmedFoodName);
                     }
                 }
-                if(!foodIds.isEmpty()) {
-                    mealDao.insertMealFoods(mealDto.getId(), foodIds);
+
+                // 검색된 음식이 있으면 저장
+                if (!foodIds.isEmpty()) {
+                    try {
+                        mealDao.insertMealFoods(id, foodIds);
+                        logger.info("식단-음식 연결 정보 저장 완료: 식단ID={}, 저장된 음식 수={}, 성공한 음식: {}",
+                                id, foodIds.size(), successFoods);
+                    } catch (Exception e) {
+                        logger.error("식단-음식 연결 정보 저장 실패: 식단ID={}, 오류: {}", id, e.getMessage(), e);
+                        throw e; // 트랜잭션 롤백을 위해 예외 재발생
+                    }
+                } else {
+                    logger.warn("저장할 유효한 음식이 없습니다: 식단ID={}, 전달받은 음식: {}", id, mealDto.getFoodNames());
                 }
+
+                // 검색 실패한 음식들이 있으면 로그로 알림
+                if (!notFoundFoods.isEmpty()) {
+                    logger.error("다음 음식들을 데이터베이스에서 찾을 수 없습니다: {}", notFoundFoods);
+                }
+            } else {
+                logger.info("수정할 음식 정보가 없습니다: 식단ID={}, foodNames={}", id, mealDto.getFoodNames());
             }
 
-            mealNutrientService.calculateDailyNutrients(mealDto.getUserId(), existingMeal.getEatDate());
-            if (!existingMeal.getEatDate().equals(mealDto.getEatDate())) {
-                mealNutrientService.calculateDailyNutrients(mealDto.getUserId(), mealDto.getEatDate());
+            // 영양소 계산 업데이트
+            try {
+                // 기존 날짜의 영양소 재계산
+                mealNutrientService.calculateDailyNutrients(userId, originalDate);
+                logger.info("기존 날짜 영양소 재계산 완료: {}", originalDate);
+
+                // 수정된 날짜가 다르면 새 날짜도 계산
+                if (!originalDate.equals(mealDto.getEatDate())) {
+                    mealNutrientService.calculateDailyNutrients(userId, mealDto.getEatDate());
+                    logger.info("새 날짜 영양소 계산 완료: {}", mealDto.getEatDate());
+                }
+            } catch (Exception e) {
+                logger.error("영양소 계산 중 오류 발생", e);
+                // 영양소 계산 실패는 식단 수정 자체를 실패시키지 않음
             }
-            return mealDao.selectById(mealDto.getId());
+
+            // 수정된 데이터 조회하여 반환
+            MealDto updatedMeal = getMeal(id);
+            logger.info("식단 수정 완료: ID={}, 최종 음식 수={}", id,
+                    updatedMeal != null && updatedMeal.getFoodNames() != null ? updatedMeal.getFoodNames().size() : 0);
+
+            return updatedMeal;
+
+        } catch (Exception e) {
+            logger.error("식단 수정 중 오류 발생: ID={}", id, e);
+            throw e; // 트랜잭션 롤백을 위해 예외 재발생
         }
-        return null;
     }
 
     // 5. 식단 삭제
     @Override
     @Transactional
     public boolean deleteMeal(int id, int userId) {
-        // 1. meal_foods에서 먼저 삭제
-        mealFoodDao.deleteByMealId(id);
+        try {
+            // 영양소 재계산을 위해 삭제 전 식단 정보 조회
+            MealDto existingMeal = mealDao.selectById(id);
 
-        int result = mealDao.deleteMeal(id, userId);
-        return result > 0;
+            // 1. meal_foods에서 먼저 삭제
+            mealFoodDao.deleteByMealId(id);
+
+            // 2. meals에서 삭제
+            int result = mealDao.deleteMeal(id, userId);
+
+            // 3. 성공적으로 삭제되었으면 영양소 재계산
+            if (result > 0 && existingMeal != null) {
+                try {
+                    mealNutrientService.calculateDailyNutrients(userId, existingMeal.getEatDate());
+                    logger.info("식단 삭제 후 영양소 재계산 완료: 날짜={}", existingMeal.getEatDate());
+                } catch (Exception e) {
+                    logger.error("식단 삭제 후 영양소 재계산 실패", e);
+                }
+            }
+
+            return result > 0;
+        } catch (Exception e) {
+            logger.error("식단 삭제 중 오류 발생: ID={}", id, e);
+            throw e;
+        }
     }
 
     // 6. 음식 검색 기반 식단 생성
