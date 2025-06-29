@@ -74,5 +74,8 @@
 - **노년층의 디지털 활용 능력 향상**: 고령자 친화적 UI/UX로 디지털 접근성 개선
 - **"한끼 건강 기록"이라는 작은 습관을 통한 삶의 질 향상**: 건강한 노년 생활 지원
 
+![image](https://github.com/user-attachments/assets/30a91e3f-4dbe-4ee9-b3af-182e2ecb0949)
+
+
 ## NotionLink
 https://www.notion.so/ssafy-jinhyeok/1ee7f669b13380b6aa6dc3c2a50bc56e?pvs=4
