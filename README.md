@@ -40,6 +40,8 @@
 <br><br>
 ## 3. ERD / API / 기획 문서
 ![image](https://github.com/user-attachments/assets/fd2c0efd-3062-4a65-85b3-d870aef33b72)
+![image](https://github.com/user-attachments/assets/18670251-fd8c-4082-9d72-97ba4cf669be)
+
 
 
 
