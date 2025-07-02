@@ -71,19 +71,20 @@
 
 ## 6. 핵심 기능 소개
 
-### 대시보드 요약
+### 1) 메인화면 및 식단/복약 관리
 <!-- 여기에 그림 추가: width="750px" -->
 ![image](https://github.com/user-attachments/assets/610a4186-1981-48c1-bdca-772841ba975f)
 
 
-### 주간 리포트 기능
-<!-- 여기에 그림 추가: width="750px" -->
+### 2) AI 맞춤형 통합 건강 관리 서비스
 ![image](https://github.com/user-attachments/assets/1fdf4ad5-a3e1-44c1-b50c-019b50edf07d)
 
 
-### 맞춤 식단 추천
-<!-- 여기에 그림 추가: width="750px" -->
+### 3) 가족(그룹) 연동 시스템
 ![image](https://github.com/user-attachments/assets/990c4f2d-c716-4515-9418-d23f42c7741c)
 
+
+
+**Fin**
 ---
 
