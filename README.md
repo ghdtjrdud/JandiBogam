@@ -15,8 +15,8 @@
 
 | 이름   | 역할                            | GitHub |
 |--------|----------------------------------|--------|
-| 홍석영 | BE & FE : 건강 데이터 처리, 리포트 분석, 그룹 코드 생성 및 관리 기능 구현 | [GitHub 프로필](https://github.com/사용자명) |
-| 유지은 | BE & FE : 사용자 테마 설정 UI, 그룹 관리 및 그룹원 목록 화면 구현 | [GitHub 프로필](https://github.com/팀원A) |
+| 홍석영 | BE & FE, 건강 데이터 처리, 리포트 분석, 그룹 코드 생성 및 관리 기능 구현 | [GitHub 프로필](https://github.com/ghdtjrdud) |
+| 유지은 | BE & FE, 사용자 테마 설정 UI, 그룹 관리 및 그룹원 목록 화면 구현 | [GitHub 프로필](https://github.com/팀원A) |
 
 
 
