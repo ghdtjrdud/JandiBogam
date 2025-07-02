@@ -47,7 +47,8 @@
 
 ### ✅ 대시보드 요약
 <!-- 여기에 그림 추가: width="750px" -->
-`<img src="![image (14)](https://github.com/user-attachments/assets/b976c36d-5643-4c3b-acb2-41e4cd037123)
+`<img src="![image](https://github.com/user-attachments/assets/30f0f0ea-b566-470a-802b-143c1f5f7a14)
+
 " width="750px" alt="대시보드" />`
 
 ### ✅ 주간 리포트 기능
