@@ -12,6 +12,15 @@
 | 플랫폼 | 웹(Web) 기반 서비스 |
 | 주요 기능 | 식단 기록, 복약 기록, 가족 연동, 주간 리포트, 맞춤형 식단 추천 |
 
+
+| 이름   | 역할                            | GitHub |
+|--------|----------------------------------|--------|
+| 홍석영 | BE & FE : 건강 데이터 처리, 리포트 분석, 그룹 코드 생성 및 관리 기능 구현 | [GitHub 프로필](https://github.com/사용자명) |
+| 유지은 | BE & FE : 사용자 테마 설정 UI, 그룹 관리 및 그룹원 목록 화면 구현 | [GitHub 프로필](https://github.com/팀원A) |
+
+
+
+
 ## 2. 기획 의도
 
 **다이닝봄**은 초고령사회로의 급속한 진입과 만성질환자 비율 증가에 대응하기 위해 기획된 건강관리 서비스입니다.  
@@ -23,6 +32,19 @@
 **사용자 친화적인 UI/UX와 큰 글씨**, **직관적인 화면 설계**를 통해 디지털 환경에 익숙하지 않은 고령자도 부담 없이 활용할 수 있도록 했습니다.  
 **다이닝봄**은 고령자의 자율성과 가족의 연계성을 동시에 강화하며, 일상 속 지속 가능한 건강 관리를 실현하고자 합니다.
 
+
+
+## 6. ERD / API / 기획 문서
+
+| 문서 | 링크 |
+|------|------|
+| ERD 다이어그램 | [📌 ERD 보기](https://www.erdcloud.com/d/your_link) |
+| API 명세서 | [📌 API 보기](https://documenter.getpostman.com/view/your_link) |
+| 기능 명세서 | [📌 기능 보기](https://docs.google.com/spreadsheets/d/your_link) |
+| 프로젝트 Notion | [📌 Notion 링크](https://www.notion.so/ssafy-jinhyeok/1ee7f669b13380b6aa6dc3c2a50bc56e?pvs=4) |
+
+
+
 ## 3. 기술 스택
 
 | 구분 | 사용 기술 |
@@ -31,6 +53,8 @@
 | **DB** | MySQL 8, MyBatis |
 | **프론트엔드** | Vue.js, Bootstrap |
 | **기타** | JWT 인증, MultipartFile 이미지 업로드 |
+
+
 
 ## 4. 주요 기능
 
@@ -42,6 +66,8 @@
 | 가족 연결 | 그룹 생성/참여/관리 |
 | 건강 관리 | 대시보드, 주간 리포트, 건강 팁 |
 | 식단 추천 | 질환 기반 추천, 주간 분석 기반 제안 |
+
+
 
 ## 5. 핵심 기능 스크린샷
 
@@ -57,31 +83,5 @@
 ### 맞춤 식단 추천
 <!-- 여기에 그림 추가: width="750px" -->
 `<img src="그림경로" width="750px" alt="식단추천" />`
-
-## 6. ERD / API / 기획 문서
-
-| 문서 | 링크 |
-|------|------|
-| ERD 다이어그램 | [📌 ERD 보기](https://www.erdcloud.com/d/your_link) |
-| API 명세서 | [📌 API 보기](https://documenter.getpostman.com/view/your_link) |
-| 기능 명세서 | [📌 기능 보기](https://docs.google.com/spreadsheets/d/your_link) |
-| 프로젝트 Notion | [📌 Notion 링크](https://www.notion.so/ssafy-jinhyeok/1ee7f669b13380b6aa6dc3c2a50bc56e?pvs=4) |
-
-## 7. 팀 소개
-
-| 이름 | 역할 | GitHub |
-|------|------|--------|
-| 홍석영 | 백엔드, 건강 데이터 처리, 리포트 분석 | [GitHub 프로필](https://github.com/사용자명) |
-| 팀원 A | 프론트엔드, UI 구현 | [GitHub 프로필](https://github.com/팀원A) |
-| 팀원 B | 백엔드, 사용자 인증 | [GitHub 프로필](https://github.com/팀원B) |
-
-## 8. 기대 효과
-
-- 고령자의 건강 자가관리 능력 향상
-- 가족의 모니터링 부담 경감
-- 맞춤형 식단으로 질환 관리
-- 노년층 디지털 활용 역량 강화
-- 일상 속 건강 습관 정착
-
 ---
 
