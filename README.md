@@ -39,13 +39,8 @@
 
 <br><br>
 ## 3. ERD / API / 기획 문서
+![image](https://github.com/user-attachments/assets/fd2c0efd-3062-4a65-85b3-d870aef33b72)
 
-| 문서 | 링크 |
-|------|------|
-| ERD 다이어그램 | [📌 ERD 보기](https://www.erdcloud.com/d/your_link) |
-| API 명세서 | [📌 API 보기](https://documenter.getpostman.com/view/your_link) |
-| 기능 명세서 | [📌 기능 보기](https://docs.google.com/spreadsheets/d/your_link) |
-| 프로젝트 Notion | [📌 Notion 링크](https://www.notion.so/ssafy-jinhyeok/1ee7f669b13380b6aa6dc3c2a50bc56e?pvs=4) |
 
 
 <br><br>
