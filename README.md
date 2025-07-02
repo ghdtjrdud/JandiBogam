@@ -1,6 +1,7 @@
 
+<img src="https://github.com/user-attachments/assets/921640d0-b819-4b93-a1f3-973d2f39c897"> 
 
-# <img src="https://github.com/user-attachments/assets/921640d0-b819-4b93-a1f3-973d2f39c897" width="40" height="40" style="vertical-align: middle;"> 다이닝봄 (Dining Bom)
+# 다이닝봄 (Dining Bom)
 
 고령자의 식사와 복약을 안전하게 관리하고, 가족과 함께 건강 상태를 체크할 수 있는 웹 서비스
 
