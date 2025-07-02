@@ -1,4 +1,5 @@
-<img src="https://github.com/your-username/your-repo/assets/e6792493-cc22-4ba5-a2ab-1ebe70ec4868" alt="DiningBom 로고" width="100"/>  
+<img src="![image](https://github.com/user-attachments/assets/f09b9e73-be4f-4a16-8243-d1180ad9b851)
+" alt="DiningBom 로고" width="100"/>  
 # 다이닝봄 (Dining Bom)
 
 
