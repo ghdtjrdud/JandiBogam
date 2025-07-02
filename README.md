@@ -1,7 +1,5 @@
 
-<img src="https://github.com/user-attachments/assets/6e4e4093-d08b-493e-9378-af94a4c4be0c" alt="다이닝봄 로고" width="120"/>
-
-다이닝봄 (Dining Bom)
+# 다이닝봄 (Dining Bom)
 
 
 
